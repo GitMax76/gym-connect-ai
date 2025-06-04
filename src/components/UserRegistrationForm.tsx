@@ -4,9 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Heart, Dumbbell, Activity } from 'lucide-react';
 
 interface UserRegistrationFormProps {
   onSubmit: (data: any) => void;
@@ -15,315 +15,262 @@ interface UserRegistrationFormProps {
 
 const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) => {
   const [formData, setFormData] = useState({
-    // Dati personali
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     password: '',
-    phone: '',
-    dateOfBirth: '',
-    
-    // Dati fisici
-    height: '',
+    age: '',
     weight: '',
-    
-    // Esperienza e obiettivi
+    height: '',
     fitnessLevel: '',
-    goals: [] as string[],
-    medicalConditions: '',
-    
-    // Disponibilità
-    preferredDays: [] as string[],
-    preferredTimes: '',
-    location: '',
+    goals: '',
+    availability: '',
     budget: '',
-    
-    // Preferenze
-    groupClassesInterest: false,
-    personalTrainingInterest: false,
-    gymOnly: false
+    location: '',
+    healthConditions: ''
   });
-
-  const handleGoalChange = (goal: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      goals: checked 
-        ? [...prev.goals, goal]
-        : prev.goals.filter(g => g !== goal)
-    }));
-  };
-
-  const handleDayChange = (day: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      preferredDays: checked 
-        ? [...prev.preferredDays, day]
-        : prev.preferredDays.filter(d => d !== day)
-    }));
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
   };
 
+  const fitnessGoals = [
+    { value: 'weight-loss', label: '🔥 Perdita di peso e tonificazione' },
+    { value: 'muscle-gain', label: '💪 Aumento massa muscolare' },
+    { value: 'endurance', label: '🏃‍♂️ Miglioramento resistenza' },
+    { value: 'strength', label: '🏋️‍♀️ Aumento forza e potenza' },
+    { value: 'flexibility', label: '🧘‍♀️ Flessibilità e mobilità' },
+    { value: 'rehabilitation', label: '🩺 Riabilitazione e recupero' },
+    { value: 'wellness', label: '✨ Benessere generale' }
+  ];
+
+  const fitnessLevels = [
+    { value: 'beginner', label: '🌱 Principiante - Nuovo al fitness' },
+    { value: 'intermediate', label: '💚 Intermedio - Qualche esperienza' },
+    { value: 'advanced', label: '🏆 Avanzato - Esperienza consolidata' },
+    { value: 'expert', label: '⭐ Esperto - Atleta/Competitivo' }
+  ];
+
   return (
-    <Card className="max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl text-center">Registrazione Utente</CardTitle>
-      </CardHeader>
-      
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Dati Personali */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-slate-900">Dati Personali</h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="firstName">Nome *</Label>
-                <Input
-                  id="firstName"
-                  value={formData.firstName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="lastName">Cognome *</Label>
-                <Input
-                  id="lastName"
-                  value={formData.lastName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="password">Password *</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="phone">Telefono</Label>
-                <Input
-                  id="phone"
-                  value={formData.phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="dateOfBirth">Data di Nascita</Label>
-                <Input
-                  id="dateOfBirth"
-                  type="date"
-                  value={formData.dateOfBirth}
-                  onChange={(e) => setFormData(prev => ({ ...prev, dateOfBirth: e.target.value }))}
-                />
-              </div>
-            </div>
+    <div className="max-w-4xl mx-auto">
+      {/* Header motivazionale */}
+      <div className="text-center mb-8">
+        <div className="flex items-center justify-center mb-4">
+          <Heart className="w-8 h-8 text-red-500 mr-2" />
+          <h1 className="text-3xl font-bold text-slate-900">Il Tuo Viaggio Fitness Inizia Qui</h1>
+          <Dumbbell className="w-8 h-8 text-green-600 ml-2" />
+        </div>
+        <p className="text-xl text-slate-600">
+          Raccontaci di te per creare il match perfetto con il tuo futuro istruttore
+        </p>
+      </div>
+
+      <Card className="shadow-2xl border-0">
+        <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b">
+          <div className="flex items-center justify-between">
+            <Button variant="ghost" onClick={onBack} className="p-2">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <CardTitle className="text-2xl text-center text-slate-900 flex items-center">
+              <Activity className="w-6 h-6 text-green-600 mr-2" />
+              Crea il Tuo Profilo Fitness
+            </CardTitle>
+            <div className="w-10"></div>
           </div>
+        </CardHeader>
+        
+        <CardContent className="p-8">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Sezione Informazioni Personali */}
+            <div className="bg-slate-50 p-6 rounded-xl">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                👤 Informazioni Personali
+              </h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <Label htmlFor="name">Nome Completo</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    required
+                    placeholder="Il tuo nome"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    required
+                    placeholder="la.tua@email.com"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                    required
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="age">Età</Label>
+                  <Input
+                    id="age"
+                    type="number"
+                    value={formData.age}
+                    onChange={(e) => setFormData(prev => ({ ...prev, age: e.target.value }))}
+                    placeholder="Es. 28"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+            </div>
 
-          {/* Dati Fisici */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-slate-900">Dati Fisici</h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="height">Altezza (cm)</Label>
-                <Input
-                  id="height"
-                  type="number"
-                  value={formData.height}
-                  onChange={(e) => setFormData(prev => ({ ...prev, height: e.target.value }))}
-                  placeholder="es. 175"
+            {/* Sezione Dati Fisici */}
+            <div className="bg-green-50 p-6 rounded-xl">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                📊 Dati Fisici & Salute
+              </h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                <div>
+                  <Label htmlFor="weight">Peso (kg)</Label>
+                  <Input
+                    id="weight"
+                    type="number"
+                    value={formData.weight}
+                    onChange={(e) => setFormData(prev => ({ ...prev, weight: e.target.value }))}
+                    placeholder="Es. 70"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="height">Altezza (cm)</Label>
+                  <Input
+                    id="height"
+                    type="number"
+                    value={formData.height}
+                    onChange={(e) => setFormData(prev => ({ ...prev, height: e.target.value }))}
+                    placeholder="Es. 175"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="fitnessLevel">Livello di Fitness</Label>
+                  <Select value={formData.fitnessLevel} onValueChange={(value) => setFormData(prev => ({ ...prev, fitnessLevel: value }))}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Seleziona il tuo livello" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fitnessLevels.map((level) => (
+                        <SelectItem key={level.value} value={level.value}>
+                          {level.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="mt-6">
+                <Label htmlFor="healthConditions">Condizioni di Salute o Infortuni Passati</Label>
+                <Textarea
+                  id="healthConditions"
+                  value={formData.healthConditions}
+                  onChange={(e) => setFormData(prev => ({ ...prev, healthConditions: e.target.value }))}
+                  placeholder="Es. Mal di schiena, problemi al ginocchio, allergie... (opzionale)"
+                  className="mt-1"
+                  rows={3}
                 />
               </div>
+            </div>
+
+            {/* Sezione Obiettivi Fitness */}
+            <div className="bg-blue-50 p-6 rounded-xl">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                🎯 I Tuoi Obiettivi Fitness
+              </h3>
               <div>
-                <Label htmlFor="weight">Peso (kg)</Label>
-                <Input
-                  id="weight"
-                  type="number"
-                  value={formData.weight}
-                  onChange={(e) => setFormData(prev => ({ ...prev, weight: e.target.value }))}
-                  placeholder="es. 70"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Esperienza e Obiettivi */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-slate-900">Esperienza e Obiettivi</h3>
-            
-            <div>
-              <Label htmlFor="fitnessLevel">Livello di Fitness</Label>
-              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, fitnessLevel: value }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleziona il tuo livello" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="beginner">Principiante</SelectItem>
-                  <SelectItem value="intermediate">Intermedio</SelectItem>
-                  <SelectItem value="advanced">Avanzato</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label>Obiettivi Principali</Label>
-              <div className="grid md:grid-cols-2 gap-2 mt-2">
-                {[
-                  'Dimagrimento',
-                  'Aumento massa muscolare',
-                  'Miglioramento resistenza',
-                  'Riabilitazione',
-                  'Tonificazione',
-                  'Preparazione atletica',
-                  'Benessere generale',
-                  'Riduzione stress'
-                ].map(goal => (
-                  <div key={goal} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={goal}
-                      checked={formData.goals.includes(goal)}
-                      onCheckedChange={(checked) => handleGoalChange(goal, !!checked)}
-                    />
-                    <Label htmlFor={goal} className="text-sm">{goal}</Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="medicalConditions">Condizioni Mediche / Infortuni Precedenti</Label>
-              <Textarea
-                id="medicalConditions"
-                value={formData.medicalConditions}
-                onChange={(e) => setFormData(prev => ({ ...prev, medicalConditions: e.target.value }))}
-                placeholder="Descrivi eventuali problemi di salute, infortuni o limitazioni fisiche..."
-                className="min-h-20"
-              />
-            </div>
-          </div>
-
-          {/* Disponibilità */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-slate-900">Disponibilità e Preferenze</h3>
-            
-            <div>
-              <Label>Giorni Preferiti</Label>
-              <div className="grid grid-cols-4 md:grid-cols-7 gap-2 mt-2">
-                {['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'].map(day => (
-                  <div key={day} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={day}
-                      checked={formData.preferredDays.includes(day)}
-                      onCheckedChange={(checked) => handleDayChange(day, !!checked)}
-                    />
-                    <Label htmlFor={day} className="text-xs">{day.slice(0, 3)}</Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="preferredTimes">Orari Preferiti</Label>
-                <Select onValueChange={(value) => setFormData(prev => ({ ...prev, preferredTimes: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleziona orario" />
+                <Label htmlFor="goals">Obiettivo Principale</Label>
+                <Select value={formData.goals} onValueChange={(value) => setFormData(prev => ({ ...prev, goals: value }))}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Cosa vuoi raggiungere?" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="morning">Mattina (6:00-12:00)</SelectItem>
-                    <SelectItem value="afternoon">Pomeriggio (12:00-18:00)</SelectItem>
-                    <SelectItem value="evening">Sera (18:00-22:00)</SelectItem>
-                    <SelectItem value="flexible">Flessibile</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label htmlFor="budget">Budget Mensile (€)</Label>
-                <Select onValueChange={(value) => setFormData(prev => ({ ...prev, budget: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleziona budget" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0-50">0 - 50€</SelectItem>
-                    <SelectItem value="50-100">50 - 100€</SelectItem>
-                    <SelectItem value="100-200">100 - 200€</SelectItem>
-                    <SelectItem value="200+">200€+</SelectItem>
+                    {fitnessGoals.map((goal) => (
+                      <SelectItem key={goal.value} value={goal.value}>
+                        {goal.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="location">Zona di Interesse</Label>
-              <Input
-                id="location"
-                value={formData.location}
-                onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                placeholder="es. Milano centro, Roma nord..."
-              />
+            {/* Sezione Preferenze */}
+            <div className="bg-orange-50 p-6 rounded-xl">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                ⚙️ Preferenze di Allenamento
+              </h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <Label htmlFor="availability">Disponibilità Settimanale</Label>
+                  <Select value={formData.availability} onValueChange={(value) => setFormData(prev => ({ ...prev, availability: value }))}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Quanto tempo puoi dedicare?" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1-2-hours">🕐 1-2 ore/settimana</SelectItem>
+                      <SelectItem value="3-4-hours">⏰ 3-4 ore/settimana</SelectItem>
+                      <SelectItem value="5-6-hours">⏳ 5-6 ore/settimana</SelectItem>
+                      <SelectItem value="7-plus-hours">💪 7+ ore/settimana</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="budget">Budget Mensile (€)</Label>
+                  <Select value={formData.budget} onValueChange={(value) => setFormData(prev => ({ ...prev, budget: value }))}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Il tuo budget" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="50-100">💰 €50-100/mese</SelectItem>
+                      <SelectItem value="100-200">💎 €100-200/mese</SelectItem>
+                      <SelectItem value="200-300">🌟 €200-300/mese</SelectItem>
+                      <SelectItem value="300-plus">👑 €300+/mese</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="mt-6">
+                <Label htmlFor="location">Zona Preferita</Label>
+                <Input
+                  id="location"
+                  value={formData.location}
+                  onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                  placeholder="Es. Milano Centro, Roma Prati, Napoli Vomero..."
+                  className="mt-1"
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Preferenze Servizi */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-slate-900">Preferenze Servizi</h3>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="groupClasses"
-                  checked={formData.groupClassesInterest}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, groupClassesInterest: !!checked }))}
-                />
-                <Label htmlFor="groupClasses">Interesse per corsi di gruppo</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="personalTraining"
-                  checked={formData.personalTrainingInterest}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, personalTrainingInterest: !!checked }))}
-                />
-                <Label htmlFor="personalTraining">Interesse per personal training</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="gymOnly"
-                  checked={formData.gymOnly}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, gymOnly: !!checked }))}
-                />
-                <Label htmlFor="gymOnly">Solo accesso palestra (senza istruttore)</Label>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-4 pt-6">
-            <Button type="button" variant="outline" onClick={onBack} className="flex-1">
-              Indietro
+            <Button 
+              type="submit" 
+              className="w-full gradient-primary text-white text-lg py-4 rounded-xl hover:scale-105 transition-transform"
+            >
+              🚀 Inizia il Tuo Percorso Fitness
             </Button>
-            <Button type="submit" className="flex-1 gradient-primary text-white">
-              Completa Registrazione
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
