@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import RoleSelector from '@/components/RoleSelector';
 import UserRegistrationForm from '@/components/UserRegistrationForm';
+import GymRegistrationForm from '@/components/GymRegistrationForm';
+import TrainerRegistrationForm from '@/components/TrainerRegistrationForm';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,9 +21,28 @@ const RegisterPage = () => {
 
   const handleFormSubmit = (data: any) => {
     console.log('Registration data:', { role: selectedRole, ...data });
+    
+    let welcomeMessage = '';
+    let description = '';
+    
+    switch (selectedRole) {
+      case 'user':
+        welcomeMessage = "🎉 Benvenuto in GymConnect AI!";
+        description = "Il tuo profilo atleta è stato creato. Preparati a scoprire il tuo match perfetto nel mondo del fitness!";
+        break;
+      case 'instructor':
+        welcomeMessage = "💪 Benvenuto Coach!";
+        description = "Il tuo profilo trainer è stato attivato. Inizia a costruire la tua community di atleti motivati!";
+        break;
+      case 'gym':
+        welcomeMessage = "🏢 Palestra Registrata!";
+        description = "La tua struttura è ora parte del network GymConnect. Attrai nuovi membri e ottimizza la gestione!";
+        break;
+    }
+    
     toast({
-      title: "🎉 Benvenuto in GymConnect AI!",
-      description: "Il tuo profilo è stato creato. Preparati a scoprire il tuo match perfetto nel mondo del fitness!",
+      title: welcomeMessage,
+      description: description,
     });
     navigate('/dashboard');
   };
@@ -58,54 +79,10 @@ const RegisterPage = () => {
                 <UserRegistrationForm onSubmit={handleFormSubmit} onBack={handleBack} />
               )}
               {selectedRole === 'instructor' && (
-                <div className="text-center py-20 bg-white rounded-2xl shadow-xl max-w-2xl mx-auto">
-                  <div className="mb-6">
-                    <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-400 rounded-full mx-auto flex items-center justify-center mb-4">
-                      <span className="text-3xl">🏋️‍♂️</span>
-                    </div>
-                    <h2 className="text-3xl font-bold mb-4 text-slate-900">Diventa un Coach di Successo</h2>
-                    <p className="text-slate-600 mb-8 text-lg">
-                      Il modulo per Personal Trainer e Istruttori sarà disponibile molto presto! 
-                      Preparati a trasformare la tua passione in una carriera di successo.
-                    </p>
-                    <div className="bg-green-50 p-4 rounded-lg mb-6">
-                      <p className="text-green-800 font-medium">
-                        🚀 Funzionalità in arrivo: Gestione clienti, Piani personalizzati, Analytics dettagliati
-                      </p>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={handleBack}
-                    className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-500 text-white rounded-xl hover:shadow-lg transition-all duration-300 font-medium"
-                  >
-                    ← Torna alla Selezione
-                  </button>
-                </div>
+                <TrainerRegistrationForm onSubmit={handleFormSubmit} onBack={handleBack} />
               )}
               {selectedRole === 'gym' && (
-                <div className="text-center py-20 bg-white rounded-2xl shadow-xl max-w-2xl mx-auto">
-                  <div className="mb-6">
-                    <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-red-400 rounded-full mx-auto flex items-center justify-center mb-4">
-                      <span className="text-3xl">🏢</span>
-                    </div>
-                    <h2 className="text-3xl font-bold mb-4 text-slate-900">Ottimizza la Tua Palestra</h2>
-                    <p className="text-slate-600 mb-8 text-lg">
-                      Il modulo per Palestre e Centri Fitness sarà disponibile molto presto! 
-                      Preparati a rivoluzionare la gestione del tuo centro fitness.
-                    </p>
-                    <div className="bg-orange-50 p-4 rounded-lg mb-6">
-                      <p className="text-orange-800 font-medium">
-                        📊 Funzionalità in arrivo: Gestione spazi, Analytics membri, Sistema prenotazioni
-                      </p>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={handleBack}
-                    className="px-8 py-3 bg-gradient-to-r from-orange-600 to-red-500 text-white rounded-xl hover:shadow-lg transition-all duration-300 font-medium"
-                  >
-                    ← Torna alla Selezione
-                  </button>
-                </div>
+                <GymRegistrationForm onSubmit={handleFormSubmit} onBack={handleBack} />
               )}
             </div>
           )}
