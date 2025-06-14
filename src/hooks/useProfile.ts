@@ -49,7 +49,7 @@ export interface TrainerProfile {
 
 export interface GymProfile {
   id: string;
-  gym_name: string;
+  gym_name: string; // Rimosso il ? per renderlo obbligatorio
   business_email?: string;
   address?: string;
   postal_code?: string;
