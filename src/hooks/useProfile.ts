@@ -1,0 +1,212 @@
+
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+
+export interface Profile {
+  id: string;
+  user_type: 'user' | 'trainer' | 'gym_owner';
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
+  avatar_url?: string;
+  city?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface UserProfile {
+  id: string;
+  age?: number;
+  weight?: number;
+  height?: number;
+  fitness_level?: string;
+  primary_goal?: string;
+  secondary_goals?: string[];
+  availability_hours_per_week?: number;
+  budget_min?: number;
+  budget_max?: number;
+  preferred_location?: string;
+  health_conditions?: string;
+  experience_description?: string;
+}
+
+export interface TrainerProfile {
+  id: string;
+  date_of_birth?: string;
+  bio?: string;
+  certifications?: string[];
+  specializations?: string[];
+  years_experience?: number;
+  languages?: string[];
+  personal_rate_per_hour?: number;
+  group_rate_per_hour?: number;
+  preferred_areas?: string;
+  availability_schedule?: any;
+  is_verified?: boolean;
+}
+
+export interface GymProfile {
+  id: string;
+  gym_name: string;
+  business_email?: string;
+  address?: string;
+  postal_code?: string;
+  description?: string;
+  facilities?: string[];
+  specializations?: string[];
+  opening_hours?: string;
+  closing_hours?: string;
+  member_capacity?: number;
+  monthly_fee?: number;
+  day_pass_fee?: number;
+  website_url?: string;
+  social_media?: any;
+  is_verified?: boolean;
+}
+
+export const useProfile = () => {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [trainerProfile, setTrainerProfile] = useState<TrainerProfile | null>(null);
+  const [gymProfile, setGymProfile] = useState<GymProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+    } else {
+      setProfile(null);
+      setUserProfile(null);
+      setTrainerProfile(null);
+      setGymProfile(null);
+      setLoading(false);
+    }
+  }, [user]);
+
+  const fetchProfile = async () => {
+    if (!user) return;
+
+    try {
+      // Fetch base profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Error fetching profile:', profileError);
+        return;
+      }
+
+      setProfile(profileData);
+
+      if (profileData?.user_type) {
+        // Fetch specific profile based on user type
+        switch (profileData.user_type) {
+          case 'user':
+            const { data: userData } = await supabase
+              .from('user_profiles')
+              .select('*')
+              .eq('id', user.id)
+              .single();
+            setUserProfile(userData);
+            break;
+          case 'trainer':
+            const { data: trainerData } = await supabase
+              .from('trainer_profiles')
+              .select('*')
+              .eq('id', user.id)
+              .single();
+            setTrainerProfile(trainerData);
+            break;
+          case 'gym_owner':
+            const { data: gymData } = await supabase
+              .from('gym_profiles')
+              .select('*')
+              .eq('id', user.id)
+              .single();
+            setGymProfile(gymData);
+            break;
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateProfile = async (updates: Partial<Profile>) => {
+    if (!user) return { error: 'No user logged in' };
+
+    const { error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', user.id);
+
+    if (!error) {
+      setProfile(prev => prev ? { ...prev, ...updates } : null);
+    }
+
+    return { error };
+  };
+
+  const createUserProfile = async (data: Partial<UserProfile>) => {
+    if (!user) return { error: 'No user logged in' };
+
+    const { error } = await supabase
+      .from('user_profiles')
+      .insert({ id: user.id, ...data });
+
+    if (!error) {
+      await fetchProfile();
+    }
+
+    return { error };
+  };
+
+  const createTrainerProfile = async (data: Partial<TrainerProfile>) => {
+    if (!user) return { error: 'No user logged in' };
+
+    const { error } = await supabase
+      .from('trainer_profiles')
+      .insert({ id: user.id, ...data });
+
+    if (!error) {
+      await fetchProfile();
+    }
+
+    return { error };
+  };
+
+  const createGymProfile = async (data: Partial<GymProfile>) => {
+    if (!user) return { error: 'No user logged in' };
+
+    const { error } = await supabase
+      .from('gym_profiles')
+      .insert({ id: user.id, ...data });
+
+    if (!error) {
+      await fetchProfile();
+    }
+
+    return { error };
+  };
+
+  return {
+    profile,
+    userProfile,
+    trainerProfile,
+    gymProfile,
+    loading,
+    updateProfile,
+    createUserProfile,
+    createTrainerProfile,
+    createGymProfile,
+    refetch: fetchProfile
+  };
+};
