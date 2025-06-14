@@ -94,7 +94,7 @@ export const useProfile = () => {
       
       // Try to fetch base profile
       try {
-        const { data: profileData, error: profileError } = await supabase
+        const { data: profileData, error: profileError } = await (supabase as any)
           .from('profiles')
           .select('*')
           .eq('id', user.id)
@@ -113,10 +113,10 @@ export const useProfile = () => {
           setProfile(profileData as Profile);
 
           // Fetch specific profile based on user type
-          if (profileData.user_type) {
-            switch (profileData.user_type) {
+          if ((profileData as any).user_type) {
+            switch ((profileData as any).user_type) {
               case 'user':
-                const { data: userData } = await supabase
+                const { data: userData } = await (supabase as any)
                   .from('user_profiles')
                   .select('*')
                   .eq('id', user.id)
@@ -124,7 +124,7 @@ export const useProfile = () => {
                 setUserProfile(userData as UserProfile);
                 break;
               case 'trainer':
-                const { data: trainerData } = await supabase
+                const { data: trainerData } = await (supabase as any)
                   .from('trainer_profiles')
                   .select('*')
                   .eq('id', user.id)
@@ -132,7 +132,7 @@ export const useProfile = () => {
                 setTrainerProfile(trainerData as TrainerProfile);
                 break;
               case 'gym_owner':
-                const { data: gymData } = await supabase
+                const { data: gymData } = await (supabase as any)
                   .from('gym_profiles')
                   .select('*')
                   .eq('id', user.id)
@@ -163,9 +163,9 @@ export const useProfile = () => {
     if (!user) return { error: 'No user logged in' };
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('profiles')
-        .update(updates)
+        .update(updates as any)
         .eq('id', user.id);
 
       if (!error) {
@@ -186,9 +186,9 @@ export const useProfile = () => {
     if (!user) return { error: 'No user logged in' };
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('user_profiles')
-        .insert({ id: user.id, ...data });
+        .insert({ id: user.id, ...data } as any);
 
       if (!error) {
         await fetchProfile();
@@ -208,9 +208,9 @@ export const useProfile = () => {
     if (!user) return { error: 'No user logged in' };
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('trainer_profiles')
-        .insert({ id: user.id, ...data });
+        .insert({ id: user.id, ...data } as any);
 
       if (!error) {
         await fetchProfile();
@@ -230,9 +230,9 @@ export const useProfile = () => {
     if (!user) return { error: 'No user logged in' };
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('gym_profiles')
-        .insert({ id: user.id, ...data });
+        .insert({ id: user.id, ...data } as any);
 
       if (!error) {
         await fetchProfile();
