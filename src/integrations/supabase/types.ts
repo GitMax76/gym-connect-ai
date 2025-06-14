@@ -9,7 +9,219 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      gym_profiles: {
+        Row: {
+          address: string | null
+          business_email: string | null
+          closing_hours: string | null
+          day_pass_fee: number | null
+          description: string | null
+          facilities: string[] | null
+          gym_name: string
+          id: string
+          is_verified: boolean | null
+          member_capacity: number | null
+          monthly_fee: number | null
+          opening_hours: string | null
+          postal_code: string | null
+          social_media: Json | null
+          specializations: string[] | null
+          website_url: string | null
+        }
+        Insert: {
+          address?: string | null
+          business_email?: string | null
+          closing_hours?: string | null
+          day_pass_fee?: number | null
+          description?: string | null
+          facilities?: string[] | null
+          gym_name: string
+          id: string
+          is_verified?: boolean | null
+          member_capacity?: number | null
+          monthly_fee?: number | null
+          opening_hours?: string | null
+          postal_code?: string | null
+          social_media?: Json | null
+          specializations?: string[] | null
+          website_url?: string | null
+        }
+        Update: {
+          address?: string | null
+          business_email?: string | null
+          closing_hours?: string | null
+          day_pass_fee?: number | null
+          description?: string | null
+          facilities?: string[] | null
+          gym_name?: string
+          id?: string
+          is_verified?: boolean | null
+          member_capacity?: number | null
+          monthly_fee?: number | null
+          opening_hours?: string | null
+          postal_code?: string | null
+          social_media?: Json | null
+          specializations?: string[] | null
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gym_profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          city: string | null
+          created_at: string | null
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          updated_at: string | null
+          user_type: Database["public"]["Enums"]["user_type"]
+        }
+        Insert: {
+          avatar_url?: string | null
+          city?: string | null
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string | null
+          user_type: Database["public"]["Enums"]["user_type"]
+        }
+        Update: {
+          avatar_url?: string | null
+          city?: string | null
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string | null
+          user_type?: Database["public"]["Enums"]["user_type"]
+        }
+        Relationships: []
+      }
+      trainer_profiles: {
+        Row: {
+          availability_schedule: Json | null
+          bio: string | null
+          certifications: string[] | null
+          date_of_birth: string | null
+          group_rate_per_hour: number | null
+          id: string
+          is_verified: boolean | null
+          languages: string[] | null
+          personal_rate_per_hour: number | null
+          preferred_areas: string | null
+          specializations: string[] | null
+          years_experience: number | null
+        }
+        Insert: {
+          availability_schedule?: Json | null
+          bio?: string | null
+          certifications?: string[] | null
+          date_of_birth?: string | null
+          group_rate_per_hour?: number | null
+          id: string
+          is_verified?: boolean | null
+          languages?: string[] | null
+          personal_rate_per_hour?: number | null
+          preferred_areas?: string | null
+          specializations?: string[] | null
+          years_experience?: number | null
+        }
+        Update: {
+          availability_schedule?: Json | null
+          bio?: string | null
+          certifications?: string[] | null
+          date_of_birth?: string | null
+          group_rate_per_hour?: number | null
+          id?: string
+          is_verified?: boolean | null
+          languages?: string[] | null
+          personal_rate_per_hour?: number | null
+          preferred_areas?: string | null
+          specializations?: string[] | null
+          years_experience?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trainer_profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_profiles: {
+        Row: {
+          age: number | null
+          availability_hours_per_week: number | null
+          budget_max: number | null
+          budget_min: number | null
+          experience_description: string | null
+          fitness_level: string | null
+          health_conditions: string | null
+          height: number | null
+          id: string
+          preferred_location: string | null
+          primary_goal: string | null
+          secondary_goals: string[] | null
+          weight: number | null
+        }
+        Insert: {
+          age?: number | null
+          availability_hours_per_week?: number | null
+          budget_max?: number | null
+          budget_min?: number | null
+          experience_description?: string | null
+          fitness_level?: string | null
+          health_conditions?: string | null
+          height?: number | null
+          id: string
+          preferred_location?: string | null
+          primary_goal?: string | null
+          secondary_goals?: string[] | null
+          weight?: number | null
+        }
+        Update: {
+          age?: number | null
+          availability_hours_per_week?: number | null
+          budget_max?: number | null
+          budget_min?: number | null
+          experience_description?: string | null
+          fitness_level?: string | null
+          health_conditions?: string | null
+          height?: number | null
+          id?: string
+          preferred_location?: string | null
+          primary_goal?: string | null
+          secondary_goals?: string[] | null
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +230,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_type: "user" | "trainer" | "gym_owner"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +345,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_type: ["user", "trainer", "gym_owner"],
+    },
   },
 } as const
