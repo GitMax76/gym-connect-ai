@@ -92,54 +92,65 @@ export const useProfile = () => {
     try {
       console.log('Fetching profile for user:', user.id);
       
-      // Fetch base profile using raw query to avoid TypeScript issues
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles' as any)
-        .select('*')
-        .eq('id', user.id)
-        .single();
+      // Try to fetch base profile
+      try {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
 
-      if (profileError && profileError.code !== 'PGRST116') {
-        console.error('Error fetching profile:', profileError);
-        if (profileError.code === '42P01') {
-          console.log('Tables not yet created. Please run the SQL migrations first.');
+        if (profileError) {
+          if (profileError.code === '42P01') {
+            console.log('Tables not yet created. Please run the SQL migrations first.');
+            setLoading(false);
+            return;
+          }
+          throw profileError;
         }
-        setLoading(false);
-        return;
-      }
 
-      if (profileData) {
-        setProfile(profileData as Profile);
+        if (profileData) {
+          setProfile(profileData as Profile);
 
-        // Fetch specific profile based on user type
-        if (profileData.user_type) {
-          switch (profileData.user_type) {
-            case 'user':
-              const { data: userData } = await supabase
-                .from('user_profiles' as any)
-                .select('*')
-                .eq('id', user.id)
-                .single();
-              setUserProfile(userData as UserProfile);
-              break;
-            case 'trainer':
-              const { data: trainerData } = await supabase
-                .from('trainer_profiles' as any)
-                .select('*')
-                .eq('id', user.id)
-                .single();
-              setTrainerProfile(trainerData as TrainerProfile);
-              break;
-            case 'gym_owner':
-              const { data: gymData } = await supabase
-                .from('gym_profiles' as any)
-                .select('*')
-                .eq('id', user.id)
-                .single();
-              setGymProfile(gymData as GymProfile);
-              break;
+          // Fetch specific profile based on user type
+          if (profileData.user_type) {
+            switch (profileData.user_type) {
+              case 'user':
+                const { data: userData } = await supabase
+                  .from('user_profiles')
+                  .select('*')
+                  .eq('id', user.id)
+                  .single();
+                setUserProfile(userData as UserProfile);
+                break;
+              case 'trainer':
+                const { data: trainerData } = await supabase
+                  .from('trainer_profiles')
+                  .select('*')
+                  .eq('id', user.id)
+                  .single();
+                setTrainerProfile(trainerData as TrainerProfile);
+                break;
+              case 'gym_owner':
+                const { data: gymData } = await supabase
+                  .from('gym_profiles')
+                  .select('*')
+                  .eq('id', user.id)
+                  .single();
+                setGymProfile(gymData as GymProfile);
+                break;
+            }
           }
         }
+      } catch (dbError: any) {
+        console.log('Database not yet setup:', dbError.message);
+        // Create a temporary profile from user data
+        setProfile({
+          id: user.id,
+          email: user.email || '',
+          first_name: user.user_metadata?.first_name || '',
+          last_name: user.user_metadata?.last_name || '',
+        } as Profile);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -153,7 +164,7 @@ export const useProfile = () => {
 
     try {
       const { error } = await supabase
-        .from('profiles' as any)
+        .from('profiles')
         .update(updates)
         .eq('id', user.id);
 
@@ -162,8 +173,11 @@ export const useProfile = () => {
       }
 
       return { error };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating profile:', error);
+      if (error.code === '42P01') {
+        return { error: 'Database tables not yet created. Please run migrations first.' };
+      }
       return { error };
     }
   };
@@ -173,7 +187,7 @@ export const useProfile = () => {
 
     try {
       const { error } = await supabase
-        .from('user_profiles' as any)
+        .from('user_profiles')
         .insert({ id: user.id, ...data });
 
       if (!error) {
@@ -181,8 +195,11 @@ export const useProfile = () => {
       }
 
       return { error };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating user profile:', error);
+      if (error.code === '42P01') {
+        return { error: 'Database tables not yet created. Please run migrations first.' };
+      }
       return { error };
     }
   };
@@ -192,7 +209,7 @@ export const useProfile = () => {
 
     try {
       const { error } = await supabase
-        .from('trainer_profiles' as any)
+        .from('trainer_profiles')
         .insert({ id: user.id, ...data });
 
       if (!error) {
@@ -200,8 +217,11 @@ export const useProfile = () => {
       }
 
       return { error };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating trainer profile:', error);
+      if (error.code === '42P01') {
+        return { error: 'Database tables not yet created. Please run migrations first.' };
+      }
       return { error };
     }
   };
@@ -211,7 +231,7 @@ export const useProfile = () => {
 
     try {
       const { error } = await supabase
-        .from('gym_profiles' as any)
+        .from('gym_profiles')
         .insert({ id: user.id, ...data });
 
       if (!error) {
@@ -219,8 +239,11 @@ export const useProfile = () => {
       }
 
       return { error };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating gym profile:', error);
+      if (error.code === '42P01') {
+        return { error: 'Database tables not yet created. Please run migrations first.' };
+      }
       return { error };
     }
   };
