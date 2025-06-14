@@ -90,47 +90,55 @@ export const useProfile = () => {
     if (!user) return;
 
     try {
-      // Fetch base profile
+      console.log('Fetching profile for user:', user.id);
+      
+      // Fetch base profile using raw query to avoid TypeScript issues
       const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
+        .from('profiles' as any)
         .select('*')
         .eq('id', user.id)
         .single();
 
       if (profileError && profileError.code !== 'PGRST116') {
         console.error('Error fetching profile:', profileError);
+        if (profileError.code === '42P01') {
+          console.log('Tables not yet created. Please run the SQL migrations first.');
+        }
+        setLoading(false);
         return;
       }
 
-      setProfile(profileData);
+      if (profileData) {
+        setProfile(profileData as Profile);
 
-      if (profileData?.user_type) {
         // Fetch specific profile based on user type
-        switch (profileData.user_type) {
-          case 'user':
-            const { data: userData } = await supabase
-              .from('user_profiles')
-              .select('*')
-              .eq('id', user.id)
-              .single();
-            setUserProfile(userData);
-            break;
-          case 'trainer':
-            const { data: trainerData } = await supabase
-              .from('trainer_profiles')
-              .select('*')
-              .eq('id', user.id)
-              .single();
-            setTrainerProfile(trainerData);
-            break;
-          case 'gym_owner':
-            const { data: gymData } = await supabase
-              .from('gym_profiles')
-              .select('*')
-              .eq('id', user.id)
-              .single();
-            setGymProfile(gymData);
-            break;
+        if (profileData.user_type) {
+          switch (profileData.user_type) {
+            case 'user':
+              const { data: userData } = await supabase
+                .from('user_profiles' as any)
+                .select('*')
+                .eq('id', user.id)
+                .single();
+              setUserProfile(userData as UserProfile);
+              break;
+            case 'trainer':
+              const { data: trainerData } = await supabase
+                .from('trainer_profiles' as any)
+                .select('*')
+                .eq('id', user.id)
+                .single();
+              setTrainerProfile(trainerData as TrainerProfile);
+              break;
+            case 'gym_owner':
+              const { data: gymData } = await supabase
+                .from('gym_profiles' as any)
+                .select('*')
+                .eq('id', user.id)
+                .single();
+              setGymProfile(gymData as GymProfile);
+              break;
+          }
         }
       }
     } catch (error) {
@@ -143,58 +151,78 @@ export const useProfile = () => {
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) return { error: 'No user logged in' };
 
-    const { error } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('id', user.id);
+    try {
+      const { error } = await supabase
+        .from('profiles' as any)
+        .update(updates)
+        .eq('id', user.id);
 
-    if (!error) {
-      setProfile(prev => prev ? { ...prev, ...updates } : null);
+      if (!error) {
+        setProfile(prev => prev ? { ...prev, ...updates } : null);
+      }
+
+      return { error };
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      return { error };
     }
-
-    return { error };
   };
 
   const createUserProfile = async (data: Partial<UserProfile>) => {
     if (!user) return { error: 'No user logged in' };
 
-    const { error } = await supabase
-      .from('user_profiles')
-      .insert({ id: user.id, ...data });
+    try {
+      const { error } = await supabase
+        .from('user_profiles' as any)
+        .insert({ id: user.id, ...data });
 
-    if (!error) {
-      await fetchProfile();
+      if (!error) {
+        await fetchProfile();
+      }
+
+      return { error };
+    } catch (error) {
+      console.error('Error creating user profile:', error);
+      return { error };
     }
-
-    return { error };
   };
 
   const createTrainerProfile = async (data: Partial<TrainerProfile>) => {
     if (!user) return { error: 'No user logged in' };
 
-    const { error } = await supabase
-      .from('trainer_profiles')
-      .insert({ id: user.id, ...data });
+    try {
+      const { error } = await supabase
+        .from('trainer_profiles' as any)
+        .insert({ id: user.id, ...data });
 
-    if (!error) {
-      await fetchProfile();
+      if (!error) {
+        await fetchProfile();
+      }
+
+      return { error };
+    } catch (error) {
+      console.error('Error creating trainer profile:', error);
+      return { error };
     }
-
-    return { error };
   };
 
   const createGymProfile = async (data: Partial<GymProfile>) => {
     if (!user) return { error: 'No user logged in' };
 
-    const { error } = await supabase
-      .from('gym_profiles')
-      .insert({ id: user.id, ...data });
+    try {
+      const { error } = await supabase
+        .from('gym_profiles' as any)
+        .insert({ id: user.id, ...data });
 
-    if (!error) {
-      await fetchProfile();
+      if (!error) {
+        await fetchProfile();
+      }
+
+      return { error };
+    } catch (error) {
+      console.error('Error creating gym profile:', error);
+      return { error };
     }
-
-    return { error };
   };
 
   return {
