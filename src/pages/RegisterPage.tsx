@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
@@ -16,7 +15,7 @@ const RegisterPage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { profile, updateProfile, createUserProfile, createTrainerProfile, createGymProfile } = useProfile();
+  const { profile, updateProfile, createUserProfile, createTrainerProfile, createGymProfile, loading } = useProfile();
 
   useEffect(() => {
     if (!user) {
@@ -24,11 +23,24 @@ const RegisterPage = () => {
       return;
     }
 
-    // If user already has a profile with user_type, redirect to dashboard
-    if (profile?.user_type) {
+    // Se l'utente ha già completato la profilazione, vai alla dashboard
+    if (profile?.user_type && (profile.first_name || profile.last_name)) {
       navigate('/dashboard');
+      return;
     }
-  }, [user, profile, navigate]);
+
+    // Se l'utente ha già un tipo ma non ha completato il profilo, vai direttamente al form
+    if (profile?.user_type) {
+      const roleMapping = {
+        'user': 'user',
+        'trainer': 'instructor', 
+        'gym_owner': 'gym'
+      } as const;
+      
+      setSelectedRole(roleMapping[profile.user_type]);
+      setStep('form');
+    }
+  }, [user, profile, navigate, loading]);
 
   const handleRoleSelect = async (role: 'user' | 'instructor' | 'gym') => {
     const userType = role === 'instructor' ? 'trainer' : role === 'gym' ? 'gym_owner' : 'user';
@@ -193,6 +205,16 @@ const RegisterPage = () => {
     };
     return mapping[budget] || { min: 0, max: 100 };
   };
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
