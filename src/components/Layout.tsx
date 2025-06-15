@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -11,6 +12,7 @@ interface LayoutProps {
 const Layout = ({ children, showNavigation = true }: LayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -29,6 +31,26 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                   GymConnect AI
                 </span>
               </div>
+              
+              {/* Navigation Links */}
+              {user && (
+                <div className="flex items-center space-x-4">
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => navigate('/dashboard')}
+                    className={location.pathname === '/dashboard' ? 'bg-slate-100' : ''}
+                  >
+                    Dashboard
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => navigate('/search')}
+                    className={location.pathname === '/search' ? 'bg-slate-100' : ''}
+                  >
+                    Cerca
+                  </Button>
+                </div>
+              )}
               
               <div className="flex items-center space-x-4">
                 {location.pathname === '/' ? (

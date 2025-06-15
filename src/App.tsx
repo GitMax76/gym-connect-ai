@@ -1,48 +1,46 @@
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import LoginPage from '@/pages/LoginPage';
+import RegisterPage from '@/pages/RegisterPage';
+import HomePage from '@/pages/HomePage';
+import DashboardPage from '@/pages/DashboardPage';
+import ProfilePage from '@/pages/ProfilePage';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { Toaster } from 'sonner';
+import { QueryClient } from 'react-query';
+import SearchPage from '@/pages/SearchPage';
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import HomePage from "./pages/HomePage";
-import RegisterPage from "./pages/RegisterPage";
-import LoginPage from "./pages/LoginPage";
-import AuthPage from "./pages/AuthPage";
-import DashboardPage from "./pages/DashboardPage";
-import NotFound from "./pages/NotFound";
-
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
+function App() {
+  return (
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+      <QueryClient>
+        <div className="App">
+          <Toaster />
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/auth" element={<AuthPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={
-              <ProtectedRoute>
-                <RegisterPage />
-              </ProtectedRoute>
-            } />
+            <Route path="/register" element={<RegisterPage />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <DashboardPage />
               </ProtectedRoute>
             } />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/search" element={
+              <ProtectedRoute>
+                <SearchPage />
+              </ProtectedRoute>
+            } />
           </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+        </div>
+      </QueryClient>
     </AuthProvider>
-  </QueryClientProvider>
-);
+  );
+}
 
 export default App;

@@ -74,6 +74,111 @@ export type Database = {
           },
         ]
       }
+      match_scores: {
+        Row: {
+          created_at: string | null
+          factors: Json | null
+          gym_id: string | null
+          id: string
+          score: number
+          trainer_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          factors?: Json | null
+          gym_id?: string | null
+          id?: string
+          score: number
+          trainer_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          factors?: Json | null
+          gym_id?: string | null
+          id?: string
+          score?: number
+          trainer_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_scores_gym_id_fkey"
+            columns: ["gym_id"]
+            isOneToOne: false
+            referencedRelation: "gym_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_scores_trainer_id_fkey"
+            columns: ["trainer_id"]
+            isOneToOne: false
+            referencedRelation: "trainer_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_scores_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matching_preferences: {
+        Row: {
+          budget_max: number | null
+          budget_min: number | null
+          created_at: string | null
+          group_vs_personal: string | null
+          id: string
+          max_distance_km: number | null
+          preferred_gym_facilities: string[] | null
+          preferred_times: Json | null
+          preferred_trainer_specializations: string[] | null
+          updated_at: string | null
+          user_id: string
+          workout_frequency_per_week: number | null
+        }
+        Insert: {
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string | null
+          group_vs_personal?: string | null
+          id?: string
+          max_distance_km?: number | null
+          preferred_gym_facilities?: string[] | null
+          preferred_times?: Json | null
+          preferred_trainer_specializations?: string[] | null
+          updated_at?: string | null
+          user_id: string
+          workout_frequency_per_week?: number | null
+        }
+        Update: {
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string | null
+          group_vs_personal?: string | null
+          id?: string
+          max_distance_km?: number | null
+          preferred_gym_facilities?: string[] | null
+          preferred_times?: Json | null
+          preferred_trainer_specializations?: string[] | null
+          updated_at?: string | null
+          user_id?: string
+          workout_frequency_per_week?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matching_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -112,6 +217,44 @@ export type Database = {
           user_type?: Database["public"]["Enums"]["user_type"]
         }
         Relationships: []
+      }
+      search_filters: {
+        Row: {
+          created_at: string | null
+          filter_name: string
+          filter_type: string
+          filters: Json
+          id: string
+          is_saved: boolean | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          filter_name: string
+          filter_type: string
+          filters: Json
+          id?: string
+          is_saved?: boolean | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          filter_name?: string
+          filter_type?: string
+          filters?: Json
+          id?: string
+          is_saved?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "search_filters_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trainer_profiles: {
         Row: {
@@ -227,7 +370,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_match_score: {
+        Args: { p_user_id: string; p_trainer_id?: string; p_gym_id?: string }
+        Returns: number
+      }
     }
     Enums: {
       user_type: "user" | "trainer" | "gym_owner"
