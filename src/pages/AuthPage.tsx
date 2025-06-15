@@ -84,6 +84,18 @@ const AuthPage = () => {
     setSelectedRole('');
   };
 
+  const handleToggleAuth = () => {
+    setIsLogin(!isLogin);
+    setShowRoleSelection(false);
+    setSelectedRole('');
+    setFormData({
+      email: '',
+      password: '',
+      firstName: '',
+      lastName: ''
+    });
+  };
+
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-blue-50 flex items-center justify-center py-12">
@@ -99,11 +111,14 @@ const AuthPage = () => {
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Torna al modulo
                 </Button>
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                  Scegli il tuo ruolo
+                <h1 className="text-4xl font-bold text-slate-900 mb-4">
+                  Scegli il tuo profilo
                 </h1>
-                <p className="text-slate-600">
-                  Seleziona come vuoi utilizzare GymConnect AI
+                <p className="text-xl text-slate-600 mb-2">
+                  Prima di completare la registrazione, seleziona il tipo di account che desideri creare
+                </p>
+                <p className="text-lg text-green-600 font-medium mb-8">
+                  Potrai modificare questa scelta in seguito nelle impostazioni del profilo
                 </p>
               </div>
               <RoleSelector onRoleSelect={handleRoleSelect} selectedRole={selectedRole} />
@@ -112,12 +127,12 @@ const AuthPage = () => {
             <>
               <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                  {isLogin ? 'Bentornato!' : 'Unisciti a GymConnect AI'}
+                  {isLogin ? 'Bentornato su GymConnect AI!' : 'Unisciti a GymConnect AI'}
                 </h1>
                 <p className="text-slate-600">
                   {isLogin 
-                    ? 'Accedi al tuo account per continuare' 
-                    : 'Crea il tuo account e inizia il tuo percorso fitness'
+                    ? 'Accedi al tuo account per continuare il tuo percorso fitness' 
+                    : 'Crea il tuo account e trasforma la tua passione per il fitness'
                   }
                 </p>
               </div>
@@ -155,11 +170,12 @@ const AuthPage = () => {
 
                     {/* Role Selection Indicator */}
                     {!isLogin && selectedRole && (
-                      <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                        <p className="text-sm text-green-800 text-center">
-                          <strong>Ruolo selezionato:</strong> {
-                            selectedRole === 'user' ? 'Atleta' : 
-                            selectedRole === 'instructor' ? 'Trainer' : 'Gestore Palestra'
+                      <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <p className="text-sm text-green-800 text-center flex items-center justify-center gap-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <strong>Profilo selezionato:</strong> {
+                            selectedRole === 'user' ? 'Atleta & Fitness Lover' : 
+                            selectedRole === 'instructor' ? 'Personal Trainer & Coach' : 'Centro Fitness & Palestra'
                           }
                         </p>
                       </div>
@@ -221,6 +237,11 @@ const AuthPage = () => {
                           className="mt-1"
                           minLength={6}
                         />
+                        {!isLogin && (
+                          <p className="text-xs text-slate-500 mt-1">
+                            Minimo 6 caratteri
+                          </p>
+                        )}
                       </div>
 
                       <Button 
@@ -230,7 +251,7 @@ const AuthPage = () => {
                       >
                         {loading ? 'Attendere...' : (
                           isLogin ? 'Accedi' : (
-                            selectedRole ? 'Registrati' : 'Scegli Ruolo'
+                            selectedRole ? 'Registrati' : 'Scegli il tuo Profilo →'
                           )
                         )}
                       </Button>
@@ -240,11 +261,7 @@ const AuthPage = () => {
                       <p className="text-slate-600">
                         {isLogin ? "Non hai un account?" : "Hai già un account?"}{' '}
                         <button 
-                          onClick={() => {
-                            setIsLogin(!isLogin);
-                            setShowRoleSelection(false);
-                            setSelectedRole('');
-                          }}
+                          onClick={handleToggleAuth}
                           className="text-green-600 hover:text-green-700 font-medium"
                         >
                           {isLogin ? 'Registrati qui' : 'Accedi qui'}
