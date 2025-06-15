@@ -200,13 +200,13 @@ const AuthPage = () => {
             <div>
               {/* Mostra il form relativo */}
               {selectedRole === 'user' && (
-                <UserRegistrationForm onSubmit={handleRegister} loading={loading} />
+                <UserRegistrationForm onSubmit={handleRegister} />
               )}
               {selectedRole === 'instructor' && (
-                <TrainerRegistrationForm onSubmit={handleRegister} loading={loading} />
+                <TrainerRegistrationForm onSubmit={handleRegister} />
               )}
               {selectedRole === 'gym' && (
-                <GymRegistrationForm onSubmit={handleRegister} loading={loading} />
+                <GymRegistrationForm onSubmit={handleRegister} />
               )}
               <div className="text-center mt-6">
                 <button
