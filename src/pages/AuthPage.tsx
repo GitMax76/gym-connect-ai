@@ -37,16 +37,16 @@ const AuthPage = () => {
         : 'user';
 
       // 1. Creazione utente (Supabase signUp): nel form sono sempre richiesti email, password, altri dati
-      const { error, user } = await signUp(
+      const { error } = await signUp(
         data.email,
         data.password,
         {
           first_name: data.firstName || data.ownerName || data.name?.split(' ')[0],
           last_name: data.lastName || data.name?.split(' ').slice(1).join(' '),
-          user_type: userType
+          user_type: userType as 'user' | 'trainer' | 'gym_owner'
         }
       );
-      if (error || !user) {
+      if (error) {
         toast({
           title: "Errore",
           description: error?.message || "Errore durante la registrazione",
@@ -62,7 +62,7 @@ const AuthPage = () => {
         last_name: data.lastName || data.name?.split(' ').slice(1).join(' '),
         phone: data.phone,
         city: data.city,
-        user_type: userType
+        user_type: userType as 'user' | 'trainer' | 'gym_owner'
       });
 
       // 3. Crea il profilo specifico del tipo utente
@@ -200,13 +200,13 @@ const AuthPage = () => {
             <div>
               {/* Mostra il form relativo */}
               {selectedRole === 'user' && (
-                <UserRegistrationForm onSubmit={handleRegister} isOnboarding loading={loading} />
+                <UserRegistrationForm onSubmit={handleRegister} loading={loading} />
               )}
               {selectedRole === 'instructor' && (
-                <TrainerRegistrationForm onSubmit={handleRegister} isOnboarding loading={loading} />
+                <TrainerRegistrationForm onSubmit={handleRegister} loading={loading} />
               )}
               {selectedRole === 'gym' && (
-                <GymRegistrationForm onSubmit={handleRegister} isOnboarding loading={loading} />
+                <GymRegistrationForm onSubmit={handleRegister} loading={loading} />
               )}
               <div className="text-center mt-6">
                 <button
