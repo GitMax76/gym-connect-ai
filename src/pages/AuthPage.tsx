@@ -1,70 +1,155 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import RoleSelector from '@/components/RoleSelector';
+import UserRegistrationForm from '@/components/UserRegistrationForm';
+import TrainerRegistrationForm from '@/components/TrainerRegistrationForm';
+import GymRegistrationForm from '@/components/GymRegistrationForm';
+import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { Chrome, Mail, Lock, User, ArrowLeft } from 'lucide-react';
+import { useProfile } from '@/hooks/useProfile';
+
+type Role = 'user' | 'instructor' | 'gym' | '';
 
 const AuthPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [showRoleSelection, setShowRoleSelection] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<'user' | 'instructor' | 'gym' | ''>('');
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    firstName: '',
-    lastName: ''
-  });
-  const [loading, setLoading] = useState(false);
-  
-  const { user, signIn, signUp, signInWithGoogle } = useAuth();
+  const [step, setStep] = useState<'select-role' | 'register'>('select-role');
+  const [selectedRole, setSelectedRole] = useState<Role>('');
+  const { toast } = useToast();
   const navigate = useNavigate();
+  const { signUp, signInWithGoogle } = useAuth();
+  const { updateProfile, createUserProfile, createTrainerProfile, createGymProfile } = useProfile();
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      navigate('/register');
-    }
-  }, [user, navigate]);
+  // Step 1: handle role select
+  const handleRoleSelect = (role: Role) => {
+    setSelectedRole(role);
+    setStep('register');
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!isLogin && !selectedRole) {
-      setShowRoleSelection(true);
-      return;
-    }
-    
+  // Step 2: handle registration depending on selected role
+  const handleRegister = async (data: any) => {
     setLoading(true);
 
     try {
-      if (isLogin) {
-        const { error } = await signIn(formData.email, formData.password);
-        if (!error) {
-          navigate('/dashboard');
-        }
-      } else {
-        const userType = selectedRole === 'instructor' ? 'trainer' : selectedRole === 'gym' ? 'gym_owner' : 'user';
-        const userData = {
-          first_name: formData.firstName,
-          last_name: formData.lastName,
+      let userType = selectedRole === 'instructor' ? 'trainer'
+        : selectedRole === 'gym' ? 'gym_owner'
+        : 'user';
+
+      // 1. Creazione utente (Supabase signUp): nel form sono sempre richiesti email, password, altri dati
+      const { error, user } = await signUp(
+        data.email,
+        data.password,
+        {
+          first_name: data.firstName || data.ownerName || data.name?.split(' ')[0],
+          last_name: data.lastName || data.name?.split(' ').slice(1).join(' '),
           user_type: userType
-        };
-        const { error } = await signUp(formData.email, formData.password, userData);
-        if (!error) {
-          navigate('/register');
         }
+      );
+      if (error || !user) {
+        toast({
+          title: "Errore",
+          description: error?.message || "Errore durante la registrazione",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
       }
-    } finally {
+
+      // 2. Aggiorna il profilo di base
+      await updateProfile({
+        first_name: data.firstName || data.ownerName || data.name?.split(' ')[0],
+        last_name: data.lastName || data.name?.split(' ').slice(1).join(' '),
+        phone: data.phone,
+        city: data.city,
+        user_type: userType
+      });
+
+      // 3. Crea il profilo specifico del tipo utente
+      let errorProfile = null;
+      if (selectedRole === 'user') {
+        const userProfileData = {
+          age: data.age ? parseInt(data.age) : undefined,
+          weight: data.weight ? parseFloat(data.weight) : undefined,
+          height: data.height ? parseInt(data.height) : undefined,
+          fitness_level: data.fitnessLevel,
+          primary_goal: data.goals,
+          availability_hours_per_week: getHoursFromAvailability(data.availability),
+          budget_min: getBudgetRange(data.budget).min,
+          budget_max: getBudgetRange(data.budget).max,
+          preferred_location: data.location,
+          health_conditions: data.healthConditions,
+          experience_description: data.goals
+        };
+        const result = await createUserProfile(userProfileData);
+        errorProfile = result.error;
+      } else if (selectedRole === 'instructor') {
+        const trainerProfileData = {
+          date_of_birth: data.dateOfBirth,
+          bio: data.bio,
+          certifications: data.certifications,
+          specializations: data.specializations,
+          years_experience: data.experience ? parseInt(data.experience) : undefined,
+          languages: data.languages,
+          personal_rate_per_hour: data.personalRate ? parseFloat(data.personalRate) : undefined,
+          group_rate_per_hour: data.groupRate ? parseFloat(data.groupRate) : undefined,
+          preferred_areas: data.preferredAreas,
+          availability_schedule: { slots: data.availability }
+        };
+        const result = await createTrainerProfile(trainerProfileData);
+        errorProfile = result.error;
+      } else if (selectedRole === 'gym') {
+        const gymProfileData = {
+          gym_name: data.gymName,
+          business_email: data.email,
+          address: data.address,
+          postal_code: data.postalCode,
+          description: data.description,
+          facilities: data.facilities,
+          specializations: data.specializations,
+          opening_hours: data.openingHours,
+          closing_hours: data.closingHours,
+          member_capacity: data.memberCapacity ? parseInt(data.memberCapacity) : undefined,
+          monthly_fee: data.monthlyFee ? parseFloat(data.monthlyFee) : undefined,
+          day_pass_fee: data.dayPassFee ? parseFloat(data.dayPassFee) : undefined
+        };
+        const result = await createGymProfile(gymProfileData);
+        errorProfile = result.error;
+      }
+
+      if (errorProfile) {
+        toast({
+          title: "Errore",
+          description: "Errore nel salvataggio del profilo",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
+
+      toast({
+        title: "Registrazione completata",
+        description:
+          selectedRole === 'user'
+            ? "Benvenuto in GymConnect! Il tuo profilo è stato creato."
+            : selectedRole === 'instructor'
+            ? "Benvenuto Coach! Il tuo profilo trainer è attivo."
+            : "La registrazione della palestra è completata.",
+        variant: "default"
+      });
+
+      navigate('/dashboard');
+    } catch (err) {
+      toast({
+        title: "Errore",
+        description: "Errore durante la registrazione",
+        variant: "destructive"
+      });
       setLoading(false);
     }
   };
 
+  // Google (opzionale, potenzia solo l'accesso base senza profilazione avanzata)
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
@@ -74,204 +159,67 @@ const AuthPage = () => {
     }
   };
 
-  const handleRoleSelect = (role: 'user' | 'instructor' | 'gym') => {
-    setSelectedRole(role);
-    setShowRoleSelection(false);
+  // helper
+  const getHoursFromAvailability = (availability: string) => {
+    const mapping: { [key: string]: number } = {
+      '1-2-hours': 1.5,
+      '3-4-hours': 3.5,
+      '5-6-hours': 5.5,
+      '7-plus-hours': 8
+    };
+    return mapping[availability] || 0;
   };
-
-  const handleBackToForm = () => {
-    setShowRoleSelection(false);
-    setSelectedRole('');
-  };
-
-  const handleToggleAuth = () => {
-    setIsLogin(!isLogin);
-    setShowRoleSelection(false);
-    setSelectedRole('');
-    setFormData({
-      email: '',
-      password: '',
-      firstName: '',
-      lastName: ''
-    });
+  const getBudgetRange = (budget: string) => {
+    const mapping: { [key: string]: { min: number, max: number } } = {
+      '50-100': { min: 50, max: 100 },
+      '100-200': { min: 100, max: 200 },
+      '200-300': { min: 200, max: 300 },
+      '300-plus': { min: 300, max: 500 }
+    };
+    return mapping[budget] || { min: 0, max: 100 };
   };
 
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-blue-50 flex items-center justify-center py-12">
         <div className="max-w-4xl w-full mx-auto px-4">
-          {!isLogin && showRoleSelection ? (
+          {step === 'select-role' ? (
             <div className="text-center">
-              <div className="mb-8">
-                <Button
-                  variant="ghost"
-                  onClick={handleBackToForm}
-                  className="mb-4 text-slate-600 hover:text-slate-900"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Torna al modulo
-                </Button>
-                <h1 className="text-4xl font-bold text-slate-900 mb-4">
-                  Scegli il tuo profilo
-                </h1>
-                <p className="text-xl text-slate-600 mb-2">
-                  Prima di completare la registrazione, seleziona il tipo di account che desideri creare
-                </p>
-                <p className="text-lg text-green-600 font-medium mb-8">
-                  Potrai modificare questa scelta in seguito nelle impostazioni del profilo
-                </p>
-              </div>
+              <h1 className="text-4xl font-bold text-slate-900 mb-4">
+                Scegli il tuo profilo
+              </h1>
+              <p className="text-xl text-slate-600 mb-2">
+                Prima di completare la registrazione, seleziona il tipo di account che desideri creare
+              </p>
+              <p className="text-lg text-green-600 font-medium mb-8">
+                Potrai modificare questa scelta in seguito nelle impostazioni del profilo
+              </p>
               <RoleSelector onRoleSelect={handleRoleSelect} selectedRole={selectedRole} />
             </div>
           ) : (
-            <>
-              <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                  {isLogin ? 'Bentornato su GymConnect AI!' : 'Unisciti a GymConnect AI'}
-                </h1>
-                <p className="text-slate-600">
-                  {isLogin 
-                    ? 'Accedi al tuo account per continuare il tuo percorso fitness' 
-                    : 'Crea il tuo account e trasforma la tua passione per il fitness'
-                  }
-                </p>
+            <div>
+              {/* Mostra il form relativo */}
+              {selectedRole === 'user' && (
+                <UserRegistrationForm onSubmit={handleRegister} isOnboarding loading={loading} />
+              )}
+              {selectedRole === 'instructor' && (
+                <TrainerRegistrationForm onSubmit={handleRegister} isOnboarding loading={loading} />
+              )}
+              {selectedRole === 'gym' && (
+                <GymRegistrationForm onSubmit={handleRegister} isOnboarding loading={loading} />
+              )}
+              <div className="text-center mt-6">
+                <button
+                  className="text-slate-600 underline text-sm"
+                  onClick={() => {
+                    setStep('select-role');
+                    setSelectedRole('');
+                  }}
+                >
+                  ← Torna alla selezione profilo
+                </button>
               </div>
-
-              <div className="max-w-md mx-auto">
-                <Card className="shadow-2xl border-0">
-                  <CardHeader>
-                    <CardTitle className="text-2xl text-center text-slate-900 flex items-center justify-center gap-2">
-                      <User className="w-6 h-6 text-green-600" />
-                      {isLogin ? 'Accedi' : 'Registrati'}
-                    </CardTitle>
-                  </CardHeader>
-                  
-                  <CardContent className="space-y-6">
-                    {/* Google Sign-in Button */}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full py-3 text-lg flex items-center justify-center gap-3 hover:bg-slate-50"
-                      onClick={handleGoogleSignIn}
-                      disabled={loading}
-                    >
-                      <Chrome className="w-5 h-5 text-blue-600" />
-                      {isLogin ? 'Accedi con Google' : 'Registrati con Google'}
-                    </Button>
-
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <Separator className="w-full" />
-                      </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-white px-2 text-slate-500">oppure</span>
-                      </div>
-                    </div>
-
-                    {/* Role Selection Indicator */}
-                    {!isLogin && selectedRole && (
-                      <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <p className="text-sm text-green-800 text-center flex items-center justify-center gap-2">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                          <strong>Profilo selezionato:</strong> {
-                            selectedRole === 'user' ? 'Atleta & Fitness Lover' : 
-                            selectedRole === 'instructor' ? 'Personal Trainer & Coach' : 'Centro Fitness & Palestra'
-                          }
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Email/Password Form */}
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                      {!isLogin && (
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="firstName">Nome</Label>
-                            <Input
-                              id="firstName"
-                              value={formData.firstName}
-                              onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                              required
-                              className="mt-1"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="lastName">Cognome</Label>
-                            <Input
-                              id="lastName"
-                              value={formData.lastName}
-                              onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                              required
-                              className="mt-1"
-                            />
-                          </div>
-                        </div>
-                      )}
-                      
-                      <div>
-                        <Label htmlFor="email" className="flex items-center gap-2">
-                          <Mail className="w-4 h-4" />
-                          Email
-                        </Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                          required
-                          className="mt-1"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="password" className="flex items-center gap-2">
-                          <Lock className="w-4 h-4" />
-                          Password
-                        </Label>
-                        <Input
-                          id="password"
-                          type="password"
-                          value={formData.password}
-                          onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                          required
-                          className="mt-1"
-                          minLength={6}
-                        />
-                        {!isLogin && (
-                          <p className="text-xs text-slate-500 mt-1">
-                            Minimo 6 caratteri
-                          </p>
-                        )}
-                      </div>
-
-                      <Button 
-                        type="submit" 
-                        className="w-full gradient-primary text-white text-lg py-3"
-                        disabled={loading}
-                      >
-                        {loading ? 'Attendere...' : (
-                          isLogin ? 'Accedi' : (
-                            selectedRole ? 'Registrati' : 'Scegli il tuo Profilo →'
-                          )
-                        )}
-                      </Button>
-                    </form>
-
-                    <div className="text-center">
-                      <p className="text-slate-600">
-                        {isLogin ? "Non hai un account?" : "Hai già un account?"}{' '}
-                        <button 
-                          onClick={handleToggleAuth}
-                          className="text-green-600 hover:text-green-700 font-medium"
-                        >
-                          {isLogin ? 'Registrati qui' : 'Accedi qui'}
-                        </button>
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </>
+            </div>
           )}
         </div>
       </div>
