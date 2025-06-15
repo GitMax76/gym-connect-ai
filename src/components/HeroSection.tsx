@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -29,9 +28,9 @@ const HeroSection = () => {
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold text-slate-900 mb-6">
-            Trasforma il Tuo
+            Potenzia il Tuo
             <span className="block bg-gradient-to-r from-green-600 via-blue-600 to-orange-500 bg-clip-text text-transparent">
-              Futuro Fitness
+              Fitness Ideale
             </span>
           </h1>
           
