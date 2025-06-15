@@ -1,29 +1,40 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const { user, signIn } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login data:', formData);
-    toast({
-      title: "Accesso effettuato!",
-      description: "Benvenuto in GymConnect AI",
-    });
-    navigate('/dashboard');
+    setLoading(true);
+
+    try {
+      const { error } = await signIn(formData.email, formData.password);
+      if (!error) {
+        navigate('/dashboard');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -55,6 +66,7 @@ const LoginPage = () => {
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                     required
                     className="mt-1"
+                    disabled={loading}
                   />
                 </div>
                 
@@ -67,11 +79,16 @@ const LoginPage = () => {
                     onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                     required
                     className="mt-1"
+                    disabled={loading}
                   />
                 </div>
 
-                <Button type="submit" className="w-full gradient-primary text-white text-lg py-3">
-                  Accedi
+                <Button 
+                  type="submit" 
+                  className="w-full gradient-primary text-white text-lg py-3"
+                  disabled={loading}
+                >
+                  {loading ? 'Accesso in corso...' : 'Accedi'}
                 </Button>
               </form>
 
@@ -79,7 +96,7 @@ const LoginPage = () => {
                 <p className="text-slate-600">
                   Non hai un account?{' '}
                   <button 
-                    onClick={() => navigate('/register')}
+                    onClick={() => navigate('/auth')}
                     className="text-green-600 hover:text-green-700 font-medium"
                   >
                     Registrati qui

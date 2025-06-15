@@ -25,12 +25,12 @@ const App = () => (
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={
               <ProtectedRoute>
                 <RegisterPage />
               </ProtectedRoute>
             } />
-            <Route path="/login" element={<LoginPage />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <DashboardPage />

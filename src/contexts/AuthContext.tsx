@@ -31,6 +31,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log('Setting up auth state listener...');
+    
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -43,6 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session?.user?.email);
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -52,6 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, userData?: any) => {
+    console.log('Attempting sign up for:', email);
     const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signUp({
@@ -64,10 +68,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (error) {
+      console.error('Sign up error:', error);
       toast({
         title: "Errore di registrazione",
         description: error.message,
         variant: "destructive"
+      });
+    } else {
+      console.log('Sign up successful');
+      toast({
+        title: "Registrazione completata!",
+        description: "Controlla la tua email per confermare l'account.",
       });
     }
 
@@ -75,16 +86,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
+    console.log('Attempting sign in for:', email);
+    
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
 
     if (error) {
+      console.error('Sign in error:', error);
       toast({
         title: "Errore di accesso",
         description: error.message,
         variant: "destructive"
+      });
+    } else {
+      console.log('Sign in successful');
+      toast({
+        title: "Accesso effettuato!",
+        description: "Benvenuto in GymConnect AI",
       });
     }
 
@@ -92,6 +112,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithGoogle = async () => {
+    console.log('Attempting Google sign in');
+    
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -100,6 +122,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (error) {
+      console.error('Google sign in error:', error);
       toast({
         title: "Errore Google Sign-in",
         description: error.message,
@@ -111,12 +134,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
+    console.log('Attempting sign out');
+    
     const { error } = await supabase.auth.signOut();
     if (error) {
+      console.error('Sign out error:', error);
       toast({
         title: "Errore logout",
         description: error.message,
         variant: "destructive"
+      });
+    } else {
+      console.log('Sign out successful');
+      toast({
+        title: "Logout effettuato",
+        description: "Arrivederci!",
       });
     }
   };
