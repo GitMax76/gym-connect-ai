@@ -51,7 +51,22 @@ export const useMatching = () => {
         return;
       }
 
-      setPreferences(data);
+      if (data) {
+        // Transform the data to match our interface
+        const transformedData: MatchingPreferences = {
+          id: data.id,
+          user_id: data.user_id,
+          preferred_trainer_specializations: data.preferred_trainer_specializations,
+          preferred_gym_facilities: data.preferred_gym_facilities,
+          max_distance_km: data.max_distance_km,
+          budget_min: data.budget_min ? Number(data.budget_min) : undefined,
+          budget_max: data.budget_max ? Number(data.budget_max) : undefined,
+          preferred_times: data.preferred_times as Record<string, string[]> || {},
+          workout_frequency_per_week: data.workout_frequency_per_week,
+          group_vs_personal: data.group_vs_personal as 'personal' | 'group' | 'both'
+        };
+        setPreferences(transformedData);
+      }
     } catch (error) {
       console.error('Error fetching preferences:', error);
     }
