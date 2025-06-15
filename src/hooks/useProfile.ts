@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -49,7 +48,7 @@ export interface TrainerProfile {
 
 export interface GymProfile {
   id: string;
-  gym_name: string; // Rimosso il ? per renderlo obbligatorio
+  gym_name: string; // Required field
   business_email?: string;
   address?: string;
   postal_code?: string;
@@ -202,7 +201,7 @@ export const useProfile = () => {
     }
   };
 
-  const createGymProfile = async (data: Partial<GymProfile>) => {
+  const createGymProfile = async (data: { gym_name: string } & Partial<Omit<GymProfile, 'id' | 'gym_name'>>) => {
     if (!user) return { error: 'No user logged in' };
 
     try {
