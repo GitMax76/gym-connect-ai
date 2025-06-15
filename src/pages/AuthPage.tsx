@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
@@ -25,6 +24,12 @@ const AuthPage = () => {
   const handleRoleSelect = (role: Role) => {
     setSelectedRole(role);
     setStep('register');
+  };
+
+  // Handle going back to role selection
+  const handleBack = () => {
+    setStep('select-role');
+    setSelectedRole('');
   };
 
   // Step 2: handle registration depending on selected role
@@ -200,21 +205,18 @@ const AuthPage = () => {
             <div>
               {/* Mostra il form relativo */}
               {selectedRole === 'user' && (
-                <UserRegistrationForm onSubmit={handleRegister} />
+                <UserRegistrationForm onSubmit={handleRegister} onBack={handleBack} />
               )}
               {selectedRole === 'instructor' && (
-                <TrainerRegistrationForm onSubmit={handleRegister} />
+                <TrainerRegistrationForm onSubmit={handleRegister} onBack={handleBack} />
               )}
               {selectedRole === 'gym' && (
-                <GymRegistrationForm onSubmit={handleRegister} />
+                <GymRegistrationForm onSubmit={handleRegister} onBack={handleBack} />
               )}
               <div className="text-center mt-6">
                 <button
                   className="text-slate-600 underline text-sm"
-                  onClick={() => {
-                    setStep('select-role');
-                    setSelectedRole('');
-                  }}
+                  onClick={handleBack}
                 >
                   ← Torna alla selezione profilo
                 </button>
