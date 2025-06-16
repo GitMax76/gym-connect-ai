@@ -16,6 +16,12 @@ export interface Booking {
   notes?: string;
   created_at?: string;
   updated_at?: string;
+  trainer?: {
+    profiles?: {
+      first_name: string;
+      last_name: string;
+    };
+  };
 }
 
 export const useBookings = () => {
@@ -30,7 +36,12 @@ export const useBookings = () => {
     try {
       const { data, error } = await supabase
         .from('bookings')
-        .select('*')
+        .select(`
+          *,
+          trainer:trainer_profiles!trainer_id (
+            profiles!id (first_name, last_name)
+          )
+        `)
         .or(`user_id.eq.${user.id},trainer_id.eq.${user.id}`)
         .order('booking_date', { ascending: false });
 
@@ -39,7 +50,14 @@ export const useBookings = () => {
         return;
       }
 
-      setBookings(data || []);
+      // Properly type the data from Supabase
+      const typedBookings: Booking[] = (data || []).map((booking: any) => ({
+        ...booking,
+        session_type: booking.session_type as 'personal' | 'group',
+        status: booking.status as 'pending' | 'confirmed' | 'cancelled' | 'completed'
+      }));
+
+      setBookings(typedBookings);
     } catch (error) {
       console.error('Error fetching bookings:', error);
     } finally {
@@ -86,6 +104,12 @@ export const useBookings = () => {
       return { error };
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      fetchUserBookings();
+    }
+  }, [user]);
 
   return {
     bookings,

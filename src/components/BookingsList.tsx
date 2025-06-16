@@ -74,7 +74,7 @@ const BookingsList = () => {
               <div className="flex items-center space-x-2">
                 <User className="h-4 w-4 text-gray-500" />
                 <span className="text-sm">
-                  {booking.trainer?.profiles?.first_name} {booking.trainer?.profiles?.last_name}
+                  {booking.trainer?.profiles?.first_name || 'N/A'} {booking.trainer?.profiles?.last_name || ''}
                 </span>
               </div>
               
