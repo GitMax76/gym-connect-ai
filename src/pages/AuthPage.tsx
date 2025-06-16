@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
@@ -183,6 +184,16 @@ const AuthPage = () => {
     };
     return mapping[budget] || { min: 0, max: 100 };
   };
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
