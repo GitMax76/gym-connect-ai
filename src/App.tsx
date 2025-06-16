@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LoginPage from '@/pages/LoginPage';
@@ -10,6 +9,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { Toaster } from 'sonner';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import SearchPage from '@/pages/SearchPage';
+import BookingsPage from '@/pages/BookingsPage';
 
 const queryClient = new QueryClient();
 
@@ -32,6 +32,11 @@ function App() {
               <Route path="/search" element={
                 <ProtectedRoute>
                   <SearchPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/bookings" element={
+                <ProtectedRoute>
+                  <BookingsPage />
                 </ProtectedRoute>
               } />
             </Routes>

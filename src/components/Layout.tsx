@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -48,6 +47,13 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                     className={location.pathname === '/search' ? 'bg-slate-100' : ''}
                   >
                     Cerca
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => navigate('/bookings')}
+                    className={location.pathname === '/bookings' ? 'bg-slate-100' : ''}
+                  >
+                    Prenotazioni
                   </Button>
                 </div>
               )}
