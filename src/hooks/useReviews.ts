@@ -47,7 +47,12 @@ export const useReviews = () => {
     }
   };
 
-  const createReview = async (reviewData: Omit<Review, 'id' | 'created_at' | 'reviewer'>) => {
+  const createReview = async (reviewData: {
+    reviewed_id: string;
+    booking_id?: string;
+    rating: number;
+    comment?: string;
+  }) => {
     if (!user) return { error: 'No user logged in' };
 
     try {

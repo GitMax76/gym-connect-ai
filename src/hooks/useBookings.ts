@@ -49,7 +49,14 @@ export const useBookings = () => {
         return;
       }
 
-      setBookings(data || []);
+      // Type assertion to ensure proper typing
+      const typedBookings = (data || []).map(booking => ({
+        ...booking,
+        session_type: booking.session_type as 'personal' | 'group',
+        status: booking.status as 'pending' | 'confirmed' | 'cancelled' | 'completed'
+      }));
+
+      setBookings(typedBookings);
     } catch (error) {
       console.error('Error fetching bookings:', error);
     } finally {
