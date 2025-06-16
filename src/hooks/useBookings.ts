@@ -14,14 +14,8 @@ export interface Booking {
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   price?: number;
   notes?: string;
-  created_at: string;
-  updated_at: string;
-  trainer?: {
-    profiles: {
-      first_name: string;
-      last_name: string;
-    };
-  };
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const useBookings = () => {
@@ -29,34 +23,23 @@ export const useBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchBookings = async () => {
+  const fetchUserBookings = async () => {
     if (!user) return;
 
     setLoading(true);
     try {
       const { data, error } = await supabase
         .from('bookings')
-        .select(`
-          *,
-          trainer:trainer_profiles!trainer_id (
-            profiles!id (first_name, last_name)
-          )
-        `)
-        .order('booking_date', { ascending: true });
+        .select('*')
+        .or(`user_id.eq.${user.id},trainer_id.eq.${user.id}`)
+        .order('booking_date', { ascending: false });
 
       if (error) {
         console.error('Error fetching bookings:', error);
         return;
       }
 
-      // Type assertion to ensure proper typing
-      const typedBookings = (data || []).map(booking => ({
-        ...booking,
-        session_type: booking.session_type as 'personal' | 'group',
-        status: booking.status as 'pending' | 'confirmed' | 'cancelled' | 'completed'
-      }));
-
-      setBookings(typedBookings);
+      setBookings(data || []);
     } catch (error) {
       console.error('Error fetching bookings:', error);
     } finally {
@@ -76,7 +59,7 @@ export const useBookings = () => {
         });
 
       if (!error) {
-        await fetchBookings();
+        await fetchUserBookings();
       }
 
       return { error };
@@ -87,36 +70,28 @@ export const useBookings = () => {
   };
 
   const updateBookingStatus = async (bookingId: string, status: Booking['status']) => {
-    if (!user) return { error: 'No user logged in' };
-
     try {
       const { error } = await supabase
         .from('bookings')
-        .update({ status, updated_at: new Date().toISOString() })
+        .update({ status })
         .eq('id', bookingId);
 
       if (!error) {
-        await fetchBookings();
+        await fetchUserBookings();
       }
 
       return { error };
     } catch (error: any) {
-      console.error('Error updating booking status:', error);
+      console.error('Error updating booking:', error);
       return { error };
     }
   };
 
-  useEffect(() => {
-    if (user) {
-      fetchBookings();
-    }
-  }, [user]);
-
   return {
     bookings,
     loading,
+    fetchUserBookings,
     createBooking,
-    updateBookingStatus,
-    refetch: fetchBookings
+    updateBookingStatus
   };
 };
