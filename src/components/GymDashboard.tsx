@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useProfile } from '@/hooks/useProfile';
 import { Building, Users, Calendar, DollarSign, Star, TrendingUp } from 'lucide-react';
+import GymProfileEditDialog from './GymProfileEditDialog';
 
 const GymDashboard = () => {
   const { profile, gymProfile, loading } = useProfile();
@@ -84,10 +85,13 @@ const GymDashboard = () => {
         {/* Gym Profile */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Building className="h-5 w-5" />
-              Profilo Palestra
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Building className="h-5 w-5" />
+                Profilo Palestra
+              </CardTitle>
+              {gymProfile && <GymProfileEditDialog currentProfile={gymProfile} />}
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {gymProfile ? (

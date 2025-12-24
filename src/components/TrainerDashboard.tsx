@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useProfile } from '@/hooks/useProfile';
 import { Calendar, Users, DollarSign, Star, Clock, Award } from 'lucide-react';
+import TrainerProfileEditDialog from './TrainerProfileEditDialog';
 
 const TrainerDashboard = () => {
   const { profile, trainerProfile, loading } = useProfile();
@@ -84,10 +85,13 @@ const TrainerDashboard = () => {
         {/* Profile Summary */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Award className="h-5 w-5" />
-              Il Tuo Profilo Trainer
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Award className="h-5 w-5" />
+                Il Tuo Profilo Trainer
+              </CardTitle>
+              {trainerProfile && <TrainerProfileEditDialog currentProfile={trainerProfile} />}
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {trainerProfile ? (

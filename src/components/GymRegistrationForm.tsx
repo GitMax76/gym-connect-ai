@@ -17,6 +17,7 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
     gymName: '',
     ownerName: '',
     email: '',
+    password: '',
     phone: '',
     address: '',
     city: '',
@@ -32,8 +33,8 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
   });
 
   const facilityOptions = [
-    'Sala Pesi', 'Cardio Area', 'Sala Corsi', 'Piscina', 'Sauna', 
-    'Bagno Turco', 'Spogliatoi', 'Parcheggio', 'WiFi Gratuito', 
+    'Sala Pesi', 'Cardio Area', 'Sala Corsi', 'Piscina', 'Sauna',
+    'Bagno Turco', 'Spogliatoi', 'Parcheggio', 'WiFi Gratuito',
     'Personal Training', 'Nutrizione', 'Fisioterapia'
   ];
 
@@ -106,7 +107,7 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
                 />
               </div>
             </div>
-            
+
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="email">Email Aziendale *</Label>
@@ -116,6 +117,17 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   placeholder="info@tuapalestra.it"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="password">Password *</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  placeholder="Password sicura"
                   required
                 />
               </div>
@@ -152,7 +164,7 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
                 required
               />
             </div>
-            
+
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="city">Città *</Label>
@@ -252,7 +264,7 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
                 />
               </div>
             </div>
-            
+
             <div className="grid md:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="memberCapacity">Capacità Massima</Label>
@@ -306,15 +318,15 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
 
         {/* Buttons */}
         <div className="flex gap-4 justify-center">
-          <Button 
-            type="button" 
-            variant="outline" 
+          <Button
+            type="button"
+            variant="outline"
             onClick={onBack}
             className="px-8 py-3"
           >
             ← Indietro
           </Button>
-          <Button 
+          <Button
             type="submit"
             className="px-8 py-3 bg-gradient-to-r from-orange-600 to-red-500 text-white hover:shadow-lg transition-all"
           >

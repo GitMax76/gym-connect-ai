@@ -1,10 +1,16 @@
-# Welcome to your Lovable project
+# Gym Connect AI 🏋️‍♂️🤖
 
-## Project info
+An intelligent, modern gym management platform built with React, Vite, Tailwind CSS, and Supabase.
 
-**URL**: https://lovable.dev/projects/ecc49b3b-ca82-4031-beab-1622100fe511
+**🚀 [Live Demo](#)** | **📚 [Deployment Guide](./DEPLOYMENT_GUIDE.md)** | **🗄️ [Database Setup](./SETUP_SUPABASE.md)**
 
-## How can I edit this code?
+## Features ✨
+
+-   **AI-Ready Architecture**: Designed to be easily integrated with AI agents and tools.
+-   **Modern Stack**: React, TypeScript, Tailwind CSS, Shadcn UI.
+-   **Performance**: Lazy loading and optimized assets.
+-   **Secure**: Row Level Security (RLS) with Supabase Auth.
+
 
 There are several ways of editing your application.
 

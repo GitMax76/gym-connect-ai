@@ -1,19 +1,31 @@
-
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LoginPage from '@/pages/LoginPage';
-import RegisterPage from '@/pages/RegisterPage';
-import AuthPage from '@/pages/AuthPage';
-import HomePage from '@/pages/HomePage';
-import DashboardPage from '@/pages/DashboardPage';
 import { AuthProvider } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Toaster } from 'sonner';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import SearchPage from '@/pages/SearchPage';
-import BookingsPage from '@/pages/BookingsPage';
+import { Loader2 } from 'lucide-react';
+
+const LoginPage = React.lazy(() => import('@/pages/LoginPage'));
+const RegisterPage = React.lazy(() => import('@/pages/RegisterPage'));
+const AuthPage = React.lazy(() => import('@/pages/AuthPage'));
+const HomePage = React.lazy(() => import('@/pages/HomePage'));
+const DashboardPage = React.lazy(() => import('@/pages/DashboardPage'));
+const SearchPage = React.lazy(() => import('@/pages/SearchPage'));
+const BookingsPage = React.lazy(() => import('@/pages/BookingsPage'));
+const SeedPage = React.lazy(() => import('@/pages/SeedPage'));
+const ProfilePage = React.lazy(() => import('@/pages/ProfilePage'));
 
 const queryClient = new QueryClient();
+
+const LoadingFallback = () => (
+  <div className="h-screen w-full flex items-center justify-center bg-slate-50">
+    <div className="flex flex-col items-center gap-2">
+      <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+      <p className="text-sm text-slate-500">Caricamento...</p>
+    </div>
+  </div>
+);
 
 function App() {
   return (
@@ -22,27 +34,36 @@ function App() {
         <Router>
           <div className="App">
             <Toaster />
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <DashboardPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/search" element={
-                <ProtectedRoute>
-                  <SearchPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/bookings" element={
-                <ProtectedRoute>
-                  <BookingsPage />
-                </ProtectedRoute>
-              } />
-            </Routes>
+            <Suspense fallback={<LoadingFallback />}>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <DashboardPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/search" element={
+                  <ProtectedRoute>
+                    <SearchPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/bookings" element={
+                  <ProtectedRoute>
+                    <BookingsPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/seed" element={<SeedPage />} />
+                <Route path="/profile/:id" element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                } />
+              </Routes>
+
+            </Suspense>
           </div>
         </Router>
       </AuthProvider>

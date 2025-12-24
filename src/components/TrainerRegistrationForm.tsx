@@ -17,6 +17,7 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
     firstName: '',
     lastName: '',
     email: '',
+    password: '',
     phone: '',
     dateOfBirth: '',
     city: '',
@@ -32,7 +33,7 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
   });
 
   const certificationOptions = [
-    'CONI', 'NASM', 'ACSM', 'ISSA', 'ACE', 'NSCA', 
+    'CONI', 'NASM', 'ACSM', 'ISSA', 'ACE', 'NSCA',
     'Laurea Scienze Motorie', 'Fisioterapista', 'Nutrizionista'
   ];
 
@@ -119,7 +120,7 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
                 />
               </div>
             </div>
-            
+
             <div className="grid md:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="email">Email *</Label>
@@ -129,6 +130,17 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   placeholder="tua@email.com"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="password">Password *</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  placeholder="Password sicura"
                   required
                 />
               </div>
@@ -322,15 +334,15 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
 
         {/* Buttons */}
         <div className="flex gap-4 justify-center">
-          <Button 
-            type="button" 
-            variant="outline" 
+          <Button
+            type="button"
+            variant="outline"
             onClick={onBack}
             className="px-8 py-3"
           >
             ← Indietro
           </Button>
-          <Button 
+          <Button
             type="submit"
             className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-500 text-white hover:shadow-lg transition-all"
           >

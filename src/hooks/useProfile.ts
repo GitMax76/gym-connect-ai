@@ -51,6 +51,7 @@ export interface GymProfile {
   gym_name: string; // Required field
   business_email?: string;
   address?: string;
+  city?: string;
   postal_code?: string;
   description?: string;
   facilities?: string[];
@@ -90,7 +91,7 @@ export const useProfile = () => {
 
     try {
       console.log('Fetching profile for user:', user.id);
-      
+
       // Fetch base profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -220,6 +221,46 @@ export const useProfile = () => {
     }
   };
 
+  const updateTrainerProfile = async (updates: Partial<TrainerProfile>) => {
+    if (!user) return { error: 'No user logged in' };
+
+    try {
+      const { error } = await supabase
+        .from('trainer_profiles')
+        .update(updates)
+        .eq('id', user.id);
+
+      if (!error) {
+        setTrainerProfile(prev => prev ? { ...prev, ...updates } : null);
+      }
+
+      return { error };
+    } catch (error: any) {
+      console.error('Error updating trainer profile:', error);
+      return { error };
+    }
+  };
+
+  const updateGymProfile = async (updates: Partial<GymProfile>) => {
+    if (!user) return { error: 'No user logged in' };
+
+    try {
+      const { error } = await supabase
+        .from('gym_profiles')
+        .update(updates)
+        .eq('id', user.id);
+
+      if (!error) {
+        setGymProfile(prev => prev ? { ...prev, ...updates } : null);
+      }
+
+      return { error };
+    } catch (error: any) {
+      console.error('Error updating gym profile:', error);
+      return { error };
+    }
+  };
+
   return {
     profile,
     userProfile,
@@ -230,6 +271,8 @@ export const useProfile = () => {
     createUserProfile,
     createTrainerProfile,
     createGymProfile,
+    updateTrainerProfile,
+    updateGymProfile,
     refetch: fetchProfile
   };
 };

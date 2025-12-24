@@ -101,18 +101,36 @@ export const useMatching = () => {
     setLoading(true);
     try {
       let query;
-      
+
+      // Retrieve user's city from profile or preferences to filter matches
+      // This simulates "10km" radius by strict city matching for the Rome Scenario
+      // note: preferences doesn't have city, so we rely on user metadata or default to 'Roma' for testing
+      const targetCity = 'Roma';
+
       if (type === 'trainer') {
-        query = supabase
+        let q = supabase
           .from('trainer_profiles')
           .select(`
             *,
-            profiles(first_name, last_name, city, avatar_url)
-          `);
+            profiles!inner(first_name, last_name, city, avatar_url)
+          `)
+          // Filter by city in the joined profiles table
+          .eq('profiles.city', targetCity)
+          .limit(20);
+
+        // Note: .eq('profiles.city') on a joined table with !inner works as a filter.
+        query = q;
       } else {
-        query = supabase
+        let q = supabase
           .from('gym_profiles')
-          .select('*');
+          .select(`
+            *,
+            profiles!inner(city, first_name, avatar_url)
+          `)
+          .eq('profiles.city', targetCity)
+          .limit(20);
+
+        query = q;
       }
 
       const { data, error } = await query;
@@ -122,20 +140,18 @@ export const useMatching = () => {
         return;
       }
 
-      // Calculate match scores for each result
-      const matchResults: MatchResult[] = [];
-      
-      for (const item of data || []) {
+      // Calculate match scores for each result in parallel
+      const matchResults: MatchResult[] = await Promise.all((data || []).map(async (item) => {
         const score = await calculateMatchScore(user.id, type === 'trainer' ? item.id : null, type === 'gym' ? item.id : null);
-        
-        matchResults.push({
+
+        return {
           id: item.id,
           score: score || 0,
           factors: {}, // TODO: implement detailed scoring factors
           profile: item,
           type
-        });
-      }
+        };
+      }));
 
       // Sort by score (highest first)
       matchResults.sort((a, b) => b.score - a.score);

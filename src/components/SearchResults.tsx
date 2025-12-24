@@ -7,6 +7,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Star, MapPin, Clock, DollarSign, Users, Award, Zap } from 'lucide-react';
 import { MatchResult } from '@/hooks/useMatching';
 
+
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+
 interface SearchResultsProps {
   results: MatchResult[];
   loading: boolean;
@@ -14,7 +18,12 @@ interface SearchResultsProps {
 }
 
 const SearchResults = ({ results, loading, type }: SearchResultsProps) => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
   if (loading) {
+    // ... (keep loading state as is, but I can't overwrite partial file easily if I need to inject hooks at top component level)
+    // I will overwrite properly.
     return (
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
@@ -64,6 +73,13 @@ const SearchResults = ({ results, loading, type }: SearchResultsProps) => {
     return 'Match Base';
   };
 
+  const handleBooking = () => {
+    toast({
+      title: "Funzionalità in arrivo",
+      description: "Il sistema di prenotazione sarà disponibile a breve.",
+    });
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-6">
@@ -90,7 +106,7 @@ const SearchResults = ({ results, loading, type }: SearchResultsProps) => {
                 )}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">
-                    {type === 'trainer' 
+                    {type === 'trainer'
                       ? `${result.profile.profiles?.first_name || ''} ${result.profile.profiles?.last_name || ''}`
                       : result.profile.gym_name
                     }
@@ -103,7 +119,7 @@ const SearchResults = ({ results, loading, type }: SearchResultsProps) => {
                   )}
                 </div>
               </div>
-              
+
               {/* Match Score */}
               <div className="text-right">
                 <div className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${getMatchColor(result.score)}`}>
@@ -179,7 +195,7 @@ const SearchResults = ({ results, loading, type }: SearchResultsProps) => {
                   </>
                 )}
               </div>
-              
+
               <div className="flex items-center">
                 <Star className="h-4 w-4 mr-1 text-yellow-500" />
                 <span>4.8 (15 recensioni)</span>
@@ -188,10 +204,13 @@ const SearchResults = ({ results, loading, type }: SearchResultsProps) => {
 
             {/* Action buttons */}
             <div className="flex gap-2">
-              <Button className="flex-1">
+              <Button
+                className="flex-1"
+                onClick={() => navigate(`/profile/${result.id}`)}
+              >
                 Visualizza Profilo
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleBooking}>
                 {type === 'trainer' ? 'Prenota Sessione' : 'Richiedi Info'}
               </Button>
             </div>
@@ -201,5 +220,6 @@ const SearchResults = ({ results, loading, type }: SearchResultsProps) => {
     </div>
   );
 };
+
 
 export default SearchResults;
