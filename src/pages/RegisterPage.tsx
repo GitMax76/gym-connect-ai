@@ -33,10 +33,10 @@ const RegisterPage = () => {
     if (profile?.user_type) {
       const roleMapping = {
         'user': 'user',
-        'trainer': 'instructor', 
+        'trainer': 'instructor',
         'gym_owner': 'gym'
       } as const;
-      
+
       setSelectedRole(roleMapping[profile.user_type]);
       setStep('form');
     }
@@ -44,10 +44,10 @@ const RegisterPage = () => {
 
   const handleRoleSelect = async (role: 'user' | 'instructor' | 'gym') => {
     const userType = role === 'instructor' ? 'trainer' : role === 'gym' ? 'gym_owner' : 'user';
-    
+
     // Update the base profile with the selected user type
     const { error } = await updateProfile({ user_type: userType });
-    
+
     if (error) {
       toast({
         title: "Errore",
@@ -63,7 +63,7 @@ const RegisterPage = () => {
 
   const handleFormSubmit = async (data: any) => {
     console.log('Registration data:', { role: selectedRole, ...data });
-    
+
     try {
       let error = null;
 
@@ -83,7 +83,7 @@ const RegisterPage = () => {
             health_conditions: data.healthConditions,
             experience_description: data.goals
           };
-          
+
           const userResult = await createUserProfile(userProfileData);
           error = userResult.error;
           break;
@@ -102,7 +102,7 @@ const RegisterPage = () => {
             preferred_areas: data.preferredAreas,
             availability_schedule: { slots: data.availability }
           };
-          
+
           const trainerResult = await createTrainerProfile(trainerProfileData);
           error = trainerResult.error;
           break;
@@ -123,7 +123,7 @@ const RegisterPage = () => {
             monthly_fee: data.monthlyFee ? parseFloat(data.monthlyFee) : undefined,
             day_pass_fee: data.dayPassFee ? parseFloat(data.dayPassFee) : undefined
           };
-          
+
           const gymResult = await createGymProfile(gymProfileData);
           error = gymResult.error;
           break;
@@ -148,7 +148,7 @@ const RegisterPage = () => {
 
       let welcomeMessage = '';
       let description = '';
-      
+
       switch (selectedRole) {
         case 'user':
           welcomeMessage = "🎉 Benvenuto in GymConnect AI!";
@@ -163,12 +163,12 @@ const RegisterPage = () => {
           description = "La tua struttura è ora parte del network GymConnect. Attrai nuovi membri e ottimizza la gestione!";
           break;
       }
-      
+
       toast({
         title: welcomeMessage,
         description: description,
       });
-      
+
       navigate('/dashboard');
     } catch (error) {
       console.error('Error during registration:', error);
@@ -222,6 +222,9 @@ const RegisterPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {step === 'role' ? (
             <div className="text-center mb-12 animate-fade-in">
+              <span className="inline-block py-1 px-3 rounded-full bg-green-100 text-green-700 text-sm font-semibold mb-4">
+                GymConnect AI
+              </span>
               <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-6">
                 Trasforma la Tua
                 <span className="block bg-gradient-to-r from-green-600 via-blue-600 to-orange-500 bg-clip-text text-transparent">
@@ -229,7 +232,7 @@ const RegisterPage = () => {
                 </span>
               </h1>
               <p className="text-xl text-slate-600 mb-4 max-w-4xl mx-auto leading-relaxed">
-                Unisciti alla rivoluzione del fitness intelligente. Scegli il tuo ruolo e inizia a creare 
+                Unisciti alla rivoluzione del fitness intelligente. Scegli il tuo ruolo e inizia a creare
                 connessioni autentiche nel mondo del benessere e della forma fisica.
               </p>
               <p className="text-lg text-green-600 font-medium mb-12">

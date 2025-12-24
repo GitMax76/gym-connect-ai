@@ -31,14 +31,14 @@ const HeroSection = () => {
             },
             {
               emoji: "💪",
-              name: "Alessandro, 28 anni", 
+              name: "Alessandro, 28 anni",
               role: "Fitness Enthusiast",
               text: "Finalmente una palestra che capisce le mie esigenze e i miei orari!"
             },
             {
               emoji: "🧘‍♀️",
               name: "Carla, 35 anni",
-              role: "Yoga Lover", 
+              role: "Yoga Lover",
               text: "Ho trovato la pace interiore e la forma fisica che cercavo da anni!"
             }
           ]
@@ -114,21 +114,21 @@ const HeroSection = () => {
           ],
           testimonials: [
             {
-              emoji: "🏃‍♀️", 
+              emoji: "🏃‍♀️",
               name: "Maria, 32 anni",
               role: "Atleta",
               text: "Ho perso 15kg in 6 mesi grazie al match perfetto con la mia trainer!"
             },
             {
               emoji: "💪",
-              name: "Marco, Trainer", 
+              name: "Marco, Trainer",
               role: "Personal Trainer",
               text: "Ho triplicato i miei clienti e ora lavoro solo con persone motivate!"
             },
             {
               emoji: "🏋️‍♂️",
               name: "FitZone Gym",
-              role: "Centro Fitness", 
+              role: "Centro Fitness",
               text: "Il 40% di nuovi iscritti in 3 mesi grazie alla piattaforma!"
             }
           ]
@@ -142,14 +142,14 @@ const HeroSection = () => {
     <div className="relative overflow-hidden">
       {/* Hero Background with fitness patterns */}
       <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-blue-50 to-orange-50"></div>
-      <div className="absolute inset-0 opacity-5">
+      <div className="absolute inset-0 opacity-5 hidden md:block">
         <div className="absolute top-20 left-10 text-6xl">🏋️‍♂️</div>
         <div className="absolute top-40 right-20 text-4xl">💪</div>
         <div className="absolute bottom-40 left-20 text-5xl">🏃‍♀️</div>
         <div className="absolute bottom-20 right-10 text-3xl">🧘‍♀️</div>
         <div className="absolute top-60 left-1/2 text-4xl">⚡</div>
       </div>
-      
+
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
         <div className="text-center animate-fade-in">
           <div className="mb-8">
@@ -157,7 +157,7 @@ const HeroSection = () => {
               🚀 La Rivoluzione del Fitness è Qui
             </span>
           </div>
-          
+
           <h1 className="text-5xl md:text-7xl font-bold text-slate-900 mb-6">
             Un solo portale.
             <span className="block bg-gradient-to-r from-green-600 via-blue-600 to-orange-500 bg-clip-text text-transparent">
@@ -171,9 +171,9 @@ const HeroSection = () => {
               <h2 className="text-2xl md:text-3xl font-semibold text-slate-700 mb-8">
                 Scegli il tuo percorso fitness
               </h2>
-              <RoleSelector 
-                onRoleSelect={setSelectedRole} 
-                selectedRole={selectedRole || ''} 
+              <RoleSelector
+                onRoleSelect={setSelectedRole}
+                selectedRole={selectedRole || ''}
               />
             </div>
           )}
@@ -182,19 +182,19 @@ const HeroSection = () => {
           {selectedRole && (
             <>
               <div className="mb-4">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => setSelectedRole(null)}
                   className="text-sm"
                 >
                   ← Cambia selezione
                 </Button>
               </div>
-              
+
               <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6">
                 {content.subtitle}
               </h2>
-              
+
               <p className="text-xl md:text-2xl text-slate-600 mb-8 max-w-4xl mx-auto leading-relaxed">
                 {content.description}
               </p>
@@ -213,18 +213,18 @@ const HeroSection = () => {
                   </div>
                 ))}
               </div>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="gradient-primary text-white text-lg px-8 py-4 rounded-xl hover:scale-105 transition-transform shadow-lg"
                   onClick={() => navigate('/register')}
                 >
                   🚀 Inizia la Tua Trasformazione
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg" 
+                <Button
+                  variant="outline"
+                  size="lg"
                   className="text-lg px-8 py-4 rounded-xl border-2 border-slate-300 hover:border-green-500 transition-colors"
                   onClick={() => navigate('/login')}
                 >
@@ -243,38 +243,34 @@ const HeroSection = () => {
                   {selectedRole === 'gym' && "Palestre che hanno rivoluzionato il loro business"}
                   {!selectedRole && "Ogni giorno aiutiamo persone a raggiungere i loro obiettivi fitness"}
                 </p>
-                
+
                 <div className="grid md:grid-cols-3 gap-6">
                   {content.testimonials.map((testimonial, index) => (
-                    <div key={index} className={`p-6 rounded-2xl ${
-                      selectedRole === 'user' ? 'bg-green-50' :
-                      selectedRole === 'instructor' ? 'bg-blue-50' :
-                      selectedRole === 'gym' ? 'bg-orange-50' : 
-                      index === 0 ? 'bg-green-50' : index === 1 ? 'bg-blue-50' : 'bg-orange-50'
-                    }`}>
-                      <div className="text-4xl mb-4">{testimonial.emoji}</div>
-                      <h4 className={`font-bold mb-1 ${
-                        selectedRole === 'user' ? 'text-green-800' :
-                        selectedRole === 'instructor' ? 'text-blue-800' :
-                        selectedRole === 'gym' ? 'text-orange-800' :
-                        index === 0 ? 'text-green-800' : index === 1 ? 'text-blue-800' : 'text-orange-800'
+                    <div key={index} className={`p-6 rounded-2xl ${selectedRole === 'user' ? 'bg-green-50' :
+                        selectedRole === 'instructor' ? 'bg-blue-50' :
+                          selectedRole === 'gym' ? 'bg-orange-50' :
+                            index === 0 ? 'bg-green-50' : index === 1 ? 'bg-blue-50' : 'bg-orange-50'
                       }`}>
+                      <div className="text-4xl mb-4">{testimonial.emoji}</div>
+                      <h4 className={`font-bold mb-1 ${selectedRole === 'user' ? 'text-green-800' :
+                          selectedRole === 'instructor' ? 'text-blue-800' :
+                            selectedRole === 'gym' ? 'text-orange-800' :
+                              index === 0 ? 'text-green-800' : index === 1 ? 'text-blue-800' : 'text-orange-800'
+                        }`}>
                         {testimonial.name}
                       </h4>
-                      <p className={`text-xs mb-2 ${
-                        selectedRole === 'user' ? 'text-green-600' :
-                        selectedRole === 'instructor' ? 'text-blue-600' :
-                        selectedRole === 'gym' ? 'text-orange-600' :
-                        index === 0 ? 'text-green-600' : index === 1 ? 'text-blue-600' : 'text-orange-600'
-                      }`}>
+                      <p className={`text-xs mb-2 ${selectedRole === 'user' ? 'text-green-600' :
+                          selectedRole === 'instructor' ? 'text-blue-600' :
+                            selectedRole === 'gym' ? 'text-orange-600' :
+                              index === 0 ? 'text-green-600' : index === 1 ? 'text-blue-600' : 'text-orange-600'
+                        }`}>
                         {testimonial.role}
                       </p>
-                      <p className={`text-sm ${
-                        selectedRole === 'user' ? 'text-green-700' :
-                        selectedRole === 'instructor' ? 'text-blue-700' :
-                        selectedRole === 'gym' ? 'text-orange-700' :
-                        index === 0 ? 'text-green-700' : index === 1 ? 'text-blue-700' : 'text-orange-700'
-                      }`}>
+                      <p className={`text-sm ${selectedRole === 'user' ? 'text-green-700' :
+                          selectedRole === 'instructor' ? 'text-blue-700' :
+                            selectedRole === 'gym' ? 'text-orange-700' :
+                              index === 0 ? 'text-green-700' : index === 1 ? 'text-blue-700' : 'text-orange-700'
+                        }`}>
                         "{testimonial.text}"
                       </p>
                     </div>
@@ -295,7 +291,7 @@ const HeroSection = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 mb-4">Matchmaking Intelligente</h3>
                 <p className="text-slate-600 leading-relaxed mb-4">
-                  Il nostro algoritmo AI analizza obiettivi, disponibilità e preferenze per trovarti 
+                  Il nostro algoritmo AI analizza obiettivi, disponibilità e preferenze per trovarti
                   il trainer perfetto e la palestra ideale
                 </p>
                 <div className="text-sm text-green-600 font-medium">
@@ -311,7 +307,7 @@ const HeroSection = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 mb-4">Gestione Completa</h3>
                 <p className="text-slate-600 leading-relaxed mb-4">
-                  Prenota sessioni, gestisci schede personalizzate e monitora i progressi 
+                  Prenota sessioni, gestisci schede personalizzate e monitora i progressi
                   tutto da un'unica piattaforma integrata
                 </p>
                 <div className="text-sm text-blue-600 font-medium">
@@ -327,7 +323,7 @@ const HeroSection = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 mb-4">Ricerca Avanzata</h3>
                 <p className="text-slate-600 leading-relaxed mb-4">
-                  Filtra per zona, specializzazione, orari e budget per trovare 
+                  Filtra per zona, specializzazione, orari e budget per trovare
                   esattamente quello che cerchi nel mondo fitness
                 </p>
                 <div className="text-sm text-orange-600 font-medium">

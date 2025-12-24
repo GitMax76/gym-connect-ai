@@ -64,11 +64,14 @@ const LoginPage = () => {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="mb-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-600 to-blue-600 rounded-full mx-auto flex items-center justify-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-green-600 to-blue-600 rounded-full mx-auto flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-2xl">GC</span>
               </div>
             </div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-2">
+              GymConnect AI
+            </h2>
+            <h1 className="text-xl font-semibold text-slate-700 mb-2">
               Bentornato!
             </h1>
             <p className="text-slate-600">
@@ -81,7 +84,7 @@ const LoginPage = () => {
             <CardHeader className="pb-4">
               <CardTitle className="text-2xl text-center text-slate-900">Accedi</CardTitle>
             </CardHeader>
-            
+
             <CardContent className="space-y-6">
               {error && (
                 <Alert variant="destructive">
@@ -105,7 +108,7 @@ const LoginPage = () => {
                     className="h-12 border-slate-200 focus:border-green-500 focus:ring-green-500"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="password" className="text-slate-700 font-medium">
                     Password
@@ -132,8 +135,8 @@ const LoginPage = () => {
                   </div>
                 </div>
 
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full h-12 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl"
                   disabled={loading}
                 >
@@ -162,7 +165,7 @@ const LoginPage = () => {
               <div className="text-center">
                 <p className="text-slate-600">
                   Non hai ancora un account?{' '}
-                  <button 
+                  <button
                     onClick={() => navigate('/auth')}
                     className="text-green-600 hover:text-green-700 font-semibold hover:underline transition-colors"
                     disabled={loading}
@@ -174,7 +177,7 @@ const LoginPage = () => {
 
               {/* Back to Home */}
               <div className="text-center pt-4 border-t border-slate-100">
-                <button 
+                <button
                   onClick={() => navigate('/')}
                   className="text-slate-500 hover:text-slate-700 text-sm transition-colors"
                   disabled={loading}
