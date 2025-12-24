@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2563EB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16A34A;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Optional: White background circle for dark mode visibility -->
+  <circle cx="50" cy="50" r="48" fill="white" />
+  
+  <!-- Bold Text -->
+  <text x="50" y="70" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-weight="900" 
+        font-size="65" 
+        fill="url(#brandGradient)" 
+        text-anchor="middle" 
+        style="font-weight: 900; letter-spacing: -2px;">
+    GC
+  </text>
+</svg>
