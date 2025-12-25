@@ -118,7 +118,24 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
           </div>
         </nav>
       )}
-      <main>{children}</main>
+      <main className="flex-grow">{children}</main>
+
+      {showNavigation && (
+        <footer className="bg-white border-t border-slate-200 py-8 mt-auto">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
+            <div className="mb-4 md:mb-0">
+              &copy; {new Date().getFullYear()} GymConnect AI. All rights reserved.
+            </div>
+            <div className="flex space-x-6">
+              <a href="/business.html" className="hover:text-primary transition-colors font-medium">
+                Investors & Partners
+              </a>
+              <span className="cursor-pointer hover:text-slate-700">Privacy</span>
+              <span className="cursor-pointer hover:text-slate-700">Terms</span>
+            </div>
+          </div>
+        </footer>
+      )}
     </div>
   );
 };
