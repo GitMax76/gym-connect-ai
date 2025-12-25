@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -70,11 +70,25 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                     <Button onClick={() => navigate('/register')} className="gradient-primary text-white">
                       Registrati
                     </Button>
+                    <Link
+                      to="/contact"
+                      className="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                    >
+                      Contatti
+                    </Link>
                   </>
                 ) : (
-                  <Button variant="outline" onClick={() => navigate('/')}>
-                    Home
-                  </Button>
+                  <>
+                    <Button variant="outline" onClick={() => navigate('/')}>
+                      Home
+                    </Button>
+                    <Link
+                      to="/contact"
+                      className="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                    >
+                      Contatti
+                    </Link>
+                  </>
                 )}
               </div>
 
@@ -99,6 +113,9 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                           <Button variant="ghost" onClick={() => navigate('/bookings')}>
                             Prenotazioni
                           </Button>
+                          <Button variant="ghost" onClick={() => navigate('/contact')}>
+                            Contatti
+                          </Button>
                         </>
                       ) : (
                         <>
@@ -107,6 +124,9 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                           </Button>
                           <Button className="gradient-primary text-white" onClick={() => navigate('/register')}>
                             Registrati
+                          </Button>
+                          <Button variant="ghost" onClick={() => navigate('/contact')}>
+                            Contatti
                           </Button>
                         </>
                       )}
@@ -127,6 +147,9 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
               &copy; {new Date().getFullYear()} GymConnect AI. All rights reserved.
             </div>
             <div className="flex space-x-6">
+              <Link to="/contact" className="hover:text-primary transition-colors text-sm">
+                Contatti
+              </Link>
               <a href="/business.html" className="hover:text-primary transition-colors font-medium">
                 Investors & Partners
               </a>
