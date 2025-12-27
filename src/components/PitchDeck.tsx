@@ -315,22 +315,22 @@ export default function PitchDeck() {
                 <SlideContainer active={currentSlide === 0} className="bg-gradient-to-br from-blue-900 to-slate-900 text-white text-center">
                     <div className="max-w-4xl mx-auto">
                         <div className="mb-6 inline-block px-4 py-2 bg-blue-500/20 rounded-full border border-blue-400/30 text-blue-200 text-sm font-semibold tracking-wider uppercase animate-pulse">
-                            Strategic Pitch Deck
+                            The Fitness Revolution 4.0
                         </div>
                         <h1 className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight tracking-tight">
-                            Oltre la Directory. <br />
+                            Libera il Tuo Potenziale. <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300">
-                                Ecosistema Fitness Intelligente
+                                Fitness Senza Confini.
                             </span>
                         </h1>
                         <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-2xl mx-auto">
-                            Connettiamo <span className="text-white font-semibold">Atleti</span>, <span className="text-white font-semibold">Trainer</span> e <span className="text-white font-semibold">Strutture</span> in tempo reale per eliminare le inefficienze del mercato.
+                            L'Ecosistema che unisce <span className="text-white font-semibold">Passione</span>, <span className="text-white font-semibold">Professione</span> e <span className="text-white font-semibold">Business</span> in un'unica piattaforma intelligente.
                         </p>
                         <button
                             onClick={nextSlide}
                             className="group bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-full font-bold text-lg transition-all transform hover:scale-105 flex items-center mx-auto"
                         >
-                            Scopri la Visione
+                            Esplora l'Ecosistema
                             <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
                         </button>
                     </div>
@@ -343,30 +343,30 @@ export default function PitchDeck() {
                 {/* SLIDE 2: IL PROBLEMA (THE GAP) */}
                 <SlideContainer active={currentSlide === 1}>
                     <div className="max-w-6xl mx-auto w-full">
-                        <h2 className="text-4xl font-bold text-center mb-4 text-gray-900">L'Inefficienza del Mercato Attuale</h2>
-                        <p className="text-center text-gray-500 mb-12 text-xl">Tre attori disconnessi, tre problemi strutturali.</p>
+                        <h2 className="text-4xl font-bold text-center mb-4 text-gray-900">Il Paradosso del Fitness Moderno</h2>
+                        <p className="text-center text-gray-500 mb-12 text-xl">Tutti vogliono allenarsi, ma il sistema è rotto.</p>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             <Card
-                                title="Atleti (La Domanda)"
+                                title="L'Atleta Bloccato"
                                 icon={Search}
                                 color="#EF4444"
                                 delay={100}
-                                description="Frustrati dalla ricerca manuale. Si adattano a orari scomodi e offerte generiche. Perdono tempo cercando la qualità."
+                                description="Vincolato da abbonamenti rigidi e orari scomodi. Cerca qualità e flessibilità, trova solo compromessi."
                             />
                             <Card
-                                title="Trainer (L'Offerta)"
+                                title="Il Trainer Invisibile"
                                 icon={Dumbbell}
                                 color="#F59E0B"
                                 delay={300}
-                                description="Alti costi di marketing per trovare clienti. Soffrono di 'orari morti' non retribuiti durante la giornata."
+                                description="Eccellente nel suo lavoro, ma schiacciato dai costi di marketing. Ore libere sprecate = Guadagno perso."
                             />
                             <Card
-                                title="Strutture (L'Asset)"
+                                title="La Struttura Vuota"
                                 icon={Building2}
                                 color="#3B82F6"
                                 delay={500}
-                                description="Sale vuote nelle fasce off-peak (mattina/pomeriggio). Costi fissi elevati (affitto, luce) non coperti da entrate costanti."
+                                description="Spazi premium inutilizzati per il 40% della giornata. Costi fissi che corrono anche a sala vuota."
                             />
                         </div>
                     </div>
@@ -375,14 +375,14 @@ export default function PitchDeck() {
                 {/* SLIDE 3: LA SOLUZIONE (CORE VALUE) */}
                 <SlideContainer active={currentSlide === 2} className="bg-slate-50">
                     <div className="max-w-5xl mx-auto text-center">
-                        <h2 className="text-4xl font-bold mb-12 text-gray-900">Il Motore di Matching a Triplo Vantaggio</h2>
+                        <h2 className="text-4xl font-bold mb-12 text-gray-900">GymConnect Advantage™</h2>
 
                         <div className="relative w-full max-w-2xl mx-auto h-[500px] flex items-center justify-center">
                             {/* Central Hub */}
                             <div className="absolute z-20 bg-white w-40 h-40 rounded-full shadow-2xl flex flex-col items-center justify-center border-4 border-blue-500 animate-pulse-slow">
                                 <Zap size={48} className="text-blue-600 mb-2" />
-                                <span className="font-bold text-gray-800">L'APP</span>
-                                <span className="text-xs text-gray-500">Matching Engine</span>
+                                <span className="font-bold text-gray-800">CONNECT</span>
+                                <span className="text-xs text-gray-500">AI Engine</span>
                             </div>
 
                             {/* Connecting Lines (SVG) */}
@@ -393,21 +393,21 @@ export default function PitchDeck() {
                             {/* Nodes */}
                             <div className="absolute top-0 transform -translate-y-4 animate-float">
                                 <div className="bg-red-50 p-4 rounded-xl border border-red-200 shadow-lg text-center w-64">
-                                    <h4 className="font-bold text-red-600 mb-1">Soluzione su Misura</h4>
+                                    <h4 className="font-bold text-red-600 mb-1">Libertà Totale</h4>
                                     <p className="text-sm text-gray-600">Per gli Atleti</p>
                                 </div>
                             </div>
 
                             <div className="absolute bottom-10 left-0 transform -translate-x-4 animate-float" style={{ animationDelay: '0.5s' }}>
                                 <div className="bg-amber-50 p-4 rounded-xl border border-amber-200 shadow-lg text-center w-64">
-                                    <h4 className="font-bold text-amber-600 mb-1">Zero Costi Marketing</h4>
+                                    <h4 className="font-bold text-amber-600 mb-1">Business Autonomo</h4>
                                     <p className="text-sm text-gray-600">Per i Trainer</p>
                                 </div>
                             </div>
 
                             <div className="absolute bottom-10 right-0 transform translate-x-4 animate-float" style={{ animationDelay: '1s' }}>
                                 <div className="bg-blue-50 p-4 rounded-xl border border-blue-200 shadow-lg text-center w-64">
-                                    <h4 className="font-bold text-blue-600 mb-1">Asset Monetization</h4>
+                                    <h4 className="font-bold text-blue-600 mb-1">Revenue Optimization</h4>
                                     <p className="text-sm text-gray-600">Per le Strutture</p>
                                 </div>
                             </div>
@@ -426,10 +426,10 @@ export default function PitchDeck() {
                     <div className="max-w-3xl mx-auto text-center">
                         <div className="mb-8">
                             <TrendingUp size={64} className="mx-auto text-green-400 mb-4" />
-                            <h2 className="text-5xl font-bold mb-6">Il Futuro del Fitness è Connesso.</h2>
+                            <h2 className="text-5xl font-bold mb-6">Unisciti alla Rivoluzione.</h2>
                             <p className="text-xl text-gray-300 mb-12">
-                                Abbiamo la tecnologia. Abbiamo la visione. <br />
-                                Ora stiamo costruendo l'ecosistema definitivo.
+                                Non stiamo solo creando un'app.<br />
+                                Stiamo ridefinendo il modo in cui il mondo si allena e lavora.
                             </p>
                         </div>
 

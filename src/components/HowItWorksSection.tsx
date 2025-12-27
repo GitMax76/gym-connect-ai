@@ -7,10 +7,10 @@ const HowItWorksSection = () => {
             <div className="container mx-auto px-4">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-                        Il Modello "Palestra di Quartiere"
+                        Il Modello "Palestra Diffusa"
                     </h2>
                     <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-                        Come funziona il nostro motore di smart-matching
+                        Come trasformiamo un'esigenza locale in valore condiviso.
                     </p>
                 </div>
 
@@ -24,9 +24,9 @@ const HowItWorksSection = () => {
                             <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4 text-2xl shadow-sm border-4 border-white">
                                 <Search className="w-8 h-8" />
                             </div>
-                            <h3 className="text-lg font-bold text-slate-900 mb-2">1. La Domanda</h3>
+                            <h3 className="text-lg font-bold text-slate-900 mb-2">1. L'Esigenza</h3>
                             <p className="text-sm text-slate-600">
-                                Un Utente cerca "Pilates" alle 10:00 (orario tipicamente vuoto).
+                                Marco vuole fare Pilates martedì alle 10:00, ma il suo abbonamento non lo copre.
                             </p>
                             <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">Trigger</div>
                         </div>
@@ -36,9 +36,9 @@ const HowItWorksSection = () => {
                             <div className="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-4 text-2xl shadow-sm border-4 border-white">
                                 <BrainCircuit className="w-8 h-8" />
                             </div>
-                            <h3 className="text-lg font-bold text-slate-900 mb-2">2. Il Matching</h3>
+                            <h3 className="text-lg font-bold text-slate-900 mb-2">2. La Connessione</h3>
                             <p className="text-sm text-slate-600">
-                                L'app trova un Trainer Specializzato libero in quella fascia oraria.
+                                Il sistema attiva Giulia, Trainer certificata libera in quell'orario.
                             </p>
                             <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">AI Engine</div>
                         </div>
@@ -48,9 +48,9 @@ const HowItWorksSection = () => {
                             <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mb-4 text-2xl shadow-sm border-4 border-white">
                                 <MapPin className="w-8 h-8" />
                             </div>
-                            <h3 className="text-lg font-bold text-slate-900 mb-2">3. La Location</h3>
+                            <h3 className="text-lg font-bold text-slate-900 mb-2">3. Lo Spazio</h3>
                             <p className="text-sm text-slate-600">
-                                L'app individua una Struttura con una sala disponibile alle 10:00.
+                                GymConnect prenota una sala vuota presso la palestra "FitClub" vicina a entrambi.
                             </p>
                             <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-orange-600 text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">Asset</div>
                         </div>
@@ -60,11 +60,11 @@ const HowItWorksSection = () => {
                             <div className="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center mb-4 text-2xl shadow-lg border-4 border-white">
                                 <Smile className="w-8 h-8" />
                             </div>
-                            <h3 className="text-lg font-bold text-green-900 mb-2">4. Win-Win-Win</h3>
+                            <h3 className="text-lg font-bold text-green-900 mb-2">4. Valore Creato</h3>
                             <ul className="text-sm text-green-800 space-y-1 text-left">
-                                <li className="flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Utente soddisfatto</li>
-                                <li className="flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Trainer pagato</li>
-                                <li className="flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Palestra monetizzata</li>
+                                <li className="flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Marco si è allenato</li>
+                                <li className="flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Giulia ha guadagnato</li>
+                                <li className="flex items-center gap-1"><CheckCircle className="w-3 h-3" /> FitClub ha monetizzato</li>
                             </ul>
                             <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-green-600 text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">Risultato</div>
                         </div>

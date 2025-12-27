@@ -137,15 +137,14 @@ const HeroSection = () => {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold text-slate-900 mb-6 leading-tight">
-            Il Primo Ecosistema a
+            Allenati alle Tue Condizioni.
             <span className="block bg-gradient-to-r from-green-600 via-blue-600 to-orange-500 bg-clip-text text-transparent">
-              Triplo Vantaggio per il Fitness.
+              L'Ecosistema Fitness Definitivo.
             </span>
           </h1>
 
           <p className="text-xl md:text-2xl text-slate-600 mb-12 max-w-4xl mx-auto leading-relaxed">
-            Non una semplice lista di contatti, ma un motore di matching intelligente.
-            Connettiamo <span className="font-semibold text-green-600">Atleti</span>, <span className="font-semibold text-blue-600">Trainer</span> e <span className="font-semibold text-orange-600">Strutture</span> in tempo reale.
+            Dimentica le liste di contatti statiche. Entra in un network vivo che connette <span className="font-semibold text-green-600">Passione</span>, <span className="font-semibold text-blue-600">Competenza</span> e <span className="font-semibold text-orange-600">Spazi Premium</span>.
           </p>
 
           {/* 3-Sided CTAs */}
@@ -195,7 +194,7 @@ const HeroSection = () => {
               </div>
 
               <h2 className={`text-3xl md:text-5xl font-bold mb-6 ${selectedRole === 'user' ? 'text-green-700' :
-                  selectedRole === 'instructor' ? 'text-blue-700' : 'text-orange-700'
+                selectedRole === 'instructor' ? 'text-blue-700' : 'text-orange-700'
                 }`}>
                 {content.subtitle}
               </h2>
@@ -209,7 +208,7 @@ const HeroSection = () => {
                 {content.stats.map((stat, index) => (
                   <div key={index} className="flex items-center gap-3 bg-white px-6 py-4 rounded-xl shadow-sm border border-slate-100">
                     <div className={`p-3 rounded-full ${selectedRole === 'user' ? 'bg-green-100 text-green-600' :
-                        selectedRole === 'instructor' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'
+                      selectedRole === 'instructor' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'
                       }`}>
                       <stat.icon className="w-6 h-6" />
                     </div>
@@ -225,7 +224,7 @@ const HeroSection = () => {
                 <Button
                   size="lg"
                   className={`text-white text-lg px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 ${selectedRole === 'user' ? 'bg-green-600 hover:bg-green-700' :
-                      selectedRole === 'instructor' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-orange-600 hover:bg-orange-700'
+                    selectedRole === 'instructor' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-orange-600 hover:bg-orange-700'
                     }`}
                   onClick={() => navigate('/register')}
                 >
@@ -242,7 +241,7 @@ const HeroSection = () => {
                     <div>
                       <div className="font-bold text-slate-900">{testimonial.name}</div>
                       <div className={`text-sm ${selectedRole === 'user' ? 'text-green-600' :
-                          selectedRole === 'instructor' ? 'text-blue-600' : 'text-orange-600'
+                        selectedRole === 'instructor' ? 'text-blue-600' : 'text-orange-600'
                         }`}>{testimonial.role}</div>
                     </div>
                   </div>
@@ -262,14 +261,14 @@ const HeroSection = () => {
                 <div className="w-14 h-14 bg-green-100 text-green-600 rounded-xl mb-6 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Users className="w-7 h-7" />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">Soluzione su Misura</h3>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Fitness su Misura</h3>
                 <p className="text-sm font-semibold text-green-600 mb-4 uppercase tracking-wider">Per gli Atleti</p>
                 <p className="text-slate-600 leading-relaxed mb-6">
-                  Smetti di adattarti all'offerta. Trova esattamente ciò che cerchi filtrando per budget, obiettivi, location e orari.
+                  Il tuo tempo è prezioso. Trova il trainer ideale esattamente quando e dove vuoi tu. Nessun compromesso.
                 </p>
                 <div className="bg-white/80 p-3 rounded-lg border border-green-100 text-sm text-green-800 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                  Accessibilità Immediata: Solo profili verificati.
+                  Match Istantaneo: Solo professionisti certificati.
                 </div>
                 <div className="mt-4 flex items-center text-xs text-slate-400 gap-1 cursor-pointer hover:text-green-600 transition-colors">
                   <Bell className="w-3 h-3" />
@@ -301,13 +300,13 @@ const HeroSection = () => {
                 <div className="w-14 h-14 bg-orange-100 text-orange-600 rounded-xl mb-6 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Building2 className="w-7 h-7" />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">Asset Monetization</h3>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Massimizza i Profitti</h3>
                 <p className="text-sm font-semibold text-orange-600 mb-4 uppercase tracking-wider">Per i Gestori</p>
                 <p className="text-slate-600 leading-relaxed mb-6">
-                  Trasforma i costi fissi in ricavi. Riempi le sale vuote nelle fasce orarie non di punta ospitando trainer esterni.
+                  Ogni metro quadro conta. Trasforma le ore morte in nuove entrate ospitando top trainer esterni.
                 </p>
                 <div className="bg-white/80 p-3 rounded-lg border border-orange-100 text-sm text-orange-800">
-                  <strong>Cross-Referral System:</strong> Il trainer porta clienti, tu offri servizi.
+                  <strong>Effetto Rete:</strong> Nuovi trainer portano nuovi clienti nel tuo club.
                 </div>
               </CardContent>
             </Card>
