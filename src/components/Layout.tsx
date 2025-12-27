@@ -83,6 +83,12 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                       Home
                     </Button>
                     <Link
+                      to="/pitch"
+                      className="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                    >
+                      Vision
+                    </Link>
+                    <Link
                       to="/contact"
                       className="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
                     >
@@ -113,6 +119,9 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                           <Button variant="ghost" onClick={() => navigate('/bookings')}>
                             Prenotazioni
                           </Button>
+                          <Button variant="ghost" onClick={() => navigate('/pitch')}>
+                            Vision
+                          </Button>
                           <Button variant="ghost" onClick={() => navigate('/contact')}>
                             Contatti
                           </Button>
@@ -124,6 +133,9 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                           </Button>
                           <Button className="gradient-primary text-white" onClick={() => navigate('/register')}>
                             Registrati
+                          </Button>
+                          <Button variant="ghost" onClick={() => navigate('/pitch')}>
+                            Vision
                           </Button>
                           <Button variant="ghost" onClick={() => navigate('/contact')}>
                             Contatti
@@ -147,6 +159,9 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
               &copy; {new Date().getFullYear()} GymConnect AI. All rights reserved.
             </div>
             <div className="flex space-x-6">
+              <Link to="/pitch" className="hover:text-primary transition-colors text-sm">
+                Vision
+              </Link>
               <Link to="/contact" className="hover:text-primary transition-colors text-sm">
                 Contatti
               </Link>
