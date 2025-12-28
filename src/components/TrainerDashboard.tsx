@@ -1,13 +1,14 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useProfile } from '@/hooks/useProfile';
-import { Calendar, Users, DollarSign, Star, Clock, Award } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Calendar, Users, DollarSign, Star, Clock, Award, LogOut } from 'lucide-react';
 import TrainerProfileEditDialog from './TrainerProfileEditDialog';
 
 const TrainerDashboard = () => {
   const { profile, trainerProfile, loading } = useProfile();
+  const { signOut } = useAuth();
 
   if (loading) {
     return (
@@ -20,13 +21,24 @@ const TrainerDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white">
-        <h1 className="text-3xl font-bold mb-2">
-          Ciao, Trainer {profile?.first_name || 'Professionista'}! 💪
-        </h1>
-        <p className="text-blue-100">
-          Gestisci i tuoi clienti e le tue sessioni
-        </p>
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">
+            Ciao, Trainer {profile?.first_name || 'Professionista'}! 👋
+          </h1>
+          <p className="text-blue-100">
+            Gestisci i tuoi clienti e le tue sessioni
+          </p>
+        </div>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={signOut}
+          className="bg-white/20 hover:bg-white/30 text-white border-0"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Esci
+        </Button>
       </div>
 
       {/* Quick Stats */}

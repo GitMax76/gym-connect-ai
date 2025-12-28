@@ -261,6 +261,26 @@ export const useProfile = () => {
     }
   };
 
+  const updateUserProfile = async (updates: Partial<UserProfile>) => {
+    if (!user) return { error: 'No user logged in' };
+
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update(updates)
+        .eq('id', user.id);
+
+      if (!error) {
+        setUserProfile(prev => prev ? { ...prev, ...updates } : null);
+      }
+
+      return { error };
+    } catch (error: any) {
+      console.error('Error updating user profile:', error);
+      return { error };
+    }
+  };
+
   return {
     profile,
     userProfile,
@@ -273,6 +293,7 @@ export const useProfile = () => {
     createGymProfile,
     updateTrainerProfile,
     updateGymProfile,
+    updateUserProfile,
     refetch: fetchProfile
   };
 };

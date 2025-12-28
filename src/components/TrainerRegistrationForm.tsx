@@ -77,11 +77,11 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
   return (
     <div className="max-w-4xl mx-auto px-4">
       <div className="text-center mb-8">
-        <div className="w-24 h-24 bg-gradient-to-r from-green-500 to-emerald-400 rounded-full mx-auto mb-6 flex items-center justify-center">
+        <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full mx-auto mb-6 flex items-center justify-center">
           <Dumbbell className="w-12 h-12 text-white" />
         </div>
         <h1 className="text-4xl font-bold text-slate-900 mb-4">
-          Diventa un <span className="text-green-600">Coach di Eccellenza</span>
+          Diventa un <span className="text-blue-600">Coach di Eccellenza</span>
         </h1>
         <p className="text-xl text-slate-600">
           💪 Trasforma la tua passione in una carriera di successo
@@ -93,7 +93,7 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-green-600" />
+              <Users className="w-5 h-5 text-blue-600" />
               Informazioni Personali
             </CardTitle>
           </CardHeader>
@@ -344,7 +344,7 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
           </Button>
           <Button
             type="submit"
-            className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-500 text-white hover:shadow-lg transition-all"
+            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-lg transition-all"
           >
             🚀 Diventa Coach
           </Button>
