@@ -6,10 +6,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Calendar, MapPin, Target, Clock, DollarSign, Activity, LogOut } from 'lucide-react';
 import UserProfileEditDialog from './UserProfileEditDialog';
 import { MatchNotification } from './MatchNotification';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from "@/hooks/use-toast";
 
 const UserDashboard = () => {
   const { profile, userProfile, loading } = useProfile();
   const { signOut } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   if (loading) {
     return (
@@ -19,10 +23,18 @@ const UserDashboard = () => {
     );
   }
 
+  const handleComingSoon = () => {
+    toast({
+      title: "In arrivo",
+      description: "Questa funzionalità sarà presto disponibile!",
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-6 text-white flex justify-between items-start">
+        {/* ... existing header code ... */}
         <div>
           <h1 className="text-3xl font-bold mb-2">
             Ciao, {profile?.first_name || 'Utente'}! 👋
@@ -45,8 +57,9 @@ const UserDashboard = () => {
         </div>
       </div>
 
-      {/* Quick Stats */}
+      {/* Quick Stats - No changes needed implicitly, but checking for context */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* ... stats ... */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Obiettivo Fitness</CardTitle>
@@ -91,7 +104,7 @@ const UserDashboard = () => {
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Profile Summary */}
+        {/* Profile Summary - No changes needed implicitly */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -148,19 +161,19 @@ const UserDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full" variant="outline">
+            <Button className="w-full" variant="outline" onClick={() => navigate('/search')}>
               <Calendar className="mr-2 h-4 w-4" />
               Trova Trainer
             </Button>
-            <Button className="w-full" variant="outline">
+            <Button className="w-full" variant="outline" onClick={() => navigate('/search')}>
               <MapPin className="mr-2 h-4 w-4" />
               Cerca Palestre
             </Button>
-            <Button className="w-full" variant="outline">
+            <Button className="w-full" variant="outline" onClick={() => navigate('/bookings')}>
               <Activity className="mr-2 h-4 w-4" />
               Le Mie Prenotazioni
             </Button>
-            <Button className="w-full" variant="outline">
+            <Button className="w-full" variant="outline" onClick={handleComingSoon}>
               <Target className="mr-2 h-4 w-4" />
               Piano di Allenamento
             </Button>

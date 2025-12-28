@@ -6,10 +6,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Calendar, Users, DollarSign, Star, Clock, Award, LogOut } from 'lucide-react';
 import TrainerProfileEditDialog from './TrainerProfileEditDialog';
 import { MatchNotification } from './MatchNotification';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from "@/hooks/use-toast";
 
 const TrainerDashboard = () => {
   const { profile, trainerProfile, loading } = useProfile();
   const { signOut } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   if (loading) {
     return (
@@ -19,10 +23,18 @@ const TrainerDashboard = () => {
     );
   }
 
+  const handleComingSoon = () => {
+    toast({
+      title: "In arrivo",
+      description: "Questa funzionalità sarà presto disponibile!",
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white flex justify-between items-start">
+        {/* ... existing header code ... */}
         <div>
           <h1 className="text-3xl font-bold mb-2">
             Ciao, Trainer {profile?.first_name || 'Professionista'}! 👋
@@ -45,7 +57,7 @@ const TrainerDashboard = () => {
         </div>
       </div>
 
-      {/* Quick Stats */}
+      {/* Quick Stats - No changes needed implicitly, but keeping context */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -98,7 +110,7 @@ const TrainerDashboard = () => {
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Profile Summary */}
+        {/* Profile Summary - No changes needed implicitly */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -157,19 +169,19 @@ const TrainerDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full">
+            <Button className="w-full" onClick={() => navigate('/bookings')}>
               <Calendar className="mr-2 h-4 w-4" />
               Gestisci Calendario
             </Button>
-            <Button className="w-full" variant="outline">
+            <Button className="w-full" variant="outline" onClick={() => navigate('/bookings')}>
               <Users className="mr-2 h-4 w-4" />
               I Miei Clienti
             </Button>
-            <Button className="w-full" variant="outline">
+            <Button className="w-full" variant="outline" onClick={() => navigate('/bookings')}>
               <Clock className="mr-2 h-4 w-4" />
               Prenotazioni Oggi
             </Button>
-            <Button className="w-full" variant="outline">
+            <Button className="w-full" variant="outline" onClick={handleComingSoon}>
               <DollarSign className="mr-2 h-4 w-4" />
               Guadagni
             </Button>

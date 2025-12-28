@@ -9,11 +9,14 @@ import {
 } from "@/components/ui/popover";
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 export const MatchNotification = () => {
-    const { profile, userProfile, trainerProfile } = useProfile();
+    const { profile } = useProfile();
     const [matches, setMatches] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const [open, setOpen] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (profile?.id) {
@@ -26,7 +29,7 @@ export const MatchNotification = () => {
         try {
             if (profile?.user_type === 'user') {
                 // Find Trainers in the same city
-                const { data, error } = await supabase
+                const { data } = await supabase
                     .from('profiles')
                     .select(`
                         id, 
@@ -44,7 +47,7 @@ export const MatchNotification = () => {
                 if (data) setMatches(data);
             } else if (profile?.user_type === 'trainer') {
                 // Find Users in the same city
-                const { data, error } = await supabase
+                const { data } = await supabase
                     .from('profiles')
                     .select(`
                         id, 
@@ -68,6 +71,11 @@ export const MatchNotification = () => {
         }
     };
 
+    const handleMatchClick = (id: string) => {
+        setOpen(false);
+        navigate(`/profile/${id}`);
+    };
+
     if (matches.length === 0) {
         return (
             <Button variant="ghost" size="icon" className="relative">
@@ -77,7 +85,7 @@ export const MatchNotification = () => {
     }
 
     return (
-        <Popover>
+        <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">
                     <Bell className="h-5 w-5 text-white" />
@@ -92,7 +100,11 @@ export const MatchNotification = () => {
                     </p>
                     <div className="grid gap-4">
                         {matches.map((match) => (
-                            <div key={match.id} className="flex items-start space-x-4 border-b pb-2 last:border-0 hover:bg-slate-50 p-2 rounded transition-colors cursor-pointer">
+                            <div
+                                key={match.id}
+                                onClick={() => handleMatchClick(match.id)}
+                                className="flex items-start space-x-4 border-b pb-2 last:border-0 hover:bg-slate-50 p-2 rounded transition-colors cursor-pointer"
+                            >
                                 <div className="space-y-1">
                                     <p className="text-sm font-medium leading-none">
                                         {match.first_name} {match.last_name}
