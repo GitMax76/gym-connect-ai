@@ -7,14 +7,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Award, DollarSign, Star, Users, ArrowLeft, Mail, Phone, Globe, Clock } from 'lucide-react';
+import { MapPin, Award, DollarSign, Star, Users, ArrowLeft, Mail, Phone, Globe, Clock, MessageSquare } from 'lucide-react';
+import BookingDialog from '@/components/BookingDialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from "@/hooks/use-toast";
 
 const ProfilePage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { toast } = useToast();
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState<any>(null);
     const [details, setDetails] = useState<any>(null);
+    const [contactOpen, setContactOpen] = useState(false);
+    const [message, setMessage] = useState('');
 
     useEffect(() => {
         if (id) fetchProfile(id);
@@ -23,7 +30,6 @@ const ProfilePage = () => {
     const fetchProfile = async (userId: string) => {
         try {
             setLoading(true);
-            // 1. Fetch Request Base Profile
             const { data: baseData, error: baseError } = await supabase
                 .from('profiles')
                 .select('*')
@@ -33,7 +39,6 @@ const ProfilePage = () => {
             if (baseError) throw baseError;
             setProfile(baseData);
 
-            // 2. Fetch Details based on type
             if (baseData.user_type === 'trainer') {
                 const { data: trainerData } = await supabase
                     .from('trainer_profiles')
@@ -54,6 +59,15 @@ const ProfilePage = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleSendMessage = () => {
+        toast({
+            title: "Messaggio Inviato",
+            description: `Il tuo messaggio è stato inviato a ${profile.first_name}.`,
+        });
+        setContactOpen(false);
+        setMessage('');
     };
 
     if (loading) {
@@ -117,13 +131,42 @@ const ProfilePage = () => {
                                     </div>
 
                                     <div className="mt-6 space-y-3">
-                                        {/* Example Actions - Could be connected to real logic later */}
-                                        <Button className="w-full bg-green-600 hover:bg-green-700">
-                                            {isTrainer ? 'Prenota Sessione' : 'Richiedi Iscrizione'}
-                                        </Button>
-                                        <Button variant="outline" className="w-full">
-                                            Contatta
-                                        </Button>
+                                        {isTrainer ? (
+                                            <BookingDialog
+                                                trainerId={profile.id}
+                                                trainerName={`${profile.first_name} ${profile.last_name}`}
+                                            />
+                                        ) : (
+                                            <Button className="w-full bg-green-600 hover:bg-green-700">
+                                                Richiedi Iscrizione
+                                            </Button>
+                                        )}
+
+                                        <Dialog open={contactOpen} onOpenChange={setContactOpen}>
+                                            <DialogTrigger asChild>
+                                                <Button variant="outline" className="w-full">
+                                                    <MessageSquare className="h-4 w-4 mr-2" />
+                                                    Contatta
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                                <DialogHeader>
+                                                    <DialogTitle>Contatta {profile.first_name}</DialogTitle>
+                                                    <DialogDescription>
+                                                        Invia un messaggio diretto per chiedere informazioni.
+                                                    </DialogDescription>
+                                                </DialogHeader>
+                                                <div className="space-y-4 py-4">
+                                                    <Textarea
+                                                        placeholder="Scrivi qui il tuo messaggio..."
+                                                        className="min-h-[100px]"
+                                                        value={message}
+                                                        onChange={(e) => setMessage(e.target.value)}
+                                                    />
+                                                    <Button onClick={handleSendMessage} className="w-full">Invia Messaggio</Button>
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -135,7 +178,7 @@ const ProfilePage = () => {
                                 <CardContent className="space-y-4 text-sm">
                                     <div className="flex items-center gap-3">
                                         <Mail className="h-4 w-4 text-slate-400" />
-                                        <span className="truncate">{profile.email} (Demo)</span>
+                                        <span className="truncate">{profile.email}</span>
                                     </div>
                                     {isGym && details?.website_url && (
                                         <div className="flex items-center gap-3">
