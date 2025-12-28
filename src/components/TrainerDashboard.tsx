@@ -8,10 +8,11 @@ import TrainerProfileEditDialog from './TrainerProfileEditDialog';
 import { MatchNotification } from './MatchNotification';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
+import AvailabilitySettings from './AvailabilitySettings';
 
 const TrainerDashboard = () => {
   const { profile, trainerProfile, loading } = useProfile();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -169,10 +170,7 @@ const TrainerDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full" onClick={() => navigate('/bookings')}>
-              <Calendar className="mr-2 h-4 w-4" />
-              Gestisci Calendario
-            </Button>
+            {user && <AvailabilitySettings trainerId={user.id} />}
             <Button className="w-full" variant="outline" onClick={() => navigate('/clients')}>
               <Users className="mr-2 h-4 w-4" />
               I Miei Clienti

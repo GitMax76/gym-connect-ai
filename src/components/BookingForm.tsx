@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useBookings } from '@/hooks/useBookings';
 import { useTrainerAvailability } from '@/hooks/useTrainerAvailability';
 import { toast } from 'sonner';
+import SlotPicker from './SlotPicker';
 
 interface BookingFormProps {
   trainerId: string;
@@ -19,7 +20,7 @@ const BookingForm = ({ trainerId, trainerName, onSuccess }: BookingFormProps) =>
   const { createBooking } = useBookings();
   const { checkAvailability } = useTrainerAvailability();
   const [loading, setLoading] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     booking_date: '',
     start_time: '',
@@ -33,7 +34,15 @@ const BookingForm = ({ trainerId, trainerName, onSuccess }: BookingFormProps) =>
     setLoading(true);
 
     try {
-      // Check availability first
+      // Basic validation
+      if (!formData.booking_date || !formData.start_time || !formData.end_time) {
+        toast.error("Seleziona data e orario");
+        setLoading(false);
+        return;
+      }
+
+      // We skip checkAvailability here if we assume SlotPicker only shows available slots,
+      // but keeping it for safety is fine.
       const isAvailable = await checkAvailability(
         trainerId,
         formData.booking_date,
@@ -42,7 +51,7 @@ const BookingForm = ({ trainerId, trainerName, onSuccess }: BookingFormProps) =>
       );
 
       if (!isAvailable) {
-        toast.error('Il trainer non è disponibile in questo orario');
+        toast.error('Il trainer non è disponibile in questo orario (verificato)');
         setLoading(false);
         return;
       }
@@ -68,6 +77,7 @@ const BookingForm = ({ trainerId, trainerName, onSuccess }: BookingFormProps) =>
         onSuccess?.();
       }
     } catch (error) {
+      console.error(error);
       toast.error('Errore durante la prenotazione');
     } finally {
       setLoading(false);
@@ -87,40 +97,31 @@ const BookingForm = ({ trainerId, trainerName, onSuccess }: BookingFormProps) =>
           id="booking_date"
           type="date"
           value={formData.booking_date}
-          onChange={(e) => setFormData(prev => ({ ...prev, booking_date: e.target.value }))}
+          min={new Date().toISOString().split('T')[0]}
+          onChange={(e) => setFormData(prev => ({ ...prev, booking_date: e.target.value, start_time: '', end_time: '' }))}
           required
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="start_time">Ora inizio</Label>
-          <Input
-            id="start_time"
-            type="time"
-            value={formData.start_time}
-            onChange={(e) => setFormData(prev => ({ ...prev, start_time: e.target.value }))}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="end_time">Ora fine</Label>
-          <Input
-            id="end_time"
-            type="time"
-            value={formData.end_time}
-            onChange={(e) => setFormData(prev => ({ ...prev, end_time: e.target.value }))}
-            required
-          />
-        </div>
+      <div className="space-y-2">
+        <Label>Orario (Durata: 1 ora)</Label>
+        <SlotPicker
+          trainerId={trainerId}
+          date={formData.booking_date ? new Date(formData.booking_date) : undefined}
+          onSelectSlot={(start, end) => setFormData(prev => ({ ...prev, start_time: start, end_time: end }))}
+        />
+        {formData.start_time && (
+          <p className="text-sm text-green-600 mt-1 font-medium bg-green-50 p-2 rounded border border-green-200 inline-block">
+            Selezionato: {formData.start_time} - {formData.end_time}
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="session_type">Tipo sessione</Label>
         <Select
           value={formData.session_type}
-          onValueChange={(value: 'personal' | 'group') => 
+          onValueChange={(value: 'personal' | 'group') =>
             setFormData(prev => ({ ...prev, session_type: value }))
           }
         >
@@ -144,7 +145,7 @@ const BookingForm = ({ trainerId, trainerName, onSuccess }: BookingFormProps) =>
         />
       </div>
 
-      <Button type="submit" disabled={loading} className="w-full">
+      <Button type="submit" disabled={loading || !formData.start_time} className="w-full bg-green-600 hover:bg-green-700">
         {loading ? 'Prenotazione in corso...' : 'Prenota Sessione'}
       </Button>
     </form>
