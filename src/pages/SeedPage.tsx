@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
-import { generateRandomUser, generateRandomTrainer, generateRandomGym, generateRomeUser, generateRomeTrainer, generateRomeGym } from '@/utils/seedData';
+import { generateRandomUser, generateRandomTrainer, generateRandomGym, generateRomeUser, generateRomeTrainer, generateRomeGym, generateSalernoUser, generateSalernoTrainer, generateSalernoGym } from '@/utils/seedData';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -334,6 +334,185 @@ const SeedPage = () => {
         }
     };
 
+    const runSalernoScenario = async () => {
+        setLoading(true);
+        setLogs([]);
+        addLog("🍕 Starting SALERNO SCENARIO seeding...");
+
+        try {
+            // 1. Create 6 Salerno Users
+            for (let i = 1; i <= 6; i++) {
+                await new Promise(r => setTimeout(r, 2000));
+                const data = generateSalernoUser(i);
+                addLog(`Processing Salerno User ${i}: ${data.email}`);
+
+                let userId = null;
+
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: data.email,
+                    password: data.password,
+                    options: {
+                        data: {
+                            first_name: data.firstName,
+                            last_name: data.lastName,
+                            user_type: 'user'
+                        }
+                    }
+                });
+
+                if (authError) {
+                    if (authError.message.includes('already registered') || authError.status === 400 || authError.status === 422) {
+                        addLog(`User exists, logging in to update...`);
+                        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                            email: data.email,
+                            password: data.password
+                        });
+                        if (!signInError) userId = signInData.user?.id;
+                    }
+                } else {
+                    userId = authData.user?.id;
+                }
+
+                if (!userId) continue;
+
+                await new Promise(r => setTimeout(r, 500));
+
+                await supabase.from('profiles').update({
+                    city: 'Salerno',
+                    user_type: 'user',
+                    first_name: data.firstName,
+                    last_name: data.lastName
+                }).eq('id', userId);
+
+                await supabase.from('user_profiles').upsert({
+                    id: userId,
+                    age: data.age,
+                    fitness_level: data.fitnessLevel,
+                    primary_goal: data.goal,
+                    budget_min: data.budget_min,
+                    budget_max: data.budget_max,
+                    preferred_location: 'Salerno',
+                    availability_hours_per_week: data.availability
+                });
+            }
+
+            // 2. Create 4 Salerno Trainers
+            for (let i = 1; i <= 4; i++) {
+                await new Promise(r => setTimeout(r, 2000));
+                const data = generateSalernoTrainer(i);
+                addLog(`Processing Salerno Trainer ${i}: ${data.email}`);
+
+                let userId = null;
+
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: data.email,
+                    password: data.password,
+                    options: {
+                        data: {
+                            first_name: data.firstName,
+                            last_name: data.lastName,
+                            user_type: 'trainer'
+                        }
+                    }
+                });
+
+                if (authError) {
+                    if (authError.message.includes('already registered') || authError.status === 400 || authError.status === 422) {
+                        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                            email: data.email,
+                            password: data.password
+                        });
+                        if (!signInError) userId = signInData.user?.id;
+                    }
+                } else {
+                    userId = authData.user?.id;
+                }
+
+                if (!userId) continue;
+
+                await new Promise(r => setTimeout(r, 500));
+
+                await supabase.from('profiles').update({
+                    city: 'Salerno',
+                    user_type: 'trainer',
+                    first_name: data.firstName,
+                    last_name: data.lastName
+                }).eq('id', userId);
+
+                await supabase.from('trainer_profiles').upsert({
+                    id: userId,
+                    bio: data.bio,
+                    years_experience: data.yearsExperience,
+                    specializations: data.specializations,
+                    personal_rate_per_hour: data.hourlyRate,
+                    preferred_areas: 'Salerno'
+                });
+            }
+
+            // 3. Create 2 Salerno Gyms
+            for (let i = 1; i <= 2; i++) {
+                await new Promise(r => setTimeout(r, 2000));
+                const data = generateSalernoGym(i);
+                addLog(`Processing Salerno Gym ${i}: ${data.email}`);
+
+                let userId = null;
+
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: data.email,
+                    password: data.password,
+                    options: {
+                        data: {
+                            first_name: data.gymName,
+                            last_name: data.ownerName,
+                            user_type: 'gym_owner'
+                        }
+                    }
+                });
+
+                if (authError) {
+                    if (authError.message.includes('already registered') || authError.status === 400 || authError.status === 422) {
+                        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                            email: data.email,
+                            password: data.password
+                        });
+                        if (!signInError) userId = signInData.user?.id;
+                    }
+                } else {
+                    userId = authData.user?.id;
+                }
+
+                if (!userId) continue;
+
+                await new Promise(r => setTimeout(r, 500));
+
+                await supabase.from('profiles').update({
+                    city: 'Salerno',
+                    user_type: 'gym_owner',
+                    first_name: data.gymName,
+                    last_name: data.ownerName
+                }).eq('id', userId);
+
+                await supabase.from('gym_profiles').upsert({
+                    id: userId,
+                    gym_name: data.gymName,
+                    address: data.address,
+                    city: 'Salerno',
+                    postal_code: data.postalCode,
+                    description: data.description,
+                    facilities: data.facilities,
+                    monthly_fee: data.monthlyFee
+                });
+            }
+
+            addLog("✅ Salerno Scenario Complete! Login as salerno_user_1@test.com / password123 to test.");
+
+        } catch (e: any) {
+            addLog(`❌ Fatal Error: ${e.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-slate-100 p-8 flex flex-col items-center">
             <Card className="w-full max-w-2xl">
@@ -350,13 +529,24 @@ const SeedPage = () => {
                         </Button>
                     </div>
 
-                    <div className="p-4 border rounded-md bg-blue-50 border-blue-200">
-                        <h3 className="font-bold mb-2 text-blue-800">🏛️ Rome Scenario (Targeted)</h3>
-                        <p className="text-sm text-blue-600 mb-4">Creates 10 Users, 5 Trainers, 3 Gyms (ALL in Rome)</p>
-                        <Button onClick={runRomeScenario} disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700">
-                            {loading ? <Loader2 className="animate-spin mr-2" /> : null}
-                            Generate Rome Scenario
-                        </Button>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="p-4 border rounded-md bg-blue-50 border-blue-200">
+                            <h3 className="font-bold mb-2 text-blue-800">🏛️ Rome Scenario</h3>
+                            <p className="text-sm text-blue-600 mb-4">Users, Trainers, Gyms in Rome</p>
+                            <Button onClick={runRomeScenario} disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700">
+                                {loading ? <Loader2 className="animate-spin mr-2" /> : null}
+                                Generate Rome
+                            </Button>
+                        </div>
+
+                        <div className="p-4 border rounded-md bg-green-50 border-green-200">
+                            <h3 className="font-bold mb-2 text-green-800">🍕 Salerno Scenario</h3>
+                            <p className="text-sm text-green-600 mb-4">Test Matching in Salerno</p>
+                            <Button onClick={runSalernoScenario} disabled={loading} className="w-full bg-green-600 hover:bg-green-700">
+                                {loading ? <Loader2 className="animate-spin mr-2" /> : null}
+                                Generate Salerno
+                            </Button>
+                        </div>
                     </div>
 
                     <div className="mt-8 bg-slate-900 text-green-400 font-mono p-4 rounded-lg h-96 overflow-y-auto text-sm">

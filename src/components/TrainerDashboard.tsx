@@ -5,6 +5,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/contexts/AuthContext';
 import { Calendar, Users, DollarSign, Star, Clock, Award, LogOut } from 'lucide-react';
 import TrainerProfileEditDialog from './TrainerProfileEditDialog';
+import { MatchNotification } from './MatchNotification';
 
 const TrainerDashboard = () => {
   const { profile, trainerProfile, loading } = useProfile();
@@ -30,15 +31,18 @@ const TrainerDashboard = () => {
             Gestisci i tuoi clienti e le tue sessioni
           </p>
         </div>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={signOut}
-          className="bg-white/20 hover:bg-white/30 text-white border-0"
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          Esci
-        </Button>
+        <div className="flex items-center gap-2">
+          <MatchNotification />
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={signOut}
+            className="bg-white/20 hover:bg-white/30 text-white border-0"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Esci
+          </Button>
+        </div>
       </div>
 
       {/* Quick Stats */}

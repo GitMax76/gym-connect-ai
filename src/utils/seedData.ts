@@ -73,6 +73,7 @@ export const generateRomeTrainer = (index: number) => ({
     hourlyRate: 50 // Within user budget
 });
 
+
 export const generateRomeGym = (index: number) => ({
     ...generateRandomGym(index),
     email: `rome_gym_${index}@test.com`,
@@ -81,3 +82,33 @@ export const generateRomeGym = (index: number) => ({
     facilities: ['Sala Pesi', 'Sauna'], // Attractive facilities
     monthlyFee: 45 // Within budget
 });
+
+// --- SALERNO SCENARIO GENERATORS ---
+
+export const generateSalernoUser = (index: number) => ({
+    ...generateRandomUser(index),
+    email: `salerno_user_${index}@test.com`,
+    city: 'Salerno',
+    goal: index % 2 === 0 ? 'muscle-gain' : 'wellness', // Mix of goals
+    budget_max: 60,
+    availability: 5 // Good availability
+});
+
+export const generateSalernoTrainer = (index: number) => ({
+    ...generateRandomTrainer(index),
+    email: `salerno_trainer_${index}@test.com`,
+    city: 'Salerno',
+    specializations: index % 2 === 0 ? ['CrossFit', 'Bodybuilding'] : ['Pilates', 'Yoga'],
+    hourlyRate: 40 // Affordable
+});
+
+export const generateSalernoGym = (index: number) => ({
+    ...generateRandomGym(index),
+    email: `salerno_gym_${index}@test.com`,
+    city: 'Salerno',
+    gymName: `Salerno Fit ${index}`,
+    address: `Corso Vittorio Emanuele ${50 + index}`,
+    facilities: ['Sala Pesi', 'Sala Corsi', 'Area Relax'],
+    monthlyFee: 35
+});
+
