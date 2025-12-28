@@ -173,7 +173,7 @@ const UserDashboard = () => {
               <Activity className="mr-2 h-4 w-4" />
               Le Mie Prenotazioni
             </Button>
-            <Button className="w-full" variant="outline" onClick={handleComingSoon}>
+            <Button className="w-full" variant="outline" onClick={() => navigate('/workout-plans')}>
               <Target className="mr-2 h-4 w-4" />
               Piano di Allenamento
             </Button>

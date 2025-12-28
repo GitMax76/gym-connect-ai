@@ -13,6 +13,8 @@ const HomePage = React.lazy(() => import('@/pages/HomePage'));
 const DashboardPage = React.lazy(() => import('@/pages/DashboardPage'));
 const SearchPage = React.lazy(() => import('@/pages/SearchPage'));
 const BookingsPage = React.lazy(() => import('@/pages/BookingsPage'));
+const ClientsPage = React.lazy(() => import('@/pages/ClientsPage'));
+const WorkoutPlansPage = React.lazy(() => import('@/pages/WorkoutPlansPage'));
 const SeedPage = React.lazy(() => import('@/pages/SeedPage'));
 const ProfilePage = React.lazy(() => import('@/pages/ProfilePage'));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
@@ -60,6 +62,16 @@ function App() {
                 <Route path="/bookings" element={
                   <ProtectedRoute>
                     <BookingsPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/clients" element={
+                  <ProtectedRoute>
+                    <ClientsPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/workout-plans" element={
+                  <ProtectedRoute>
+                    <WorkoutPlansPage />
                   </ProtectedRoute>
                 } />
                 <Route path="/seed" element={<SeedPage />} />
