@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { useProfile, UserProfile } from '@/hooks/useProfile';
 import { useToast } from "@/hooks/use-toast";
 import { Pencil } from 'lucide-react';
@@ -15,7 +14,7 @@ interface UserProfileEditDialogProps {
 }
 
 const UserProfileEditDialog = ({ currentProfile }: UserProfileEditDialogProps) => {
-    const { updateUserProfile } = useProfile();
+    const { updateUserProfile, updateProfile } = useProfile();
     const { toast } = useToast();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -28,6 +27,7 @@ const UserProfileEditDialog = ({ currentProfile }: UserProfileEditDialogProps) =
     const [availability, setAvailability] = useState(currentProfile?.availability_hours_per_week?.toString() || '');
     const [budgetMin, setBudgetMin] = useState(currentProfile?.budget_min?.toString() || '');
     const [budgetMax, setBudgetMax] = useState(currentProfile?.budget_max?.toString() || '');
+    const [preferredLocation, setPreferredLocation] = useState(currentProfile?.preferred_location || '');
 
     const handleOpenChange = (newOpen: boolean) => {
         setOpen(newOpen);
@@ -39,6 +39,7 @@ const UserProfileEditDialog = ({ currentProfile }: UserProfileEditDialogProps) =
             setAvailability(currentProfile.availability_hours_per_week?.toString() || '');
             setBudgetMin(currentProfile.budget_min?.toString() || '');
             setBudgetMax(currentProfile.budget_max?.toString() || '');
+            setPreferredLocation(currentProfile.preferred_location || '');
         }
     }
 
@@ -53,7 +54,8 @@ const UserProfileEditDialog = ({ currentProfile }: UserProfileEditDialogProps) =
             primary_goal: primaryGoal,
             availability_hours_per_week: parseInt(availability) || 0,
             budget_min: parseFloat(budgetMin) || 0,
-            budget_max: parseFloat(budgetMax) || 0
+            budget_max: parseFloat(budgetMax) || 0,
+            preferred_location: preferredLocation
         };
 
         const { error } = await updateUserProfile(updates);
@@ -65,6 +67,11 @@ const UserProfileEditDialog = ({ currentProfile }: UserProfileEditDialogProps) =
                 description: "Impossibile aggiornare il profilo. Riprova.",
             });
         } else {
+            // Also update the base profile city if provided
+            if (preferredLocation) {
+                await updateProfile({ city: preferredLocation });
+            }
+
             toast({
                 title: "Successo",
                 description: "Profilo aggiornato con successo!",
@@ -84,9 +91,14 @@ const UserProfileEditDialog = ({ currentProfile }: UserProfileEditDialogProps) =
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Modifica Profilo Attleta</DialogTitle>
+                    <DialogTitle>Modifica Profilo Atleta</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="preferredLocation">Zona di Interesse (Città)</Label>
+                        <Input id="preferredLocation" value={preferredLocation} onChange={e => setPreferredLocation(e.target.value)} placeholder="Es. Salerno" />
+                    </div>
+
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="weight">Peso (kg)</Label>
