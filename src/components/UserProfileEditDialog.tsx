@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useProfile, UserProfile } from '@/hooks/useProfile';
 import { useToast } from "@/hooks/use-toast";
 import { Pencil } from 'lucide-react';
+import { DISCIPLINES } from '@/constants/disciplines';
 
 interface UserProfileEditDialogProps {
     currentProfile: UserProfile | null;
@@ -29,6 +31,11 @@ const UserProfileEditDialog = ({ currentProfile }: UserProfileEditDialogProps) =
     const [budgetMax, setBudgetMax] = useState(currentProfile?.budget_max?.toString() || '');
     const [preferredLocation, setPreferredLocation] = useState(currentProfile?.preferred_location || '');
 
+    // Manage secondary goals (disciplines) as string array
+    const [secondaryGoals, setSecondaryGoals] = useState<string[]>(
+        currentProfile?.secondary_goals || []
+    );
+
     const handleOpenChange = (newOpen: boolean) => {
         setOpen(newOpen);
         if (newOpen && currentProfile) {
@@ -40,8 +47,17 @@ const UserProfileEditDialog = ({ currentProfile }: UserProfileEditDialogProps) =
             setBudgetMin(currentProfile.budget_min?.toString() || '');
             setBudgetMax(currentProfile.budget_max?.toString() || '');
             setPreferredLocation(currentProfile.preferred_location || '');
+            setSecondaryGoals(currentProfile.secondary_goals || []);
         }
     }
+
+    const handleDisciplineChange = (discipline: string, checked: boolean) => {
+        if (checked) {
+            setSecondaryGoals([...secondaryGoals, discipline]);
+        } else {
+            setSecondaryGoals(secondaryGoals.filter(g => g !== discipline));
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -52,6 +68,7 @@ const UserProfileEditDialog = ({ currentProfile }: UserProfileEditDialogProps) =
             height: parseFloat(height) || undefined,
             fitness_level: fitnessLevel,
             primary_goal: primaryGoal,
+            secondary_goals: secondaryGoals,
             availability_hours_per_week: parseInt(availability) || 0,
             budget_min: parseFloat(budgetMin) || 0,
             budget_max: parseFloat(budgetMax) || 0,
@@ -89,7 +106,7 @@ const UserProfileEditDialog = ({ currentProfile }: UserProfileEditDialogProps) =
                     Modifica
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Modifica Profilo Atleta</DialogTitle>
                 </DialogHeader>
@@ -139,6 +156,27 @@ const UserProfileEditDialog = ({ currentProfile }: UserProfileEditDialogProps) =
                                 <SelectItem value="wellness">Benessere</SelectItem>
                             </SelectContent>
                         </Select>
+                    </div>
+
+                    <div className="space-y-3">
+                        <Label>Discipline di Interesse (Obiettivi Secondari)</Label>
+                        <div className="grid grid-cols-2 gap-2 border p-3 rounded-md bg-slate-50">
+                            {DISCIPLINES.map((discipline) => (
+                                <div key={discipline} className="flex items-center space-x-2">
+                                    <Checkbox
+                                        id={`spec-${discipline}`}
+                                        checked={secondaryGoals.includes(discipline)}
+                                        onCheckedChange={(checked) => handleDisciplineChange(discipline, checked as boolean)}
+                                    />
+                                    <Label
+                                        htmlFor={`spec-${discipline}`}
+                                        className="text-sm font-normal cursor-pointer"
+                                    >
+                                        {discipline}
+                                    </Label>
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
                     <div className="space-y-2">
