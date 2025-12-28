@@ -173,7 +173,7 @@ const TrainerDashboard = () => {
               <Calendar className="mr-2 h-4 w-4" />
               Gestisci Calendario
             </Button>
-            <Button className="w-full" variant="outline" onClick={() => navigate('/bookings')}>
+            <Button className="w-full" variant="outline" onClick={() => navigate('/clients')}>
               <Users className="mr-2 h-4 w-4" />
               I Miei Clienti
             </Button>
