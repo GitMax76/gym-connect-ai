@@ -9,10 +9,20 @@ import { it } from 'date-fns/locale';
 import { Calendar, Clock, User, Check, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import ReviewDialog from './ReviewDialog';
 
-const BookingsList = () => {
+interface BookingsListProps {
+  filterStatus?: 'all' | 'pending' | 'confirmed' | 'completed' | 'cancelled';
+}
+
+const BookingsList = ({ filterStatus = 'all' }: BookingsListProps) => {
   const { bookings, loading, updateBookingStatus } = useBookings();
   const { user } = useAuth();
+
+  const filteredBookings = bookings.filter(booking => {
+    if (filterStatus === 'all') return true;
+    return booking.status === filterStatus;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -34,22 +44,51 @@ const BookingsList = () => {
     }
   };
 
-  const handleAction = async (id: string, newStatus: 'confirmed' | 'cancelled') => {
+  const handleAction = async (id: string, newStatus: 'confirmed' | 'cancelled' | 'completed') => {
     const { error } = await updateBookingStatus(id, newStatus);
     if (error) {
       toast.error("Errore nell'aggiornamento dello stato");
     } else {
-      toast.success(`Prenotazione ${newStatus === 'confirmed' ? 'confermata' : 'cancellata'}`);
+      const messages = {
+        confirmed: 'Prenotazione confermata',
+        cancelled: 'Prenotazione cancellata',
+        completed: 'Prenotazione segnata come completata'
+      };
+      toast.success(messages[newStatus]);
     }
+  };
+
+  // Check if a confirmed booking is in the past (eligible for completion)
+  const canComplete = (booking: any) => {
+    if (booking.status !== 'confirmed') return false;
+    const bookingDateTime = new Date(`${booking.booking_date}T${booking.end_time}`);
+    const now = new Date();
+    return now > bookingDateTime;
+  };
+
+  // Check availability of review (>= 4 completed bookings with this counterpart)
+  const canReview = (booking: any) => {
+    if (booking.status !== 'completed') return false;
+
+    // Find bookings with same counterpart
+    const isTrainer = user?.id === booking.trainer_id;
+    const counterpartId = isTrainer ? booking.user_id : booking.trainer_id;
+
+    const completedCount = bookings.filter(b =>
+      b.status === 'completed' &&
+      (isTrainer ? b.user_id === counterpartId : b.trainer_id === counterpartId)
+    ).length;
+
+    return completedCount >= 4;
   };
 
   if (loading) return <div className="text-center py-8">Caricamento prenotazioni...</div>;
 
-  if (bookings.length === 0) {
+  if (filteredBookings.length === 0) {
     return (
       <Card className="border-dashed">
         <CardContent className="text-center py-12">
-          <p className="text-muted-foreground">Nessuna prenotazione trovata</p>
+          <p className="text-muted-foreground">Nessuna prenotazione trovata in questa sezione.</p>
         </CardContent>
       </Card>
     );
@@ -57,7 +96,7 @@ const BookingsList = () => {
 
   return (
     <div className="space-y-4">
-      {bookings.map((booking) => {
+      {filteredBookings.map((booking) => {
         const isTrainer = user?.id === booking.trainer_id;
         const otherPartyName = isTrainer
           ? `${booking.client?.first_name || 'Utente'} ${booking.client?.last_name || ''}`
@@ -98,9 +137,9 @@ const BookingsList = () => {
               )}
 
               {/* Actions Area */}
-              {booking.status === 'pending' && (
-                <div className="flex gap-2 justify-end pt-2 border-t mt-2">
-                  {isTrainer ? (
+              <div className="flex gap-2 justify-end pt-2 border-t mt-2 flex-wrap">
+                {booking.status === 'pending' && (
+                  isTrainer ? (
                     <>
                       <Button
                         size="sm"
@@ -127,9 +166,27 @@ const BookingsList = () => {
                     >
                       Cancella Richiesta
                     </Button>
-                  )}
-                </div>
-              )}
+                  )
+                )}
+
+                {canComplete(booking) && (
+                  <Button
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={() => handleAction(booking.id, 'completed')}
+                  >
+                    <Check className="h-4 w-4 mr-1" /> Segna come Completata
+                  </Button>
+                )}
+
+                {canReview(booking) && (
+                  <ReviewDialog
+                    bookingId={booking.id}
+                    targetId={isTrainer ? booking.user_id : booking.trainer_id}
+                    targetName={otherPartyName}
+                  />
+                )}
+              </div>
             </CardContent>
           </Card>
         );

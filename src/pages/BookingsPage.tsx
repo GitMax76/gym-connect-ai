@@ -29,19 +29,19 @@ const BookingsPage = () => {
             </TabsList>
 
             <TabsContent value="all" className="space-y-6">
-              <BookingsList />
+              <BookingsList filterStatus="all" />
             </TabsContent>
 
             <TabsContent value="pending" className="space-y-6">
-              <BookingsList />
+              <BookingsList filterStatus="pending" />
             </TabsContent>
 
             <TabsContent value="confirmed" className="space-y-6">
-              <BookingsList />
+              <BookingsList filterStatus="confirmed" />
             </TabsContent>
 
             <TabsContent value="completed" className="space-y-6">
-              <BookingsList />
+              <BookingsList filterStatus="completed" />
             </TabsContent>
           </Tabs>
         </div>

@@ -156,7 +156,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
         <footer className="bg-white border-t border-slate-200 py-8 mt-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
             <div className="mb-4 md:mb-0">
-              &copy; {new Date().getFullYear()} GymConnect AI. All rights reserved.
+              &copy; {new Date().getFullYear()} GymConnect AI. <Link to="/credits" className="hover:text-primary underline decoration-dotted">Credits</Link>
             </div>
             <div className="flex space-x-6">
               <Link to="/pitch" className="hover:text-primary transition-colors text-sm">

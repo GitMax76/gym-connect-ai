@@ -19,6 +19,7 @@ const SeedPage = React.lazy(() => import('@/pages/SeedPage'));
 const ProfilePage = React.lazy(() => import('@/pages/ProfilePage'));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 const PitchPage = lazy(() => import("./pages/PitchPage"));
+const CreditsPage = lazy(() => import("./pages/CreditsPage"));
 
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ function App() {
                 <Route path="/business.html" element={<Navigate to="/business.html" replace />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/pitch" element={<PitchPage />} />
+                <Route path="/credits" element={<CreditsPage />} />
 
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />

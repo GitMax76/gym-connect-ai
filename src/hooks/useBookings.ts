@@ -62,6 +62,27 @@ export const useBookings = () => {
         status: booking.status as 'pending' | 'confirmed' | 'cancelled' | 'completed'
       }));
 
+      // Auto-complete logic for confirmed bookings older than 48 hours
+      const now = new Date();
+      typedBookings.forEach(async (booking) => {
+        if (booking.status === 'confirmed') {
+          const bookingDateTime = new Date(`${booking.booking_date}T${booking.end_time}`);
+          // Add 48 hours (2 days) to booking time
+          const autoCompletionTime = new Date(bookingDateTime.getTime() + (48 * 60 * 60 * 1000));
+
+          if (now > autoCompletionTime) {
+            // It's been more than 48 hours, mark as completed
+            await supabase
+              .from('bookings')
+              .update({ status: 'completed' })
+              .eq('id', booking.id);
+
+            // Update local state for this item
+            booking.status = 'completed';
+          }
+        }
+      });
+
       setBookings(typedBookings);
     } catch (error) {
       console.error('Error fetching bookings:', error);
