@@ -22,6 +22,10 @@ export interface Booking {
       last_name: string;
     };
   };
+  client?: {
+    first_name: string;
+    last_name: string;
+  };
 }
 
 export const useBookings = () => {
@@ -40,7 +44,8 @@ export const useBookings = () => {
           *,
           trainer:trainer_profiles!trainer_id (
             profiles!id (first_name, last_name)
-          )
+          ),
+          client:profiles!user_id (first_name, last_name)
         `)
         .or(`user_id.eq.${user.id},trainer_id.eq.${user.id}`)
         .order('booking_date', { ascending: false });

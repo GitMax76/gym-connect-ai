@@ -5,7 +5,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/contexts/AuthContext';
 import { Calendar, Users, DollarSign, Star, Clock, Award, LogOut } from 'lucide-react';
 import TrainerProfileEditDialog from './TrainerProfileEditDialog';
-import { MatchNotification } from './MatchNotification';
+import { Notifications } from './Notifications';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import AvailabilitySettings from './AvailabilitySettings';
@@ -45,7 +45,7 @@ const TrainerDashboard = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <MatchNotification />
+          <Notifications />
           <Button
             variant="secondary"
             size="sm"

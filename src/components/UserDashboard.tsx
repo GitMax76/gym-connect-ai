@@ -5,7 +5,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/contexts/AuthContext';
 import { Calendar, MapPin, Target, Clock, DollarSign, Activity, LogOut } from 'lucide-react';
 import UserProfileEditDialog from './UserProfileEditDialog';
-import { MatchNotification } from './MatchNotification';
+import { Notifications } from './Notifications';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 
@@ -44,7 +44,7 @@ const UserDashboard = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <MatchNotification />
+          <Notifications />
           <Button
             variant="secondary"
             size="sm"
