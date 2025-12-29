@@ -83,6 +83,9 @@ export type Database = {
           member_capacity: number | null
           monthly_fee: number | null
           opening_hours: string | null
+          closing_hours: string | null
+          opening_days: string[] | null
+          subscription_plans: Json[] | null
           postal_code: string | null
           social_media: Json | null
           specializations: string[] | null
@@ -101,6 +104,9 @@ export type Database = {
           member_capacity?: number | null
           monthly_fee?: number | null
           opening_hours?: string | null
+          closing_hours?: string | null
+          opening_days?: string[] | null
+          subscription_plans?: Json[] | null
           postal_code?: string | null
           social_media?: Json | null
           specializations?: string[] | null
@@ -119,6 +125,9 @@ export type Database = {
           member_capacity?: number | null
           monthly_fee?: number | null
           opening_hours?: string | null
+          closing_hours?: string | null
+          opening_days?: string[] | null
+          subscription_plans?: Json[] | null
           postal_code?: string | null
           social_media?: Json | null
           specializations?: string[] | null

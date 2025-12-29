@@ -24,6 +24,7 @@ const ProfilePage = () => {
     const [details, setDetails] = useState<any>(null);
     const [contactOpen, setContactOpen] = useState(false);
     const [message, setMessage] = useState('');
+    const [promoDialogOpen, setPromoDialogOpen] = useState(false);
 
     useEffect(() => {
         if (id) fetchProfile(id);
@@ -145,13 +146,7 @@ const ProfilePage = () => {
                                         ) : currentUserProfile?.user_type === 'gym_owner' && profile.user_type === 'user' ? (
                                             <Button
                                                 className="w-full bg-blue-600 hover:bg-blue-700"
-                                                onClick={() => {
-                                                    toast({
-                                                        title: "Promozione Inviata! 🚀",
-                                                        description: "L'atleta riceverà una notifica con la tua offerta.",
-                                                        variant: "default",
-                                                    });
-                                                }}
+                                                onClick={() => setPromoDialogOpen(true)}
                                             >
                                                 Invia Promozione
                                             </Button>
