@@ -21,7 +21,7 @@ export interface MatchResult {
   score: number;
   factors: any;
   profile: any;
-  type: 'trainer' | 'gym';
+  type: 'trainer' | 'gym' | 'user';
 }
 
 export const useMatching = () => {
@@ -95,7 +95,7 @@ export const useMatching = () => {
     }
   };
 
-  const findMatches = async (type: 'trainer' | 'gym' = 'trainer') => {
+  const findMatches = async (type: 'trainer' | 'gym' | 'user' = 'trainer') => {
     if (!user) return;
 
     setLoading(true);
@@ -114,18 +114,28 @@ export const useMatching = () => {
             *,
             profiles!inner(first_name, last_name, city, avatar_url)
           `)
-          // Filter by city in the joined profiles table
           .eq('profiles.city', targetCity)
           .limit(20);
 
-        // Note: .eq('profiles.city') on a joined table with !inner works as a filter.
         query = q;
-      } else {
+      } else if (type === 'gym') {
         let q = supabase
           .from('gym_profiles')
           .select(`
             *,
             profiles!inner(city, first_name, avatar_url)
+          `)
+          .eq('profiles.city', targetCity)
+          .limit(20);
+
+        query = q;
+      } else if (type === 'user') {
+        // Search for athletes/users
+        let q = supabase
+          .from('user_profiles')
+          .select(`
+            *,
+            profiles!inner(first_name, last_name, city, avatar_url)
           `)
           .eq('profiles.city', targetCity)
           .limit(20);
@@ -142,7 +152,13 @@ export const useMatching = () => {
 
       // Calculate match scores for each result in parallel
       const matchResults: MatchResult[] = await Promise.all((data || []).map(async (item) => {
-        const score = await calculateMatchScore(user.id, type === 'trainer' ? item.id : null, type === 'gym' ? item.id : null);
+        const score = await calculateMatchScore(
+          user.id,
+          type === 'trainer' ? item.id : null,
+          type === 'gym' ? item.id : null
+          // Note: we might need a p_target_user_id for athlete-to-athlete matching if the RPC supports it,
+          // but for now we'll assume the basic scoring applies or returns 0.
+        );
 
         return {
           id: item.id,

@@ -170,7 +170,7 @@ export const useProfile = () => {
     try {
       const { error } = await supabase
         .from('user_profiles')
-        .insert({ id: user.id, ...data });
+        .upsert({ id: user.id, ...data });
 
       if (!error) {
         await fetchProfile();
@@ -189,7 +189,7 @@ export const useProfile = () => {
     try {
       const { error } = await supabase
         .from('trainer_profiles')
-        .insert({ id: user.id, ...data });
+        .upsert({ id: user.id, ...data });
 
       if (!error) {
         await fetchProfile();
@@ -208,7 +208,7 @@ export const useProfile = () => {
     try {
       const { error } = await supabase
         .from('gym_profiles')
-        .insert({ id: user.id, ...data });
+        .upsert({ id: user.id, ...data });
 
       if (!error) {
         await fetchProfile();

@@ -11,14 +11,14 @@ import { Separator } from "@/components/ui/separator";
 import { MatchingPreferences } from '@/hooks/useMatching';
 
 interface SearchFiltersProps {
-  searchType: 'trainer' | 'gym';
+  searchType: 'trainer' | 'gym' | 'user';
   onFiltersChange: (filters: any) => void;
   preferences: MatchingPreferences | null;
 }
 
 const SearchFilters = ({ searchType, onFiltersChange, preferences }: SearchFiltersProps) => {
   const [budget, setBudget] = useState<number[]>([
-    preferences?.budget_min || 20, 
+    preferences?.budget_min || 20,
     preferences?.budget_max || 100
   ]);
   const [distance, setDistance] = useState<number[]>([preferences?.max_distance_km || 10]);
@@ -32,7 +32,7 @@ const SearchFilters = ({ searchType, onFiltersChange, preferences }: SearchFilte
   const trainerSpecializations = [
     'Personal Training',
     'Yoga',
-    'Pilates', 
+    'Pilates',
     'CrossFit',
     'Bodybuilding',
     'Cardio',
@@ -56,14 +56,14 @@ const SearchFilters = ({ searchType, onFiltersChange, preferences }: SearchFilte
   ];
 
   const handleSpecializationChange = (spec: string, checked: boolean) => {
-    const newSpecs = checked 
+    const newSpecs = checked
       ? [...specializations, spec]
       : specializations.filter(s => s !== spec);
     setSpecializations(newSpecs);
   };
 
   const handleFacilityChange = (facility: string, checked: boolean) => {
-    const newFacilities = checked 
+    const newFacilities = checked
       ? [...facilities, facility]
       : facilities.filter(f => f !== facility);
     setFacilities(newFacilities);
@@ -133,7 +133,7 @@ const SearchFilters = ({ searchType, onFiltersChange, preferences }: SearchFilte
                 <Checkbox
                   id={spec}
                   checked={specializations.includes(spec)}
-                  onCheckedChange={(checked) => 
+                  onCheckedChange={(checked) =>
                     handleSpecializationChange(spec, checked as boolean)
                   }
                 />
@@ -154,7 +154,7 @@ const SearchFilters = ({ searchType, onFiltersChange, preferences }: SearchFilte
                 <Checkbox
                   id={facility}
                   checked={facilities.includes(facility)}
-                  onCheckedChange={(checked) => 
+                  onCheckedChange={(checked) =>
                     handleFacilityChange(facility, checked as boolean)
                   }
                 />

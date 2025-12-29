@@ -6,15 +6,39 @@ import SearchResults from '@/components/SearchResults';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMatching } from '@/hooks/useMatching';
+import { useProfile } from '@/hooks/useProfile';
 import { Search, Filter, Zap } from 'lucide-react';
 
 const SearchPage = () => {
   const { matches, loading, findMatches, preferences } = useMatching();
-  const [activeTab, setActiveTab] = useState<'trainer' | 'gym'>('trainer');
+  const { profile } = useProfile();
+  const [activeTab, setActiveTab] = useState<'trainer' | 'gym' | 'user'>('trainer');
   const [filters, setFilters] = useState({});
 
+  // Determine available tabs based on user role
+  const availableTabs = React.useMemo(() => {
+    if (!profile?.user_type) return ['trainer', 'gym'];
+
+    switch (profile.user_type) {
+      case 'trainer':
+        return ['user', 'gym'];
+      case 'gym_owner':
+        return ['trainer', 'user'];
+      case 'user':
+      default:
+        return ['trainer', 'gym'];
+    }
+  }, [profile]);
+
   useEffect(() => {
-    // Automatically find matches when page loads
+    // Set default active tab when profile loads
+    if (availableTabs.length > 0 && !availableTabs.includes(activeTab as any)) {
+      setActiveTab(availableTabs[0] as any);
+    }
+  }, [availableTabs]);
+
+  useEffect(() => {
+    // Automatically find matches when page loads or tab changes
     findMatches(activeTab);
   }, [activeTab]);
 
@@ -24,7 +48,16 @@ const SearchPage = () => {
   };
 
   const handleTabChange = (value: string) => {
-    setActiveTab(value as 'trainer' | 'gym');
+    setActiveTab(value as 'trainer' | 'gym' | 'user');
+  };
+
+  const getTabLabel = (type: string) => {
+    switch (type) {
+      case 'trainer': return 'Trainer Personali';
+      case 'gym': return 'Palestre';
+      case 'user': return 'Atleti';
+      default: return type;
+    }
   };
 
   return (
@@ -42,8 +75,8 @@ const SearchPage = () => {
               </h1>
             </div>
             <p className="text-slate-600 max-w-2xl">
-              Utilizza il nostro algoritmo di matching intelligente per trovare trainer e palestre 
-              perfettamente allineati ai tuoi obiettivi e preferenze.
+              Utilizza il nostro algoritmo di matching intelligente per trovare {profile?.user_type === 'trainer' ? 'clienti e palestre' : 'trainer e palestre'}
+              perfettamente allineati ai tuoi obiettivi.
             </p>
           </div>
 
@@ -59,8 +92,7 @@ const SearchPage = () => {
                     Matching Intelligente Attivo
                   </h3>
                   <p className="text-slate-600">
-                    I risultati sono ordinati in base alla compatibilità con le tue preferenze. 
-                    {preferences ? ' Le tue preferenze sono state caricate.' : ' Configura le tue preferenze per risultati più precisi.'}
+                    I risultati sono ordinati in base alla compatibilità con le tue preferenze.
                   </p>
                 </div>
               </div>
@@ -78,7 +110,7 @@ const SearchPage = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <SearchFilters 
+                  <SearchFilters
                     searchType={activeTab}
                     onFiltersChange={handleSearch}
                     preferences={preferences}
@@ -90,26 +122,23 @@ const SearchPage = () => {
             {/* Main content area */}
             <div className="lg:col-span-3">
               <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="trainer">Trainer Personali</TabsTrigger>
-                  <TabsTrigger value="gym">Palestre</TabsTrigger>
+                <TabsList className={`grid w-full grid-cols-${availableTabs.length} mb-6`}>
+                  {availableTabs.map(type => (
+                    <TabsTrigger key={type} value={type}>
+                      {getTabLabel(type)}
+                    </TabsTrigger>
+                  ))}
                 </TabsList>
-                
-                <TabsContent value="trainer">
-                  <SearchResults 
-                    results={matches.filter(m => m.type === 'trainer')} 
-                    loading={loading} 
-                    type="trainer"
-                  />
-                </TabsContent>
-                
-                <TabsContent value="gym">
-                  <SearchResults 
-                    results={matches.filter(m => m.type === 'gym')} 
-                    loading={loading} 
-                    type="gym"
-                  />
-                </TabsContent>
+
+                {availableTabs.map(type => (
+                  <TabsContent key={type} value={type}>
+                    <SearchResults
+                      results={matches.filter(m => m.type === type)}
+                      loading={loading}
+                      type={type as any}
+                    />
+                  </TabsContent>
+                ))}
               </Tabs>
             </div>
           </div>

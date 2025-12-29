@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 interface SearchResultsProps {
   results: MatchResult[];
   loading: boolean;
-  type: 'trainer' | 'gym';
+  type: 'trainer' | 'gym' | 'user';
 }
 
 const SearchResults = ({ results, loading, type }: SearchResultsProps) => {
@@ -84,7 +84,7 @@ const SearchResults = ({ results, loading, type }: SearchResultsProps) => {
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-900">
-          {results.length} {type === 'trainer' ? 'Trainer' : 'Palestre'} trovati
+          {results.length} {type === 'trainer' ? 'Trainer' : type === 'gym' ? 'Palestre' : 'Atleti'} trovati
         </h2>
         <div className="text-sm text-gray-600">
           Ordinati per compatibilità
@@ -96,7 +96,7 @@ const SearchResults = ({ results, loading, type }: SearchResultsProps) => {
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-4">
-                {type === 'trainer' && (
+                {(type === 'trainer' || type === 'user') && (
                   <Avatar className="w-16 h-16">
                     <AvatarImage src={result.profile.profiles?.avatar_url} />
                     <AvatarFallback>
@@ -106,7 +106,7 @@ const SearchResults = ({ results, loading, type }: SearchResultsProps) => {
                 )}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">
-                    {type === 'trainer'
+                    {(type === 'trainer' || type === 'user')
                       ? `${result.profile.profiles?.first_name || ''} ${result.profile.profiles?.last_name || ''}`
                       : result.profile.gym_name
                     }
@@ -190,6 +190,24 @@ const SearchResults = ({ results, loading, type }: SearchResultsProps) => {
                       <div className="flex items-center">
                         <Users className="h-4 w-4 mr-1" />
                         Fino a {result.profile.member_capacity} membri
+                      </div>
+                    )}
+                  </>
+                )}
+                {type === 'user' && (
+                  <>
+                    {result.profile.primary_goal && (
+                      <div className="flex items-center">
+                        <Award className="h-4 w-4 mr-1" />
+                        {result.profile.primary_goal === 'muscle-gain' ? 'Massa Muscolare' :
+                          result.profile.primary_goal === 'weight-loss' ? 'Perdita Peso' :
+                            result.profile.primary_goal}
+                      </div>
+                    )}
+                    {result.profile.fitness_level && (
+                      <div className="flex items-center">
+                        <Zap className="h-4 w-4 mr-1" />
+                        {result.profile.fitness_level}
                       </div>
                     )}
                   </>
