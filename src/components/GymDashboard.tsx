@@ -3,12 +3,21 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useProfile } from '@/hooks/useProfile';
-import { Building, Users, Calendar, DollarSign, Star, TrendingUp } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { Building, Users, Calendar, DollarSign, Star, TrendingUp, LogOut } from 'lucide-react';
 import GymProfileEditDialog from './GymProfileEditDialog';
 import GymLeads from './GymLeads';
 
 const GymDashboard = () => {
   const { profile, gymProfile, loading } = useProfile();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   if (loading) {
     return (
@@ -21,13 +30,23 @@ const GymDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-6 text-white">
-        <h1 className="text-3xl font-bold mb-2">
-          Benvenuto, {gymProfile?.gym_name || profile?.first_name || 'Gestore'}! 🏋️‍♀️
-        </h1>
-        <p className="text-purple-100">
-          Gestisci la tua palestra e i tuoi membri
-        </p>
+      <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-6 text-white flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">
+            Benvenuto, {gymProfile?.gym_name || profile?.first_name || 'Gestore'}! 🏋️‍♀️
+          </h1>
+          <p className="text-purple-100">
+            Gestisci la tua palestra e i tuoi membri
+          </p>
+        </div>
+        <Button
+          variant="secondary"
+          className="bg-white/20 hover:bg-white/30 text-white border-0"
+          onClick={handleLogout}
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          Esci
+        </Button>
       </div>
 
       {/* Quick Stats */}
