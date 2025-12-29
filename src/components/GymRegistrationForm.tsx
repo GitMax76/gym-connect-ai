@@ -21,6 +21,7 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
     gymName: '',
     ownerName: '',
     email: user?.email || '',
+    password: '',
     phone: '',
     address: '',
     city: '',
@@ -168,6 +169,22 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
                 />
               </div>
             </div>
+
+            {!user && (
+              <div>
+                <Label htmlFor="password">Password *</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  placeholder="Password sicura"
+                  required
+                  className="mt-1"
+                />
+                <p className="text-xs text-slate-500 mt-1">La password per accedere al tuo account GymConnect.</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 

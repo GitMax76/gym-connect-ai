@@ -120,15 +120,16 @@ const AuthPage = () => {
           gym_name: data.gymName,
           business_email: data.email,
           address: data.address,
+          city: data.city,
           postal_code: data.postalCode,
           description: data.description,
           facilities: data.facilities,
           specializations: data.specializations,
+          opening_days: data.openingDays,
           opening_hours: data.openingHours,
           closing_hours: data.closingHours,
           member_capacity: data.memberCapacity ? parseInt(data.memberCapacity) : undefined,
-          monthly_fee: data.monthlyFee ? parseFloat(data.monthlyFee) : undefined,
-          day_pass_fee: data.dayPassFee ? parseFloat(data.dayPassFee) : undefined
+          subscription_plans: data.subscriptionPlans as any // Cast to any/Json for Supabase
         };
         const result = await createGymProfile(gymProfileData);
         errorProfile = result.error;
