@@ -12,11 +12,13 @@ import BookingDialog from '@/components/BookingDialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from "@/hooks/use-toast";
+import { useProfile } from '@/hooks/useProfile';
 
 const ProfilePage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { toast } = useToast();
+    const { profile: currentUserProfile } = useProfile();
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState<any>(null);
     const [details, setDetails] = useState<any>(null);
@@ -136,11 +138,24 @@ const ProfilePage = () => {
                                                 trainerId={profile.id}
                                                 trainerName={`${profile.first_name} ${profile.last_name}`}
                                             />
-                                        ) : (
+                                        ) : isGym ? (
                                             <Button className="w-full bg-green-600 hover:bg-green-700">
                                                 Richiedi Iscrizione
                                             </Button>
-                                        )}
+                                        ) : currentUserProfile?.user_type === 'gym_owner' && profile.user_type === 'user' ? (
+                                            <Button
+                                                className="w-full bg-blue-600 hover:bg-blue-700"
+                                                onClick={() => {
+                                                    toast({
+                                                        title: "Promozione Inviata! 🚀",
+                                                        description: "L'atleta riceverà una notifica con la tua offerta.",
+                                                        variant: "default",
+                                                    });
+                                                }}
+                                            >
+                                                Invia Promozione
+                                            </Button>
+                                        ) : null}
 
                                         <Dialog open={contactOpen} onOpenChange={setContactOpen}>
                                             <DialogTrigger asChild>
