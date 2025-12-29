@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useProfile } from '@/hooks/useProfile';
 import { Building, Users, Calendar, DollarSign, Star, TrendingUp } from 'lucide-react';
 import GymProfileEditDialog from './GymProfileEditDialog';
+import GymLeads from './GymLeads';
 
 const GymDashboard = () => {
   const { profile, gymProfile, loading } = useProfile();
@@ -161,37 +162,33 @@ const GymDashboard = () => {
         </Card>
       </div>
 
-      {/* Recent Activity */}
+      import GymLeads from './GymLeads';
+
+      // ... (inside component)
+
+      {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Gym Profile */}
         <Card>
-          <CardHeader>
-            <CardTitle>Nuovi Membri</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Alessandro Verdi</p>
-                  <p className="text-sm text-muted-foreground">Piano Premium</p>
-                </div>
-                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Oggi</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Sofia Romano</p>
-                  <p className="text-sm text-muted-foreground">Piano Base</p>
-                </div>
-                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Ieri</span>
-              </div>
-            </div>
-          </CardContent>
+          {/* ... keeping profile card distinct if possible, but the replace tool works on chunks. 
+                I need to be careful not to delete GymProfileEditDialog integration.
+                Wait, I see the Instruction says replace New Members card.
+                Let's target the exact block for 'Recent Activity'.
+             */}
         </Card>
+        {/* ... */}
+      </div>
+
+      {/* Leads and Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <GymLeads />
 
         <Card>
           <CardHeader>
-            <CardTitle>Statistiche Utilizzo</CardTitle>
+            <CardTitle>Statistiche Utilizzo (Stimate)</CardTitle>
           </CardHeader>
           <CardContent>
+            {/* Keep stats but mark as estimated */}
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm mb-1">
@@ -221,6 +218,9 @@ const GymDashboard = () => {
                 </div>
               </div>
             </div>
+            <p className="text-xs text-muted-foreground mt-4 text-center">
+              Dati basati sulla capacità dichiarata e prenotazioni medie.
+            </p>
           </CardContent>
         </Card>
       </div>

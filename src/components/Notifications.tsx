@@ -78,6 +78,26 @@ export const Notifications = () => {
                         });
                     });
                 }
+            } else if (profile?.user_type === 'gym_owner') {
+                // Fetch Users in the same city who might be interested
+                const { data } = await supabase
+                    .from('profiles')
+                    .select(`id, first_name, last_name, user_profiles!inner(primary_goal)`)
+                    .eq('user_type', 'user')
+                    .eq('city', profile.city)
+                    .limit(5);
+
+                if (data) {
+                    data.forEach(match => {
+                        newNotifications.push({
+                            id: `lead-${match.id}`,
+                            type: 'match',
+                            title: `Nuovo Membro Potenziale: ${match.first_name}`,
+                            description: `Obiettivo: ${match.user_profiles.primary_goal}`,
+                            link: `/profile/${match.id}`
+                        });
+                    });
+                }
             }
 
             // 2. Fetch Pending Bookings (For Trainers)
