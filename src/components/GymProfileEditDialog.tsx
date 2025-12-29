@@ -13,13 +13,14 @@ interface GymProfileEditDialogProps {
 }
 
 const GymProfileEditDialog = ({ currentProfile }: GymProfileEditDialogProps) => {
-    const { updateGymProfile } = useProfile();
+    const { updateGymProfile, updateProfile, profile } = useProfile();
     const { toast } = useToast();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
     // Form State
     const [gymName, setGymName] = useState(currentProfile?.gym_name || '');
+    const [city, setCity] = useState(profile?.city || '');
     const [address, setAddress] = useState(currentProfile?.address || '');
     const [description, setDescription] = useState(currentProfile?.description || '');
     const [facilities, setFacilities] = useState(currentProfile?.facilities?.join(', ') || '');
@@ -28,19 +29,37 @@ const GymProfileEditDialog = ({ currentProfile }: GymProfileEditDialogProps) => 
 
     const handleOpenChange = (newOpen: boolean) => {
         setOpen(newOpen);
-        if (newOpen && currentProfile) {
-            setGymName(currentProfile.gym_name || '');
-            setAddress(currentProfile.address || '');
-            setDescription(currentProfile.description || '');
-            setFacilities(currentProfile.facilities?.join(', ') || '');
-            setMonthlyFee(currentProfile.monthly_fee?.toString() || '');
-            setMemberCapacity(currentProfile.member_capacity?.toString() || '');
+        if (newOpen) {
+            if (currentProfile) {
+                setGymName(currentProfile.gym_name || '');
+                setAddress(currentProfile.address || '');
+                setDescription(currentProfile.description || '');
+                setFacilities(currentProfile.facilities?.join(', ') || '');
+                setMonthlyFee(currentProfile.monthly_fee?.toString() || '');
+                setMemberCapacity(currentProfile.member_capacity?.toString() || '');
+            }
+            if (profile) {
+                setCity(profile.city || '');
+            }
         }
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+
+        // Update Base Profile (City)
+        const { error: profileError } = await updateProfile({ city });
+
+        if (profileError) {
+            toast({
+                variant: "destructive",
+                title: "Errore",
+                description: "Impossibile aggiornare la città.",
+            });
+            setLoading(false);
+            return;
+        }
 
         const updates = {
             gym_name: gymName,
@@ -57,7 +76,7 @@ const GymProfileEditDialog = ({ currentProfile }: GymProfileEditDialogProps) => 
             toast({
                 variant: "destructive",
                 title: "Errore",
-                description: "Impossibile aggiornare il profilo. Riprova.",
+                description: "Impossibile aggiornare il profilo palestra.",
             });
         } else {
             toast({
@@ -86,9 +105,15 @@ const GymProfileEditDialog = ({ currentProfile }: GymProfileEditDialogProps) => 
                         <Label htmlFor="gymName">Nome Palestra</Label>
                         <Input id="gymName" value={gymName} onChange={e => setGymName(e.target.value)} placeholder="Nome della palestra" />
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="address">Indirizzo</Label>
-                        <Input id="address" value={address} onChange={e => setAddress(e.target.value)} placeholder="Via Roma 1, Roma" />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="city">Città</Label>
+                            <Input id="city" value={city} onChange={e => setCity(e.target.value)} placeholder="Roma" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="address">Indirizzo</Label>
+                            <Input id="address" value={address} onChange={e => setAddress(e.target.value)} placeholder="Via Roma 1" />
+                        </div>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="description">Descrizione</Label>

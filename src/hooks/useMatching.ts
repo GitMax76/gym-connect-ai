@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useProfile } from '@/hooks/useProfile';
 
 export interface MatchingPreferences {
   id?: string;
@@ -26,6 +27,7 @@ export interface MatchResult {
 
 export const useMatching = () => {
   const { user } = useAuth();
+  const { profile } = useProfile();
   const [preferences, setPreferences] = useState<MatchingPreferences | null>(null);
   const [matches, setMatches] = useState<MatchResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -103,9 +105,9 @@ export const useMatching = () => {
       let query;
 
       // Retrieve user's city from profile or preferences to filter matches
-      // This simulates "10km" radius by strict city matching for the Rome Scenario
-      // note: preferences doesn't have city, so we rely on user metadata or default to 'Roma' for testing
-      const targetCity = 'Roma';
+      // Default to 'Roma' only if no city is found in profile
+      const targetCity = profile?.city || 'Roma';
+      console.log('Searching matches for city:', targetCity);
 
       if (type === 'trainer') {
         let q = supabase
@@ -130,7 +132,6 @@ export const useMatching = () => {
 
         query = q;
       } else if (type === 'user') {
-        // Search for athletes/users
         let q = supabase
           .from('user_profiles')
           .select(`
@@ -156,14 +157,12 @@ export const useMatching = () => {
           user.id,
           type === 'trainer' ? item.id : null,
           type === 'gym' ? item.id : null
-          // Note: we might need a p_target_user_id for athlete-to-athlete matching if the RPC supports it,
-          // but for now we'll assume the basic scoring applies or returns 0.
         );
 
         return {
           id: item.id,
           score: score || 0,
-          factors: {}, // TODO: implement detailed scoring factors
+          factors: {},
           profile: item,
           type
         };
