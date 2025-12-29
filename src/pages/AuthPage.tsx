@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import RoleSelector from '@/components/RoleSelector';
 import UserRegistrationForm from '@/components/UserRegistrationForm';
@@ -13,6 +13,7 @@ import { useProfile } from '@/hooks/useProfile';
 type Role = 'user' | 'instructor' | 'gym' | '';
 
 const AuthPage = () => {
+  const location = useLocation();
   const [step, setStep] = useState<'select-role' | 'register'>('select-role');
   const [selectedRole, setSelectedRole] = useState<Role>('');
   const { toast } = useToast();
@@ -20,6 +21,16 @@ const AuthPage = () => {
   const { signUp, signInWithGoogle } = useAuth();
   const { updateProfile, createUserProfile, createTrainerProfile, createGymProfile } = useProfile();
   const [loading, setLoading] = useState(false);
+
+  // Check for role in URL on mount
+  React.useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const roleParam = searchParams.get('role');
+    if (roleParam && (roleParam === 'user' || roleParam === 'instructor' || roleParam === 'gym')) {
+      setSelectedRole(roleParam as Role);
+      setStep('register');
+    }
+  }, [location]);
 
   // Step 1: handle role select
   const handleRoleSelect = (role: Role) => {
@@ -40,7 +51,7 @@ const AuthPage = () => {
     try {
       let userType = selectedRole === 'instructor' ? 'trainer'
         : selectedRole === 'gym' ? 'gym_owner'
-        : 'user';
+          : 'user';
 
       // 1. Creazione utente (Supabase signUp): nel form sono sempre richiesti email, password, altri dati
       const { error } = await signUp(
@@ -139,8 +150,8 @@ const AuthPage = () => {
           selectedRole === 'user'
             ? "Benvenuto in GymConnect! Il tuo profilo è stato creato."
             : selectedRole === 'instructor'
-            ? "Benvenuto Coach! Il tuo profilo trainer è attivo."
-            : "La registrazione della palestra è completata.",
+              ? "Benvenuto Coach! Il tuo profilo trainer è attivo."
+              : "La registrazione della palestra è completata.",
         variant: "default"
       });
 

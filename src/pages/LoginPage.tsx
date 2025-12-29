@@ -162,7 +162,7 @@ const LoginPage = () => {
               </div>
 
               {/* Register Link */}
-              <div className="text-center">
+              <div className="text-center space-y-3">
                 <p className="text-slate-600">
                   Non hai ancora un account?{' '}
                   <button
@@ -173,6 +173,18 @@ const LoginPage = () => {
                     Registrati qui
                   </button>
                 </p>
+                <div className="pt-2 border-t border-slate-100">
+                  <p className="text-slate-500 text-sm">
+                    Gestisci una palestra?{' '}
+                    <button
+                      onClick={() => navigate('/auth?role=gym')}
+                      className="text-orange-600 hover:text-orange-700 font-bold hover:underline transition-colors"
+                      disabled={loading}
+                    >
+                      Registra la tua struttura
+                    </button>
+                  </p>
+                </div>
               </div>
 
               {/* Back to Home */}
