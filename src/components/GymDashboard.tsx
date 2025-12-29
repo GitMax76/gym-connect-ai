@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Building, Users, Calendar, DollarSign, Star, TrendingUp, LogOut } from 'lucide-react';
+import { Building, Users, Calendar, DollarSign, Star, TrendingUp, LogOut, Search } from 'lucide-react';
 import GymProfileEditDialog from './GymProfileEditDialog';
 import GymLeads from './GymLeads';
 
@@ -161,7 +161,11 @@ const GymDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full">
+            <Button className="w-full" onClick={() => navigate('/search')}>
+              <Search className="mr-2 h-4 w-4" />
+              Cerca Trainer/Atleti
+            </Button>
+            <Button className="w-full" variant="outline">
               <Users className="mr-2 h-4 w-4" />
               Gestisci Membri
             </Button>
@@ -181,22 +185,7 @@ const GymDashboard = () => {
         </Card>
       </div>
 
-      import GymLeads from './GymLeads';
 
-      // ... (inside component)
-
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Gym Profile */}
-        <Card>
-          {/* ... keeping profile card distinct if possible, but the replace tool works on chunks. 
-                I need to be careful not to delete GymProfileEditDialog integration.
-                Wait, I see the Instruction says replace New Members card.
-                Let's target the exact block for 'Recent Activity'.
-             */}
-        </Card>
-        {/* ... */}
-      </div>
 
       {/* Leads and Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
