@@ -247,19 +247,26 @@ export const useProfile = () => {
     if (!user) return { error: 'No user logged in' };
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('gym_profiles')
         .update(updates)
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .select();
 
-      if (!error) {
-        setGymProfile(prev => prev ? { ...prev, ...updates } : null);
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const updatedProfile = data[0] as GymProfile;
+        setGymProfile(updatedProfile);
+        return { data: updatedProfile, error: null };
+      } else {
+        // No row updated - RLS or ID mismatch
+        console.warn('Update succeeded but no row was returned. Check RLS policies.');
+        return { data: null, error: { message: 'Nessun dato aggiornato (Errore permessi o profilo non trovato)' } };
       }
-
-      return { error };
     } catch (error: any) {
       console.error('Error updating gym profile:', error);
-      return { error };
+      return { data: null, error };
     }
   };
 

@@ -171,10 +171,11 @@ const GymProfileEditDialog = ({
         const { error } = await updateGymProfile(updates);
 
         if (error) {
+            console.error("Update failed:", error);
             toast({
                 variant: "destructive",
                 title: "Errore",
-                description: "Impossibile aggiornare il profilo palestra.",
+                description: `Impossibile aggiornare il profilo: ${error.message || error}`,
             });
         } else {
             toast({
