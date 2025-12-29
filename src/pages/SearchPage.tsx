@@ -10,8 +10,8 @@ import { useProfile } from '@/hooks/useProfile';
 import { Search, Filter, Zap } from 'lucide-react';
 
 const SearchPage = () => {
-  const { matches, loading, findMatches, preferences } = useMatching();
-  const { profile } = useProfile();
+  const { matches, loading: matchingLoading, findMatches, preferences } = useMatching();
+  const { profile, loading: profileLoading } = useProfile();
   const [activeTab, setActiveTab] = useState<'trainer' | 'gym' | 'user'>('trainer');
   const [filters, setFilters] = useState({});
 
@@ -39,8 +39,11 @@ const SearchPage = () => {
 
   useEffect(() => {
     // Automatically find matches when page loads or tab changes
+    // Only search if profile is loaded to avoid default city fallback
+    if (profileLoading || !profile) return;
+
     findMatches(activeTab);
-  }, [activeTab]);
+  }, [activeTab, profileLoading, profile]);
 
   const handleSearch = (newFilters: any) => {
     setFilters(newFilters);
@@ -134,7 +137,7 @@ const SearchPage = () => {
                   <TabsContent key={type} value={type}>
                     <SearchResults
                       results={matches.filter(m => m.type === type)}
-                      loading={loading}
+                      loading={matchingLoading}
                       type={type as any}
                     />
                   </TabsContent>

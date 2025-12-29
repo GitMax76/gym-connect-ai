@@ -74,10 +74,24 @@ const SearchResults = ({ results, loading, type }: SearchResultsProps) => {
   };
 
   const handleBooking = () => {
+    if (type === 'user') {
+      toast({
+        title: "Promozione Inviata! 🚀",
+        description: "L'atleta riceverà una notifica con la tua offerta.",
+        variant: "default",
+      });
+      return;
+    }
+
     toast({
-      title: "Funzionalità in arrivo",
       description: "Il sistema di prenotazione sarà disponibile a breve.",
     });
+  };
+
+  const getActionButtonLabel = () => {
+    if (type === 'user') return 'Invia Promozione';
+    if (type === 'trainer') return 'Prenota Sessione';
+    return 'Richiedi Info';
   };
 
   return (
@@ -229,7 +243,7 @@ const SearchResults = ({ results, loading, type }: SearchResultsProps) => {
                 Visualizza Profilo
               </Button>
               <Button variant="outline" onClick={handleBooking}>
-                {type === 'trainer' ? 'Prenota Sessione' : 'Richiedi Info'}
+                {type === 'trainer' ? 'Prenota Sessione' : type === 'user' ? 'Invia Promozione' : 'Richiedi Info'}
               </Button>
             </div>
           </CardContent>
