@@ -49,13 +49,13 @@ export const usePromotions = () => {
     };
 
     const createPromotion = async (promotion: Omit<Promotion, 'id' | 'created_at' | 'gym_id'>) => {
-        if (!gymId) { // Check for gymId instead of user
+        if (!gymId) {
             toast({
                 variant: "destructive",
                 title: "Errore",
                 description: "Utente non autenticato."
             });
-            return { error: 'No user' };
+            return { data: null, error: 'No user' };
         }
         try {
             const { data, error } = await (supabase
@@ -66,12 +66,15 @@ export const usePromotions = () => {
                 .select() as any);
 
             if (error) throw error;
-            setPromotions(prev => [...prev, data[0] as Promotion]);
+
+            const newPromotion = data[0] as Promotion;
+            setPromotions(prev => [...prev, newPromotion]);
+
             toast({
                 title: "Promozione creata",
                 description: "La promozione è stata creata con successo."
             });
-            return data[0];
+            return { data: newPromotion, error: null };
         } catch (err: any) {
             console.error('Error creating promotion:', err);
             toast({
@@ -79,7 +82,7 @@ export const usePromotions = () => {
                 title: "Errore",
                 description: "Impossibile creare la promozione."
             });
-            throw err;
+            return { data: null, error: err };
         }
     };
 
@@ -92,11 +95,15 @@ export const usePromotions = () => {
                 .select() as any);
 
             if (error) throw error;
-            setPromotions(prev => prev.map(p => p.id === id ? (data[0] as Promotion) : p));
+
+            const updatedPromo = data[0] as Promotion;
+            setPromotions(prev => prev.map(p => p.id === id ? updatedPromo : p));
+
             toast({
                 title: "Promozione aggiornata",
                 description: "Le modifiche sono state salvate."
             });
+            return { data: updatedPromo, error: null };
         } catch (err: any) {
             console.error('Error updating promotion:', err);
             toast({
@@ -104,6 +111,7 @@ export const usePromotions = () => {
                 title: "Errore",
                 description: "Impossibile aggiornare la promozione."
             });
+            return { data: null, error: err };
         }
     };
 
@@ -120,6 +128,7 @@ export const usePromotions = () => {
                 title: "Promozione eliminata",
                 description: "La promozione è stata rimossa."
             });
+            return { error: null };
         } catch (err: any) {
             console.error('Error deleting promotion:', err);
             toast({
@@ -127,6 +136,7 @@ export const usePromotions = () => {
                 title: "Errore",
                 description: "Impossibile eliminare la promozione."
             });
+            return { error: err };
         }
     };
 

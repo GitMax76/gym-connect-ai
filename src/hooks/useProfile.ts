@@ -56,8 +56,10 @@ export interface GymProfile {
   description?: string;
   facilities?: string[];
   specializations?: string[];
+  opening_days?: string[] | null; // Added
   opening_hours?: string;
   closing_hours?: string;
+  subscription_plans?: any[] | null; // Added
   member_capacity?: number;
   monthly_fee?: number;
   day_pass_fee?: number;

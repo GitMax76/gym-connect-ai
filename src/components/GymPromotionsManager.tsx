@@ -29,16 +29,8 @@ const GymPromotionsManager = () => {
         const { error } = await createPromotion(newPromo);
 
         if (error) {
-            toast({
-                variant: 'destructive',
-                title: 'Errore',
-                description: 'Impossibile creare la promozione.'
-            });
+            // Error is handled by the hook toast, but we can verify here if needed
         } else {
-            toast({
-                title: 'Successo',
-                description: 'Promozione creata con successo!'
-            });
             setIsCreateOpen(false);
             setNewPromo({ title: '', description: '', discount_value: '', is_active: true });
         }

@@ -144,18 +144,26 @@ const GymProfileEditDialog = ({
             return;
         }
 
+        // Validate numeric fields
+        const safeMemberCapacity = memberCapacity ? parseInt(memberCapacity) : 0;
+        let safeMonthlyFee = 0;
+
+        if (subscriptionPlans.length > 0) {
+            const price = parseFloat(subscriptionPlans[0].price);
+            safeMonthlyFee = isNaN(price) ? 0 : price;
+        }
+
         const updates = {
             gym_name: gymName,
             address,
             description,
             facilities,
-            member_capacity: parseInt(memberCapacity) || 0,
+            member_capacity: isNaN(safeMemberCapacity) ? 0 : safeMemberCapacity,
             opening_days: openingDays,
             opening_hours: openingHours,
             closing_hours: closingHours,
             subscription_plans: subscriptionPlans,
-            // Fallback for types not yet updated or legacy components
-            monthly_fee: subscriptionPlans.length > 0 ? parseFloat(subscriptionPlans[0].price) : 0
+            monthly_fee: safeMonthlyFee
         };
 
         const { error } = await updateGymProfile(updates);
@@ -236,8 +244,8 @@ const GymProfileEditDialog = ({
                                             key={day}
                                             onClick={() => handleDayToggle(day)}
                                             className={`cursor-pointer px-3 py-1 rounded-md text-xs font-medium border transition-colors ${openingDays.includes(day)
-                                                    ? 'bg-purple-100 text-purple-700 border-purple-200'
-                                                    : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
+                                                ? 'bg-purple-100 text-purple-700 border-purple-200'
+                                                : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
                                                 }`}
                                         >
                                             {day}
