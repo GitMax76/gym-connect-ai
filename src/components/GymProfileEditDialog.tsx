@@ -17,6 +17,7 @@ interface GymProfileEditDialogProps {
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
     onSwitchToTab?: (tab: string) => void; // Callback to switch dashboard tabs
+    onProfileUpdated?: () => void;
 }
 
 const facilityOptions = [
@@ -31,7 +32,8 @@ const GymProfileEditDialog = ({
     trigger,
     open: controlledOpen,
     onOpenChange: setControlledOpen,
-    onSwitchToTab
+    onSwitchToTab,
+    onProfileUpdated
 }: GymProfileEditDialogProps) => {
     const { updateGymProfile, updateProfile, profile, gymProfile: hookGymProfile } = useProfile();
     const currentProfile = propProfile || hookGymProfile;
@@ -179,6 +181,7 @@ const GymProfileEditDialog = ({
                 title: "Successo",
                 description: "Profilo aggiornato con successo!",
             });
+            if (onProfileUpdated) onProfileUpdated();
             if (setOpen) setOpen(false);
         }
         setLoading(false);

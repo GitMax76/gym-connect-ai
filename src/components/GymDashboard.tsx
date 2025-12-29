@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const GymDashboard = () => {
-  const { profile, gymProfile, loading } = useProfile();
+  const { profile, gymProfile, loading, refetch } = useProfile();
   const { signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -94,6 +94,7 @@ const GymDashboard = () => {
             defaultTab={editDialogTab}
             onSwitchToTab={setActiveTab}
             currentProfile={gymProfile}
+            onProfileUpdated={refetch}
           />
         </div>
 
