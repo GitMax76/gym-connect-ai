@@ -76,6 +76,12 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                     >
                       Contatti
                     </Link>
+                    <Link
+                      to="/pitch"
+                      className="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                    >
+                      Vision
+                    </Link>
                   </>
                 ) : (
                   <>

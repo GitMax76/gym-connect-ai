@@ -26,7 +26,7 @@ const ContactPage = () => {
 
         try {
             // @ts-ignore - leads table added via migration, types not yet updated
-            const { error } = await supabase
+            const { error } = await (supabase as any)
                 .from('leads')
                 .insert([data]);
 
@@ -43,7 +43,13 @@ const ContactPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-background pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-background pt-24 pb-12 px-4 sm:px-6 lg:px-8 relative">
+            <a
+                href="/"
+                className="absolute top-4 left-4 md:top-8 md:left-8 z-50 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-all text-slate-700 hover:text-green-600 flex items-center gap-2 px-4 font-medium"
+            >
+                ← Home
+            </a>
             <div className="max-w-4xl mx-auto space-y-12">
 
                 {/* Header content */}
