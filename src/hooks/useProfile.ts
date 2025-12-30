@@ -152,9 +152,16 @@ export const useProfile = () => {
     if (!targetId) return { error: 'No user logged in or provided' };
 
     try {
+      // Use type assertion to allow optional user_type since the trigger handles defaults
+      const upsertData = {
+        id: targetId,
+        ...updates,
+        updated_at: new Date().toISOString()
+      } as any;
+
       const { error } = await supabase
         .from('profiles')
-        .upsert({ id: targetId, ...updates, updated_at: new Date().toISOString() });
+        .upsert(upsertData);
 
       if (!error) {
         setProfile(prev => prev ? { ...prev, ...updates } : null);
@@ -209,38 +216,59 @@ export const useProfile = () => {
 
   const createGymProfile = async (data: { gym_name: string } & Partial<Omit<GymProfile, 'id' | 'gym_name'>>, userId?: string) => {
     const targetId = userId || user?.id;
-    if (!targetId) return { error: 'No user logged in or provided' };
+    console.log('createGymProfile called with targetId:', targetId);
+    console.log('createGymProfile data:', data);
+
+    if (!targetId) {
+      console.error('createGymProfile: No user ID available');
+      return { error: 'No user logged in or provided' };
+    }
 
     try {
-      const { error } = await supabase.rpc('manage_gym_profile', {
-        p_user_id: targetId,
-        p_gym_name: data.gym_name,
-        p_business_email: data.business_email,
-        p_address: data.address,
-        p_city: data.city,
-        p_postal_code: data.postal_code,
-        p_description: data.description,
-        p_facilities: data.facilities,
-        p_specializations: data.specializations,
-        p_opening_days: data.opening_days,
-        p_opening_hours: data.opening_hours,
-        p_closing_hours: data.closing_hours,
-        p_member_capacity: data.member_capacity,
-        p_subscription_plans: data.subscription_plans,
-        p_monthly_fee: data.monthly_fee,
-        p_day_pass_fee: data.day_pass_fee,
-        p_website_url: data.website_url,
-        p_social_media: data.social_media
-      });
+      // Use direct INSERT instead of RPC - RPC requires auth.uid() which may not be available during registration
+      const insertData = {
+        id: targetId,
+        gym_name: data.gym_name,
+        business_email: data.business_email || null,
+        address: data.address || null,
+        city: data.city || null,
+        postal_code: data.postal_code || null,
+        description: data.description || null,
+        facilities: data.facilities || null,
+        specializations: data.specializations || null,
+        opening_days: data.opening_days || null,
+        opening_hours: data.opening_hours || null,
+        closing_hours: data.closing_hours || null,
+        member_capacity: data.member_capacity || null,
+        subscription_plans: data.subscription_plans || null,
+        monthly_fee: data.monthly_fee || null,
+        day_pass_fee: data.day_pass_fee || null,
+        website_url: data.website_url || null,
+        social_media: data.social_media || null
+      };
+      console.log('Inserting gym profile directly:', insertData);
 
-      if (!error) {
-        await fetchProfile();
+      const { data: result, error } = await supabase
+        .from('gym_profiles')
+        .upsert(insertData as any)
+        .select()
+        .single();
+
+      console.log('Direct insert result:', { result, error: error?.message });
+
+      if (error) {
+        console.error('Error inserting gym profile:', error);
+        return { error: error.message || error };
       }
 
-      return { error };
+      if (result) {
+        setGymProfile(result as GymProfile);
+      }
+
+      return { error: null, data: result };
     } catch (error: any) {
-      console.error('Error creating gym profile:', error);
-      return { error };
+      console.error('Error creating gym profile (exception):', error);
+      return { error: error.message || error };
     }
   };
 
@@ -265,14 +293,21 @@ export const useProfile = () => {
   };
 
   const updateGymProfile = async (updates: Partial<GymProfile>) => {
-    if (!user) return { error: 'No user logged in' };
+    console.log('updateGymProfile called with updates:', updates);
+    console.log('Current gymProfile state:', gymProfile);
+
+    if (!user) {
+      console.error('updateGymProfile: No user logged in');
+      return { error: 'No user logged in' };
+    }
 
     try {
       const merged = { ...gymProfile, ...updates };
+      console.log('Merged profile data:', merged);
 
-      const { data, error } = await supabase.rpc('manage_gym_profile', {
+      const rpcParams = {
         p_user_id: user.id,
-        p_gym_name: merged.gym_name || '', // gym_name is required in RPC, ensure it exists
+        p_gym_name: merged.gym_name || '',
         p_business_email: merged.business_email,
         p_address: merged.address,
         p_city: merged.city,
@@ -289,18 +324,23 @@ export const useProfile = () => {
         p_day_pass_fee: merged.day_pass_fee,
         p_website_url: merged.website_url,
         p_social_media: merged.social_media
-      });
+      };
+      console.log('Calling RPC manage_gym_profile for update with params:', rpcParams);
+
+      // Type assertion needed because manage_gym_profile RPC isn't in generated types yet
+      const { data, error } = await (supabase.rpc as any)('manage_gym_profile', rpcParams);
+
+      console.log('RPC update result:', { data, error: error?.message });
 
       if (error) throw error;
 
-      // RPC returns the JSON of the updated row
-      // We need to cast it to GymProfile if we want to use it
       const updatedProfile = data as unknown as GymProfile;
+      console.log('Setting gymProfile state to:', updatedProfile);
       setGymProfile(updatedProfile);
       return { data: updatedProfile, error: null };
 
     } catch (error: any) {
-      console.error('Error updating gym profile:', error);
+      console.error('Error updating gym profile (exception):', error);
       return { data: null, error };
     }
   };

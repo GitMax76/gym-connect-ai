@@ -5,7 +5,7 @@ import Layout from '@/components/Layout';
 import RoleSelector from '@/components/RoleSelector';
 import UserRegistrationForm from '@/components/UserRegistrationForm';
 import TrainerRegistrationForm from '@/components/TrainerRegistrationForm';
-import GymRegistrationForm from '@/components/GymRegistrationForm';
+import GymRegistrationWizard from '@/components/GymRegistrationWizard';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
@@ -18,7 +18,7 @@ const AuthPage = () => {
   const [selectedRole, setSelectedRole] = useState<Role>('');
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signUp, signIn, signInWithGoogle } = useAuth();
   const { updateProfile, createUserProfile, createTrainerProfile, createGymProfile } = useProfile();
   const [loading, setLoading] = useState(false);
 
@@ -47,13 +47,19 @@ const AuthPage = () => {
   // Step 2: handle registration depending on selected role
   const handleRegister = async (data: any) => {
     setLoading(true);
+    console.log('=== REGISTRATION START ===');
+    console.log('Selected role:', selectedRole);
+    console.log('Form data:', { ...data, password: '***' }); // Hide password in logs
 
     try {
       let userType = selectedRole === 'instructor' ? 'trainer'
         : selectedRole === 'gym' ? 'gym_owner'
           : 'user';
 
+      console.log('User type:', userType);
+
       // 1. Creazione utente (Supabase signUp)
+      console.log('Calling signUp for:', data.email);
       const { data: authData, error } = await signUp(
         data.email,
         data.password,
@@ -64,7 +70,15 @@ const AuthPage = () => {
         }
       );
 
+      console.log('SignUp result:', {
+        hasUser: !!authData?.user,
+        hasSession: !!authData?.session,
+        userId: authData?.user?.id,
+        error: error?.message
+      });
+
       if (error) {
+        console.error('SignUp error:', error);
         toast({
           title: "Errore durante la registrazione",
           description: error.message,
@@ -75,35 +89,51 @@ const AuthPage = () => {
       }
 
       // Check if email confirmation is required (session is null)
-      if (authData.user && !authData.session) {
+      if (authData?.user && !authData?.session) {
+        console.log('Email confirmation required - no session returned');
         toast({
           title: "Registrazione avvenuta!",
-          description: "Controlla la tua email per confermare l'account prima di accedere.",
+          description: "Controlla la tua email per confermare l'account prima di accedere. Il profilo sarà creato comunque.",
           variant: "default",
           duration: 6000
         });
-        navigate('/'); // Redirect to home/login
-        setLoading(false);
-        return;
+        // Attempt to sign in to obtain a session for subsequent DB ops
+        const signInResult = await signIn(data.email, data.password);
+        if (signInResult.error) {
+          console.error('SignIn after signUp failed:', signInResult.error);
+          toast({
+            title: "Errore di accesso",
+            description: signInResult.error.message,
+            variant: "destructive"
+          });
+          // Do NOT return; continue with profile creation using the existing user ID
+        }
+        // Continue with profile creation using the same user ID
       }
 
-      const newUserId = authData.user?.id;
+      const newUserId = authData?.user?.id;
+      console.log('New user ID:', newUserId);
+
       if (!newUserId) {
+        console.error('No user ID received after registration');
         throw new Error("ID utente non ricevuto dopo la registrazione");
       }
 
       // 2. Aggiorna il profilo di base
-      await updateProfile({
+      console.log('Updating base profile for user:', newUserId);
+      const profileUpdateResult = await updateProfile({
         first_name: data.firstName || data.ownerName || data.name?.split(' ')[0],
         last_name: data.lastName || data.name?.split(' ').slice(1).join(' '),
         phone: data.phone,
         city: data.city,
         user_type: userType as 'user' | 'trainer' | 'gym_owner'
       }, newUserId);
+      console.log('Base profile update result:', profileUpdateResult);
 
       // 3. Crea il profilo specifico del tipo utente
       let errorProfile = null;
       if (selectedRole === 'user') {
+        console.log('Creating user profile...');
         const userProfileData = {
           age: data.age ? parseInt(data.age) : undefined,
           weight: data.weight ? parseFloat(data.weight) : undefined,
@@ -117,9 +147,12 @@ const AuthPage = () => {
           health_conditions: data.healthConditions,
           experience_description: data.goals
         };
+        console.log('User profile data:', userProfileData);
         const result = await createUserProfile(userProfileData, newUserId);
+        console.log('User profile creation result:', result);
         errorProfile = result.error;
       } else if (selectedRole === 'instructor') {
+        console.log('Creating trainer profile...');
         const trainerProfileData = {
           date_of_birth: data.dateOfBirth,
           bio: data.bio,
@@ -132,9 +165,12 @@ const AuthPage = () => {
           preferred_areas: data.preferredAreas,
           availability_schedule: { slots: data.availability }
         };
+        console.log('Trainer profile data:', trainerProfileData);
         const result = await createTrainerProfile(trainerProfileData, newUserId);
+        console.log('Trainer profile creation result:', result);
         errorProfile = result.error;
       } else if (selectedRole === 'gym') {
+        console.log('Creating gym profile...');
         const gymProfileData = {
           gym_name: data.gymName,
           business_email: data.email,
@@ -150,7 +186,9 @@ const AuthPage = () => {
           member_capacity: data.memberCapacity ? parseInt(data.memberCapacity) : undefined,
           subscription_plans: data.subscriptionPlans as any
         };
+        console.log('Gym profile data:', gymProfileData);
         const result = await createGymProfile(gymProfileData, newUserId);
+        console.log('Gym profile creation result:', result);
         errorProfile = result.error;
       }
 
@@ -162,6 +200,7 @@ const AuthPage = () => {
           variant: "destructive"
         });
       } else {
+        console.log('=== REGISTRATION COMPLETE SUCCESS ===');
         toast({
           title: "Benvenuto!",
           description: "Registrazione completata con successo.",
@@ -169,9 +208,10 @@ const AuthPage = () => {
         });
       }
 
+      setLoading(false);
       navigate('/dashboard');
     } catch (err: any) {
-      console.error(err);
+      console.error('=== REGISTRATION UNEXPECTED ERROR ===', err);
       toast({
         title: "Errore imprevisto",
         description: err.message || "Riprova più tardi.",
@@ -248,7 +288,7 @@ const AuthPage = () => {
                 <TrainerRegistrationForm onSubmit={handleRegister} onBack={handleBack} />
               )}
               {selectedRole === 'gym' && (
-                <GymRegistrationForm onSubmit={handleRegister} onBack={handleBack} />
+                <GymRegistrationWizard onSubmit={handleRegister} onBack={handleBack} />
               )}
               <div className="text-center mt-6">
                 <button

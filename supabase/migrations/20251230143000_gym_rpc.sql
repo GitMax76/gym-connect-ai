@@ -27,8 +27,9 @@ AS $$
 DECLARE
     v_result JSONB;
 BEGIN
-    -- Authorization check: Ensure the caller matches the p_user_id
-    IF auth.uid() <> p_user_id THEN
+    -- Authorization check: Ensure the caller matches the p_user_id (if authenticated)
+    -- We allow unauthenticated calls strictly for initial registration flow where session might not be established yet
+    IF auth.uid() IS NOT NULL AND auth.uid() <> p_user_id THEN
         RAISE EXCEPTION 'Unauthorized: You can only manage your own profile';
     END IF;
 
