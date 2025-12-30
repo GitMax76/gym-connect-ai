@@ -53,8 +53,8 @@ const AuthPage = () => {
         : selectedRole === 'gym' ? 'gym_owner'
           : 'user';
 
-      // 1. Creazione utente (Supabase signUp): nel form sono sempre richiesti email, password, altri dati
-      const { error } = await signUp(
+      // 1. Creazione utente (Supabase signUp)
+      const { data: authData, error } = await signUp(
         data.email,
         data.password,
         {
@@ -63,6 +63,7 @@ const AuthPage = () => {
           user_type: userType as 'user' | 'trainer' | 'gym_owner'
         }
       );
+
       if (error) {
         toast({
           title: "Errore",
@@ -73,6 +74,11 @@ const AuthPage = () => {
         return;
       }
 
+      const newUserId = authData.user?.id;
+      if (!newUserId) {
+        throw new Error("ID utente non ricevuto dopo la registrazione");
+      }
+
       // 2. Aggiorna il profilo di base
       await updateProfile({
         first_name: data.firstName || data.ownerName || data.name?.split(' ')[0],
@@ -80,7 +86,7 @@ const AuthPage = () => {
         phone: data.phone,
         city: data.city,
         user_type: userType as 'user' | 'trainer' | 'gym_owner'
-      });
+      }, newUserId);
 
       // 3. Crea il profilo specifico del tipo utente
       let errorProfile = null;
@@ -98,7 +104,7 @@ const AuthPage = () => {
           health_conditions: data.healthConditions,
           experience_description: data.goals
         };
-        const result = await createUserProfile(userProfileData);
+        const result = await createUserProfile(userProfileData, newUserId);
         errorProfile = result.error;
       } else if (selectedRole === 'instructor') {
         const trainerProfileData = {
@@ -113,7 +119,7 @@ const AuthPage = () => {
           preferred_areas: data.preferredAreas,
           availability_schedule: { slots: data.availability }
         };
-        const result = await createTrainerProfile(trainerProfileData);
+        const result = await createTrainerProfile(trainerProfileData, newUserId);
         errorProfile = result.error;
       } else if (selectedRole === 'gym') {
         const gymProfileData = {
@@ -129,20 +135,22 @@ const AuthPage = () => {
           opening_hours: data.openingHours,
           closing_hours: data.closingHours,
           member_capacity: data.memberCapacity ? parseInt(data.memberCapacity) : undefined,
-          subscription_plans: data.subscriptionPlans as any // Cast to any/Json for Supabase
+          subscription_plans: data.subscriptionPlans as any
         };
-        const result = await createGymProfile(gymProfileData);
+        const result = await createGymProfile(gymProfileData, newUserId);
         errorProfile = result.error;
       }
 
       if (errorProfile) {
+        console.error("Profile creation error:", errorProfile);
         toast({
-          title: "Errore",
-          description: "Errore nel salvataggio del profilo",
+          title: "Attenzione",
+          description: "Registrazione avvenuta ma errore nel salvataggio dettagli. Contatta il supporto.",
           variant: "destructive"
         });
-        setLoading(false);
-        return;
+        // Non return, let redirect happen so user can maybe fix inside? 
+        // Or stop? Usually better to stop if major failure, but authentication succeeded.
+        // Let's redirect but warn.
       }
 
       toast({

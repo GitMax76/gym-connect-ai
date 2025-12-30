@@ -147,14 +147,15 @@ export const useProfile = () => {
     }
   };
 
-  const updateProfile = async (updates: Partial<Profile>) => {
-    if (!user) return { error: 'No user logged in' };
+  const updateProfile = async (updates: Partial<Profile>, userId?: string) => {
+    const targetId = userId || user?.id;
+    if (!targetId) return { error: 'No user logged in or provided' };
 
     try {
       const { error } = await supabase
         .from('profiles')
         .update(updates)
-        .eq('id', user.id);
+        .eq('id', targetId);
 
       if (!error) {
         setProfile(prev => prev ? { ...prev, ...updates } : null);
@@ -167,13 +168,14 @@ export const useProfile = () => {
     }
   };
 
-  const createUserProfile = async (data: Partial<UserProfile>) => {
-    if (!user) return { error: 'No user logged in' };
+  const createUserProfile = async (data: Partial<UserProfile>, userId?: string) => {
+    const targetId = userId || user?.id;
+    if (!targetId) return { error: 'No user logged in or provided' };
 
     try {
       const { error } = await supabase
         .from('user_profiles')
-        .upsert({ id: user.id, ...data });
+        .upsert({ id: targetId, ...data });
 
       if (!error) {
         await fetchProfile();
@@ -186,13 +188,14 @@ export const useProfile = () => {
     }
   };
 
-  const createTrainerProfile = async (data: Partial<TrainerProfile>) => {
-    if (!user) return { error: 'No user logged in' };
+  const createTrainerProfile = async (data: Partial<TrainerProfile>, userId?: string) => {
+    const targetId = userId || user?.id;
+    if (!targetId) return { error: 'No user logged in or provided' };
 
     try {
       const { error } = await supabase
         .from('trainer_profiles')
-        .upsert({ id: user.id, ...data });
+        .upsert({ id: targetId, ...data });
 
       if (!error) {
         await fetchProfile();
@@ -205,13 +208,14 @@ export const useProfile = () => {
     }
   };
 
-  const createGymProfile = async (data: { gym_name: string } & Partial<Omit<GymProfile, 'id' | 'gym_name'>>) => {
-    if (!user) return { error: 'No user logged in' };
+  const createGymProfile = async (data: { gym_name: string } & Partial<Omit<GymProfile, 'id' | 'gym_name'>>, userId?: string) => {
+    const targetId = userId || user?.id;
+    if (!targetId) return { error: 'No user logged in or provided' };
 
     try {
       const { error } = await supabase
         .from('gym_profiles')
-        .upsert({ id: user.id, ...data });
+        .upsert({ id: targetId, ...data });
 
       if (!error) {
         await fetchProfile();
