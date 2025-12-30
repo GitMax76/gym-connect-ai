@@ -154,8 +154,7 @@ export const useProfile = () => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update(updates)
-        .eq('id', targetId);
+        .upsert({ id: targetId, ...updates, updated_at: new Date().toISOString() });
 
       if (!error) {
         setProfile(prev => prev ? { ...prev, ...updates } : null);

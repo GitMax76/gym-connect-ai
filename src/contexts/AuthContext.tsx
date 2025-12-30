@@ -32,7 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     console.log('Setting up auth state listener...');
-    
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -57,8 +57,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, userData?: any) => {
     console.log('Attempting sign up for:', email);
     const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
+
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -76,19 +76,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     } else {
       console.log('Sign up successful');
-      toast({
-        title: "Registrazione completata!",
-        description: "Controlla la tua email per confermare l'account.",
-      });
+      if (data.session) {
+        toast({
+          title: "Registrazione completata!",
+          description: "Benvenuto in GymConnect.",
+        });
+      } else {
+        toast({
+          title: "Registrazione completata!",
+          description: "Controlla la tua email per confermare l'account.",
+        });
+      }
     }
 
-    return { error };
+    return { data, error };
   };
 
   const signIn = async (email: string, password: string) => {
     console.log('Attempting sign in for:', email);
-    
-    const { error } = await supabase.auth.signInWithPassword({
+
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
@@ -108,12 +115,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     }
 
-    return { error };
+    return { data, error };
   };
 
   const signInWithGoogle = async () => {
     console.log('Attempting Google sign in');
-    
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -135,7 +142,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     console.log('Attempting sign out');
-    
+
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error('Sign out error:', error);

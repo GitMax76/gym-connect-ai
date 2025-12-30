@@ -66,10 +66,23 @@ const AuthPage = () => {
 
       if (error) {
         toast({
-          title: "Errore",
-          description: error?.message || "Errore durante la registrazione",
+          title: "Errore durante la registrazione",
+          description: error.message,
           variant: "destructive"
         });
+        setLoading(false);
+        return;
+      }
+
+      // Check if email confirmation is required (session is null)
+      if (authData.user && !authData.session) {
+        toast({
+          title: "Registrazione avvenuta!",
+          description: "Controlla la tua email per confermare l'account prima di accedere.",
+          variant: "default",
+          duration: 6000
+        });
+        navigate('/'); // Redirect to home/login
         setLoading(false);
         return;
       }
@@ -145,30 +158,23 @@ const AuthPage = () => {
         console.error("Profile creation error:", errorProfile);
         toast({
           title: "Attenzione",
-          description: "Registrazione avvenuta ma errore nel salvataggio dettagli. Contatta il supporto.",
+          description: "Profilo creato parzialmente. Potrai completare i dati nella dashboard.",
           variant: "destructive"
         });
-        // Non return, let redirect happen so user can maybe fix inside? 
-        // Or stop? Usually better to stop if major failure, but authentication succeeded.
-        // Let's redirect but warn.
+      } else {
+        toast({
+          title: "Benvenuto!",
+          description: "Registrazione completata con successo.",
+          variant: "default"
+        });
       }
 
-      toast({
-        title: "Registrazione completata",
-        description:
-          selectedRole === 'user'
-            ? "Benvenuto in GymConnect! Il tuo profilo è stato creato."
-            : selectedRole === 'instructor'
-              ? "Benvenuto Coach! Il tuo profilo trainer è attivo."
-              : "La registrazione della palestra è completata.",
-        variant: "default"
-      });
-
       navigate('/dashboard');
-    } catch (err) {
+    } catch (err: any) {
+      console.error(err);
       toast({
-        title: "Errore",
-        description: "Errore durante la registrazione",
+        title: "Errore imprevisto",
+        description: err.message || "Riprova più tardi.",
         variant: "destructive"
       });
       setLoading(false);
