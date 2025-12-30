@@ -94,7 +94,7 @@ const GymDashboard = () => {
             defaultTab={editDialogTab}
             onSwitchToTab={setActiveTab}
             currentProfile={gymProfile}
-            onProfileUpdated={refetch}
+            onProfileUpdated={() => refetch({ silent: true })}
           />
         </div>
 
