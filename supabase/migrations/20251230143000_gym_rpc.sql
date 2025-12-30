@@ -1,4 +1,6 @@
--- Secure RPC to manage gym profiles, bypassing complex RLS on the table
+-- Ensure the column exists
+ALTER TABLE public.gym_profiles ADD COLUMN IF NOT EXISTS opening_hours_map JSONB DEFAULT NULL;
+
 CREATE OR REPLACE FUNCTION public.manage_gym_profile(
     p_user_id UUID,
     p_gym_name TEXT,
@@ -17,7 +19,8 @@ CREATE OR REPLACE FUNCTION public.manage_gym_profile(
     p_monthly_fee NUMERIC DEFAULT NULL,
     p_day_pass_fee NUMERIC DEFAULT NULL,
     p_website_url TEXT DEFAULT NULL,
-    p_social_media JSONB DEFAULT NULL
+    p_social_media JSONB DEFAULT NULL,
+    p_opening_hours_map JSONB DEFAULT NULL
 )
 RETURNS JSONB
 LANGUAGE plpgsql
@@ -38,12 +41,12 @@ BEGIN
         id, gym_name, business_email, address, city, postal_code, description,
         facilities, specializations, opening_days, opening_hours, closing_hours,
         member_capacity, subscription_plans, monthly_fee, day_pass_fee,
-        website_url, social_media
+        website_url, social_media, opening_hours_map
     ) VALUES (
         p_user_id, p_gym_name, p_business_email, p_address, p_city, p_postal_code, p_description,
         p_facilities, p_specializations, p_opening_days, p_opening_hours, p_closing_hours,
         p_member_capacity, p_subscription_plans, p_monthly_fee, p_day_pass_fee,
-        p_website_url, p_social_media
+        p_website_url, p_social_media, p_opening_hours_map
     )
     ON CONFLICT (id) DO UPDATE SET
         gym_name = EXCLUDED.gym_name,
@@ -62,7 +65,8 @@ BEGIN
         monthly_fee = EXCLUDED.monthly_fee,
         day_pass_fee = EXCLUDED.day_pass_fee,
         website_url = EXCLUDED.website_url,
-        social_media = EXCLUDED.social_media;
+        social_media = EXCLUDED.social_media,
+        opening_hours_map = EXCLUDED.opening_hours_map;
 
     -- Return the updated/inserted row
     SELECT to_jsonb(gp.*) INTO v_result FROM public.gym_profiles gp WHERE id = p_user_id;

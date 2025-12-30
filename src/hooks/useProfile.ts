@@ -65,6 +65,7 @@ export interface GymProfile {
   day_pass_fee?: number;
   website_url?: string;
   social_media?: any;
+  opening_hours_map?: any;
   is_verified?: boolean;
 }
 
@@ -225,44 +226,42 @@ export const useProfile = () => {
     }
 
     try {
-      // Use direct INSERT instead of RPC - RPC requires auth.uid() which may not be available during registration
-      const insertData = {
-        id: targetId,
-        gym_name: data.gym_name,
-        business_email: data.business_email || null,
-        address: data.address || null,
-        city: data.city || null,
-        postal_code: data.postal_code || null,
-        description: data.description || null,
-        facilities: data.facilities || null,
-        specializations: data.specializations || null,
-        opening_days: data.opening_days || null,
-        opening_hours: data.opening_hours || null,
-        closing_hours: data.closing_hours || null,
-        member_capacity: data.member_capacity || null,
-        subscription_plans: data.subscription_plans || null,
-        monthly_fee: data.monthly_fee || null,
-        day_pass_fee: data.day_pass_fee || null,
-        website_url: data.website_url || null,
-        social_media: data.social_media || null
+      // Use RPC to create profile - ensuring we pass opening_hours_map
+      const rpcParams = {
+        p_user_id: targetId,
+        p_gym_name: data.gym_name,
+        p_business_email: data.business_email || null,
+        p_address: data.address || null,
+        p_city: data.city || null,
+        p_postal_code: data.postal_code || null,
+        p_description: data.description || null,
+        p_facilities: data.facilities || null,
+        p_specializations: data.specializations || null,
+        p_opening_days: data.opening_days || null,
+        p_opening_hours: data.opening_hours || null,
+        p_closing_hours: data.closing_hours || null,
+        p_member_capacity: data.member_capacity || null,
+        p_subscription_plans: data.subscription_plans || null,
+        p_monthly_fee: data.monthly_fee || null,
+        p_day_pass_fee: data.day_pass_fee || null,
+        p_website_url: data.website_url || null,
+        p_social_media: data.social_media || null,
+        p_opening_hours_map: data.opening_hours_map || null
       };
-      console.log('Inserting gym profile directly:', insertData);
 
-      const { data: result, error } = await supabase
-        .from('gym_profiles')
-        .upsert(insertData as any)
-        .select()
-        .single();
+      console.log('Calling manage_gym_profile RPC with:', rpcParams);
 
-      console.log('Direct insert result:', { result, error: error?.message });
+      const { data: result, error } = await (supabase.rpc as any)('manage_gym_profile', rpcParams);
+
+      console.log('RPC result:', { result, error: error?.message });
 
       if (error) {
-        console.error('Error inserting gym profile:', error);
+        console.error('Error creating gym profile via RPC:', error);
         return { error: error.message || error };
       }
 
       if (result) {
-        setGymProfile(result as GymProfile);
+        setGymProfile(result as unknown as GymProfile);
       }
 
       return { error: null, data: result };
