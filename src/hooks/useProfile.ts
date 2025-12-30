@@ -212,9 +212,26 @@ export const useProfile = () => {
     if (!targetId) return { error: 'No user logged in or provided' };
 
     try {
-      const { error } = await supabase
-        .from('gym_profiles')
-        .upsert({ id: targetId, ...data });
+      const { error } = await supabase.rpc('manage_gym_profile', {
+        p_user_id: targetId,
+        p_gym_name: data.gym_name,
+        p_business_email: data.business_email,
+        p_address: data.address,
+        p_city: data.city,
+        p_postal_code: data.postal_code,
+        p_description: data.description,
+        p_facilities: data.facilities,
+        p_specializations: data.specializations,
+        p_opening_days: data.opening_days,
+        p_opening_hours: data.opening_hours,
+        p_closing_hours: data.closing_hours,
+        p_member_capacity: data.member_capacity,
+        p_subscription_plans: data.subscription_plans,
+        p_monthly_fee: data.monthly_fee,
+        p_day_pass_fee: data.day_pass_fee,
+        p_website_url: data.website_url,
+        p_social_media: data.social_media
+      });
 
       if (!error) {
         await fetchProfile();
@@ -251,29 +268,37 @@ export const useProfile = () => {
     if (!user) return { error: 'No user logged in' };
 
     try {
-      // Create full profile object for upsert to ensure no data loss and satisfy insert constraints
-      const fullProfile = {
-        ...gymProfile,
-        ...updates,
-        id: user.id,
-        updated_at: new Date().toISOString()
-      };
+      const merged = { ...gymProfile, ...updates };
 
-      const { data, error } = await supabase
-        .from('gym_profiles')
-        .upsert(fullProfile)
-        .select();
+      const { data, error } = await supabase.rpc('manage_gym_profile', {
+        p_user_id: user.id,
+        p_gym_name: merged.gym_name || '', // gym_name is required in RPC, ensure it exists
+        p_business_email: merged.business_email,
+        p_address: merged.address,
+        p_city: merged.city,
+        p_postal_code: merged.postal_code,
+        p_description: merged.description,
+        p_facilities: merged.facilities,
+        p_specializations: merged.specializations,
+        p_opening_days: merged.opening_days,
+        p_opening_hours: merged.opening_hours,
+        p_closing_hours: merged.closing_hours,
+        p_member_capacity: merged.member_capacity,
+        p_subscription_plans: merged.subscription_plans,
+        p_monthly_fee: merged.monthly_fee,
+        p_day_pass_fee: merged.day_pass_fee,
+        p_website_url: merged.website_url,
+        p_social_media: merged.social_media
+      });
 
       if (error) throw error;
 
-      if (data && data.length > 0) {
-        const updatedProfile = data[0] as GymProfile;
-        setGymProfile(updatedProfile);
-        return { data: updatedProfile, error: null };
-      } else {
-        console.warn('Upsert succeeded but no row was returned.');
-        return { data: null, error: { message: 'Salvataggio non riuscito (Nessun dato ritornato)' } };
-      }
+      // RPC returns the JSON of the updated row
+      // We need to cast it to GymProfile if we want to use it
+      const updatedProfile = data as unknown as GymProfile;
+      setGymProfile(updatedProfile);
+      return { data: updatedProfile, error: null };
+
     } catch (error: any) {
       console.error('Error updating gym profile:', error);
       return { data: null, error };
