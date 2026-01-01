@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/contexts/AuthContext';
-import { Calendar, MapPin, Target, Clock, DollarSign, Activity, LogOut } from 'lucide-react';
+import { Calendar, MapPin, Target, Clock, DollarSign, Activity, LogOut, Users } from 'lucide-react';
 import UserProfileEditDialog from './UserProfileEditDialog';
 import { Notifications } from './Notifications';
 import { useNavigate } from 'react-router-dom';
@@ -33,7 +33,7 @@ const UserDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-6 text-white flex justify-between items-start">
+      <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg p-6 text-white flex justify-between items-start">
         {/* ... existing header code ... */}
         <div>
           <h1 className="text-3xl font-bold mb-2">
@@ -176,6 +176,35 @@ const UserDashboard = () => {
             <Button className="w-full" variant="outline" onClick={() => navigate('/workout-plans')}>
               <Target className="mr-2 h-4 w-4" />
               Piano di Allenamento
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Referral Card */}
+        <Card className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Invita Amici
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-indigo-100 mb-4 text-sm">
+              Guadagna 15 FC per ogni amico che si iscrive col tuo codice!
+            </p>
+            <div className="bg-white/10 p-3 rounded-lg text-center mb-4">
+              <span className="font-mono text-xl font-bold tracking-wider">
+                {profile?.referral_code || 'CARICAMENTO...'}
+              </span>
+            </div>
+            <Button
+              className="w-full bg-white text-indigo-600 hover:bg-indigo-50"
+              onClick={() => {
+                navigator.clipboard.writeText(profile?.referral_code || '');
+                toast({ title: "Copiato!", description: "Codice invito copiato negli appunti." });
+              }}
+            >
+              Copia Codice
             </Button>
           </CardContent>
         </Card>

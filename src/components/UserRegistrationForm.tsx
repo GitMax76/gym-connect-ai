@@ -26,7 +26,8 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
     availability: '',
     budget: '',
     location: '',
-    healthConditions: ''
+    healthConditions: '',
+    referralCode: ''
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -78,7 +79,7 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
             <div className="w-10"></div>
           </div>
         </CardHeader>
-        
+
         <CardContent className="p-8">
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Sezione Informazioni Personali */}
@@ -130,6 +131,16 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
                     onChange={(e) => setFormData(prev => ({ ...prev, age: e.target.value }))}
                     placeholder="Es. 28"
                     className="mt-1"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <Label htmlFor="referralCode" className="text-blue-600 font-bold">Hai un codice amico? (Opzionale)</Label>
+                  <Input
+                    id="referralCode"
+                    value={formData.referralCode || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, referralCode: e.target.value }))}
+                    placeholder="Inserisci il codice per 15 FC bonus"
+                    className="mt-1 border-blue-200 bg-blue-50"
                   />
                 </div>
               </div>
@@ -234,17 +245,20 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <Label htmlFor="budget">Budget Mensile (€)</Label>
-                  <Select value={formData.budget} onValueChange={(value) => setFormData(prev => ({ ...prev, budget: value }))}>
+                <div className="space-y-2">
+                  <Label htmlFor="budget">Budget Mensile (FC)</Label>
+                  <Select
+                    onValueChange={(val) => setFormData(prev => ({ ...prev, budget: val }))}
+                    defaultValue={formData.budget}
+                  >
                     <SelectTrigger className="mt-1">
                       <SelectValue placeholder="Il tuo budget" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="50-100">💰 €50-100/mese</SelectItem>
-                      <SelectItem value="100-200">💎 €100-200/mese</SelectItem>
-                      <SelectItem value="200-300">🌟 €200-300/mese</SelectItem>
-                      <SelectItem value="300-plus">👑 €300+/mese</SelectItem>
+                      <SelectItem value="50-100">💰 50-100 FC/mese</SelectItem>
+                      <SelectItem value="100-200">💎 100-200 FC/mese</SelectItem>
+                      <SelectItem value="200-300">🌟 200-300 FC/mese</SelectItem>
+                      <SelectItem value="300-plus">👑 300+ FC/mese</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -261,8 +275,8 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
               </div>
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full gradient-primary text-white text-lg py-4 rounded-xl hover:scale-105 transition-transform"
             >
               🚀 Inizia il Tuo Percorso Fitness

@@ -97,7 +97,7 @@ export const useMatching = () => {
     }
   };
 
-  const findMatches = async (type: 'trainer' | 'gym' | 'user' = 'trainer') => {
+  const findMatches = async (type: 'trainer' | 'gym' | 'user' = 'trainer', filters: any = {}) => {
     if (!user) return;
 
     setLoading(true);
@@ -116,10 +116,17 @@ export const useMatching = () => {
             *,
             profiles!inner(first_name, last_name, city, avatar_url)
           `)
-          .eq('profiles.city', targetCity)
-          .limit(20);
+          .eq('profiles.city', targetCity);
 
-        query = q;
+        // Apply filters
+        if (filters.specializations && filters.specializations.length > 0) {
+          q = q.contains('specializations', filters.specializations);
+        }
+        if (filters.budget_max) {
+          q = q.lte('personal_rate_per_hour', filters.budget_max);
+        }
+
+        query = q.limit(20);
       } else if (type === 'gym') {
         let q = supabase
           .from('gym_profiles')
@@ -127,10 +134,17 @@ export const useMatching = () => {
             *,
             profiles!inner(city, first_name, avatar_url)
           `)
-          .eq('profiles.city', targetCity)
-          .limit(20);
+          .eq('profiles.city', targetCity);
 
-        query = q;
+        // Apply filters
+        if (filters.facilities && filters.facilities.length > 0) {
+          q = q.contains('facilities', filters.facilities);
+        }
+        if (filters.budget_max) {
+          q = q.lte('monthly_fee', filters.budget_max);
+        }
+
+        query = q.limit(20);
       } else if (type === 'user') {
         let q = supabase
           .from('user_profiles')
@@ -138,10 +152,9 @@ export const useMatching = () => {
             *,
             profiles!inner(first_name, last_name, city, avatar_url)
           `)
-          .eq('profiles.city', targetCity)
-          .limit(20);
+          .eq('profiles.city', targetCity);
 
-        query = q;
+        query = q.limit(20);
       }
 
       const { data, error } = await query;

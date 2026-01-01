@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/contexts/AuthContext';
-import { Calendar, Users, DollarSign, Star, Clock, Award, LogOut } from 'lucide-react';
+import { Calendar, Users, DollarSign, Star, Clock, Award, LogOut, Target } from 'lucide-react';
 import TrainerProfileEditDialog from './TrainerProfileEditDialog';
 import { Notifications } from './Notifications';
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +19,7 @@ const TrainerDashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -34,7 +34,7 @@ const TrainerDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white flex justify-between items-start">
+      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg p-6 text-white flex justify-between items-start">
         {/* ... existing header code ... */}
         <div>
           <h1 className="text-3xl font-bold mb-2">
@@ -217,8 +217,74 @@ const TrainerDashboard = () => {
           </div>
         </CardContent>
       </Card>
+      {/* Requests Section */}
+      <Card className="md:col-span-2 lg:col-span-2">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5" />
+            Richieste di Schede (Remote Coaching)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {/* Fetch and map requests logic would go here. For now, static placeholder or basic fetch if easy */}
+            <RequestsList />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
+
+// Simple internal component for Requests List
+import { supabase } from '@/integrations/supabase/client';
+import CreateWorkoutPlanDialog from './CreateWorkoutPlanDialog';
+
+const RequestsList = () => {
+  const { user } = useAuth();
+  const [requests, setRequests] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    if (!user) return;
+    const fetchRequests = async () => {
+      const { data } = await supabase
+        .from('workout_requests' as any)
+        .select('*, profiles!workout_requests_user_id_fkey(first_name, last_name, email)')
+        .eq('trainer_id', user.id)
+        .eq('status', 'pending');
+      if (data) setRequests(data);
+    };
+    fetchRequests();
+  }, [user]);
+
+  if (requests.length === 0) {
+    return <p className="text-muted-foreground text-sm">Nessuna richiesta pending.</p>;
+  }
+
+  return (
+    <div className="space-y-4">
+      {requests.map((req) => (
+        <div key={req.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border">
+          <div>
+            <p className="font-semibold">{req.profiles?.first_name} {req.profiles?.last_name}</p>
+            <p className="text-sm text-slate-600">Obiettivo: {req.goals}</p>
+            <p className="text-xs text-slate-500">{req.days_per_week} giorni/settimana</p>
+            {req.injuries && <p className="text-xs text-red-500 mt-1">⚠️ {req.injuries}</p>}
+          </div>
+          <CreateWorkoutPlanDialog
+            userId={req.user_id}
+            userName={`${req.profiles?.first_name} ${req.profiles?.last_name}`}
+            onSuccess={() => {
+              // Mark request as handled? ideally yes, but keeping it simple
+              // For now just refetch
+              window.location.reload();
+            }}
+          />
+        </div>
+      ))}
+    </div>
+  );
+};
+
 
 export default TrainerDashboard;

@@ -42,12 +42,12 @@ const SearchPage = () => {
     // Only search if profile is loaded to avoid default city fallback
     if (profileLoading || !profile) return;
 
-    findMatches(activeTab);
-  }, [activeTab, profileLoading, profile]);
+    findMatches(activeTab, filters);
+  }, [activeTab, profileLoading, profile, filters]);
 
   const handleSearch = (newFilters: any) => {
     setFilters(newFilters);
-    findMatches(activeTab);
+    // findMatches will be called by useEffect when filters change
   };
 
   const handleTabChange = (value: string) => {

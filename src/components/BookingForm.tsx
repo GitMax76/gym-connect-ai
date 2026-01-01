@@ -7,8 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useBookings } from '@/hooks/useBookings';
 import { useTrainerAvailability } from '@/hooks/useTrainerAvailability';
+import { useWallet } from '@/hooks/useWallet';
 import { toast } from 'sonner';
 import SlotPicker from './SlotPicker';
+import { supabase } from '@/integrations/supabase/client';
 
 interface BookingFormProps {
   trainerId: string;
@@ -20,6 +22,24 @@ const BookingForm = ({ trainerId, trainerName, onSuccess }: BookingFormProps) =>
   const { createBooking } = useBookings();
   const { checkAvailability } = useTrainerAvailability();
   const [loading, setLoading] = useState(false);
+  const [price, setPrice] = useState<number | null>(null);
+
+  // Fetch Trainer rates for price calculation
+  React.useEffect(() => {
+    const fetchRates = async () => {
+      const { data } = await supabase
+        .from('trainer_profiles')
+        .select('personal_rate_per_hour, group_rate_per_hour')
+        .eq('id', trainerId)
+        .single();
+
+      if (data) {
+        // Calculate initial price based on default session type 'personal'
+        setPrice(data.personal_rate_per_hour || 0);
+      }
+    };
+    fetchRates();
+  }, [trainerId]);
 
   const [formData, setFormData] = useState({
     booking_date: '',
@@ -29,11 +49,27 @@ const BookingForm = ({ trainerId, trainerName, onSuccess }: BookingFormProps) =>
     notes: ''
   });
 
+  // ... inside BookingForm component
+  const { wallet, processPayment, refreshWallet } = useWallet();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      if (!price) {
+        toast.error("Impossibile determinare il prezzo");
+        setLoading(false);
+        return;
+      }
+
+      // 1. Check Wallet Balance
+      if (!wallet || wallet.balance < price) {
+        toast.error(`Credito insufficiente. Hai ${wallet?.balance || 0} crediti, necessari: ${price}`);
+        setLoading(false);
+        return;
+      }
+
       // Basic validation
       if (!formData.booking_date || !formData.start_time || !formData.end_time) {
         toast.error("Seleziona data e orario");
@@ -41,8 +77,7 @@ const BookingForm = ({ trainerId, trainerName, onSuccess }: BookingFormProps) =>
         return;
       }
 
-      // We skip checkAvailability here if we assume SlotPicker only shows available slots,
-      // but keeping it for safety is fine.
+      // Check Availability
       const isAvailable = await checkAvailability(
         trainerId,
         formData.booking_date,
@@ -51,34 +86,64 @@ const BookingForm = ({ trainerId, trainerName, onSuccess }: BookingFormProps) =>
       );
 
       if (!isAvailable) {
-        toast.error('Il trainer non è disponibile in questo orario (verificato)');
+        toast.error('Il trainer non è disponibile in questo orario');
         setLoading(false);
         return;
       }
 
-      const { error } = await createBooking({
+      // 2. Create Booking (Pending Payment)
+      const { data: bookingData, error: bookingError } = await createBooking({
         trainer_id: trainerId,
-        user_id: '', // Will be set by the hook
+        user_id: '', // Hook handles this
         ...formData,
+        price: price || 0,
         status: 'pending'
       });
 
-      if (error) {
-        toast.error('Errore durante la prenotazione');
-      } else {
-        toast.success('Prenotazione creata con successo!');
-        setFormData({
-          booking_date: '',
-          start_time: '',
-          end_time: '',
-          session_type: 'personal',
-          notes: ''
-        });
-        onSuccess?.();
+      if (bookingError || !bookingData) {
+        toast.error('Errore creazione prenotazione');
+        setLoading(false);
+        return;
       }
+
+      // 3. Process Payment (Atomic Transfer)
+      const paymentResult = await processPayment(trainerId, price, bookingData.id) as { success: boolean; error?: string };
+
+      if (paymentResult?.success) {
+        // 4. Update Booking to Confirmed
+        const { error: confirmError } = await supabase
+          .from('bookings')
+          .update({ status: 'confirmed' })
+          .eq('id', bookingData.id);
+
+        if (confirmError) {
+          console.error("Payment success but status update failed", confirmError);
+          toast.warning("Pagamento riuscito ma stato non aggiornato. Contatta il supporto.");
+        } else {
+          toast.success('Prenotazione Confermata! Crediti scalati.');
+          refreshWallet(); // Update UI
+          setFormData({
+            booking_date: '',
+            start_time: '',
+            end_time: '',
+            session_type: 'personal',
+            notes: ''
+          });
+          onSuccess?.();
+        }
+      } else {
+        // Payment Failed -> Cancel Booking
+        await supabase
+          .from('bookings')
+          .delete()
+          .eq('id', bookingData.id);
+
+        toast.error(`Pagamento fallito: ${paymentResult?.error || 'Errore sconosciuto'}`);
+      }
+
     } catch (error) {
       console.error(error);
-      toast.error('Errore durante la prenotazione');
+      toast.error('Errore critico durante la prenotazione');
     } finally {
       setLoading(false);
     }
@@ -86,7 +151,16 @@ const BookingForm = ({ trainerId, trainerName, onSuccess }: BookingFormProps) =>
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Wallet Balance Display */}
+      <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 flex justify-between items-center">
+        <span className="text-sm font-medium text-slate-600">Il tuo Saldo:</span>
+        <span className={`font-bold ${wallet && price && wallet.balance >= price ? 'text-green-600' : 'text-red-500'}`}>
+          {wallet?.balance || 0} Credits
+        </span>
+      </div>
+
       <div className="space-y-2">
+
         <Label htmlFor="trainer">Trainer</Label>
         <Input value={trainerName} disabled />
       </div>
@@ -133,6 +207,11 @@ const BookingForm = ({ trainerId, trainerName, onSuccess }: BookingFormProps) =>
             <SelectItem value="group">Gruppo</SelectItem>
           </SelectContent>
         </Select>
+        {price !== null && (
+          <p className="text-sm text-muted-foreground text-right mt-1">
+            Prezzo stimato: <span className="font-semibold text-green-600">{price} FC</span>
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">

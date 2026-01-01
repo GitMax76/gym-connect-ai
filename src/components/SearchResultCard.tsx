@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, MapPin, Euro, Clock, Dumbbell, Building } from 'lucide-react';
 import { TrainerSearchResult, GymSearchResult } from '@/hooks/useSearch';
+import WorkoutRequestDialog from './WorkoutRequestDialog';
 
 interface SearchResultCardProps {
   result: TrainerSearchResult | GymSearchResult;
@@ -28,7 +29,7 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold">
-            {isTrainer 
+            {isTrainer
               ? `${trainer?.profile.first_name} ${trainer?.profile.last_name}`
               : gym?.gym_name
             }
@@ -39,7 +40,7 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({
             </Badge>
           )}
         </div>
-        
+
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <MapPin className="w-4 h-4" />
           <span>
@@ -90,21 +91,24 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({
                 <span>{trainer.years_experience} anni di esperienza</span>
               </div>
             )}
-            
+
             <div className="flex items-center gap-2 text-sm">
               <Euro className="w-4 h-4 text-gray-500" />
               <span>
-                {trainer?.personal_rate_per_hour 
-                  ? `€${trainer.personal_rate_per_hour}/h personale` 
-                  : 'Prezzo da concordare'
+                {(trainer?.personal_rate_per_hour !== null && trainer?.group_rate_per_hour !== null)
+                  ? `${trainer?.personal_rate_per_hour} FC/h personale`
+                  : (trainer?.personal_rate_per_hour !== null)
+                    ? `${trainer?.personal_rate_per_hour} FC/h`
+                    : (trainer?.group_rate_per_hour !== null)
+                      ? `${trainer?.group_rate_per_hour} FC/h`
+                      : 'Prezzo da concordare'
                 }
               </span>
             </div>
-            
-            {trainer?.group_rate_per_hour && (
+            {trainer?.group_rate_per_hour !== null && (
               <div className="flex items-center gap-2 text-sm">
                 <Euro className="w-4 h-4 text-gray-500" />
-                <span>€{trainer.group_rate_per_hour}/h gruppo</span>
+                <span>{trainer.group_rate_per_hour} FC/h gruppo</span>
               </div>
             )}
           </div>
@@ -120,25 +124,28 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({
                 {gym.facilities.length > 2 && <span>+{gym.facilities.length - 2}</span>}
               </div>
             )}
-            
+
             {gym.address && (
               <div className="flex items-center gap-2 text-sm">
                 <Building className="w-4 h-4 text-gray-500" />
                 <span className="truncate">{gym.address}</span>
               </div>
             )}
-            
+
             <div className="flex items-center gap-4 text-sm">
-              {gym.monthly_fee && (
+              {gym.monthly_fee !== null && (
                 <div className="flex items-center gap-1">
                   <Euro className="w-4 h-4 text-gray-500" />
-                  <span>€{gym.monthly_fee}/mese</span>
+                  <span>{gym.monthly_fee} FC/mese</span>
                 </div>
               )}
-              {gym.day_pass_fee && (
+              {gym.monthly_fee !== null && gym.day_pass_fee !== null && (
+                <span className="mx-2">•</span>
+              )}
+              {gym.day_pass_fee !== null && (
                 <div className="flex items-center gap-1">
                   <Euro className="w-4 h-4 text-gray-500" />
-                  <span>€{gym.day_pass_fee}/giorno</span>
+                  <span>{gym.day_pass_fee} FC/giorno</span>
                 </div>
               )}
             </div>
@@ -147,17 +154,25 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({
 
         {/* Action buttons */}
         <div className="flex gap-2 pt-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => onViewDetails(result.id)}
             className="flex-1"
           >
             Vedi dettagli
           </Button>
+
+          {isTrainer && trainer && (
+            <WorkoutRequestDialog
+              trainerId={trainer.id}
+              trainerName={`${trainer.profile.first_name} ${trainer.profile.last_name}`}
+            />
+          )}
+
           {onBook && (
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               onClick={() => onBook(result.id)}
               className="flex-1"
             >

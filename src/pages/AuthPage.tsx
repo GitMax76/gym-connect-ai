@@ -1,6 +1,9 @@
 
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Mail, Check } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from "@/components/ui/button";
 import Layout from '@/components/Layout';
 import RoleSelector from '@/components/RoleSelector';
 import UserRegistrationForm from '@/components/UserRegistrationForm';
@@ -14,7 +17,7 @@ type Role = 'user' | 'instructor' | 'gym' | '';
 
 const AuthPage = () => {
   const location = useLocation();
-  const [step, setStep] = useState<'select-role' | 'register'>('select-role');
+  const [step, setStep] = useState<'select-role' | 'register' | 'success'>('select-role');
   const [selectedRole, setSelectedRole] = useState<Role>('');
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -44,11 +47,15 @@ const AuthPage = () => {
     setSelectedRole('');
   };
 
+  // Error state for persistent display
+  const [persistentError, setPersistentError] = useState<string | null>(null);
+
   // Step 2: handle registration depending on selected role
   const handleRegister = async (data: any) => {
     setLoading(true);
+    setPersistentError(null); // Clear previous errors
     console.log('=== REGISTRATION START ===');
-    console.log('Selected role:', selectedRole);
+    // ... (rest of logic) ...
     console.log('Form data:', { ...data, password: '***' }); // Hide password in logs
 
     try {
@@ -66,7 +73,7 @@ const AuthPage = () => {
         {
           first_name: data.firstName || data.ownerName || data.name?.split(' ')[0],
           last_name: data.lastName || data.name?.split(' ').slice(1).join(' '),
-          user_type: userType as 'user' | 'trainer' | 'gym_owner'
+          user_type: 'user' // Initialize as 'user' to avoid DB constraints; updated in step 2
         }
       );
 
@@ -79,6 +86,7 @@ const AuthPage = () => {
 
       if (error) {
         console.error('SignUp error:', error);
+        setPersistentError(error.message || "Errore sconosciuto durante la registrazione");
         toast({
           title: "Errore durante la registrazione",
           description: error.message,
@@ -91,24 +99,7 @@ const AuthPage = () => {
       // Check if email confirmation is required (session is null)
       if (authData?.user && !authData?.session) {
         console.log('Email confirmation required - no session returned');
-        toast({
-          title: "Registrazione avvenuta!",
-          description: "Controlla la tua email per confermare l'account prima di accedere. Il profilo sarà creato comunque.",
-          variant: "default",
-          duration: 6000
-        });
-        // Attempt to sign in to obtain a session for subsequent DB ops
-        const signInResult = await signIn(data.email, data.password);
-        if (signInResult.error) {
-          console.error('SignIn after signUp failed:', signInResult.error);
-          toast({
-            title: "Errore di accesso",
-            description: signInResult.error.message,
-            variant: "destructive"
-          });
-          // Do NOT return; continue with profile creation using the existing user ID
-        }
-        // Continue with profile creation using the same user ID
+        // We will notify and stop redirection at the end of the function
       }
 
       const newUserId = authData?.user?.id;
@@ -200,6 +191,23 @@ const AuthPage = () => {
           variant: "destructive"
         });
       } else {
+        // 4. Se c'è un codice referral, applicalo
+        if (data.referralCode && selectedRole === 'user') {
+          console.log('Applying referral code:', data.referralCode);
+          // @ts-ignore
+          const { data: refData, error: refError } = await supabase.rpc('apply_referral_code', {
+            code_input: data.referralCode
+          });
+          console.log('Referral result:', refData, refError);
+          if (!refError && refData && (refData as any).success) {
+            toast({
+              title: "Bonus Attivato!",
+              description: "Hai ricevuto 15 FC di benvenuto grazie al codice amico.",
+              className: "bg-green-50 border-green-200"
+            });
+          }
+        }
+
         console.log('=== REGISTRATION COMPLETE SUCCESS ===');
         toast({
           title: "Benvenuto!",
@@ -209,7 +217,14 @@ const AuthPage = () => {
       }
 
       setLoading(false);
-      navigate('/dashboard');
+
+      // Verify if we have a session (user confirmed or confirmation disabled)
+      if (authData?.session) {
+        navigate('/dashboard');
+      } else {
+        // Email confirmation required case - Show Success Screen
+        setStep('success');
+      }
     } catch (err: any) {
       console.error('=== REGISTRATION UNEXPECTED ERROR ===', err);
       toast({
@@ -261,6 +276,54 @@ const AuthPage = () => {
     );
   }
 
+  if (step === 'success') {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-md w-full space-y-8 text-center bg-white p-10 rounded-xl shadow-lg">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
+              <Check className="h-8 w-8 text-green-600" />
+            </div>
+            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+              Registrazione Completa!
+            </h2>
+            <div className="mt-2 text-sm text-gray-600">
+              <p className="mb-4">
+                Il tuo account è stato creato con successo.
+              </p>
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-left">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <Mail className="h-5 w-5 text-blue-400" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-blue-700">
+                      Ti abbiamo inviato un'email di conferma all'indirizzo che hai fornito.
+                    </p>
+                    <p className="text-sm text-blue-700 font-bold mt-2">
+                      Clicca sul link nell'email per attivare il tuo account e accedere.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6">
+              <Button
+                onClick={() => {
+                  setStep('select-role');
+                  navigate('/login');
+                }}
+                className="w-full"
+              >
+                Vai al Login
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-blue-50 flex items-center justify-center py-12">
@@ -280,6 +343,25 @@ const AuthPage = () => {
             </div>
           ) : (
             <div>
+              {persistentError && (
+                <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-md shadow-sm">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-red-700 font-bold">
+                        Si è verificato un errore:
+                      </p>
+                      <p className="text-sm text-red-600 mt-1">
+                        {persistentError}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               {/* Mostra il form relativo */}
               {selectedRole === 'user' && (
                 <UserRegistrationForm onSubmit={handleRegister} onBack={handleBack} />
@@ -291,6 +373,13 @@ const AuthPage = () => {
                 <GymRegistrationWizard onSubmit={handleRegister} onBack={handleBack} />
               )}
               <div className="text-center mt-6">
+                <p className="text-xs text-slate-500 mb-4">
+                  Cliccando su Registrati, accetti la nostra{' '}
+                  <a href="/privacy" target="_blank" className="underline hover:text-slate-800">
+                    Privacy Policy
+                  </a>
+                  {' '}e il trattamento dei dati personali.
+                </p>
                 <button
                   className="text-slate-600 underline text-sm"
                   onClick={handleBack}

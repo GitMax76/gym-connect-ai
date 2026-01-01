@@ -27,6 +27,7 @@ const CreateWorkoutPlanDialog = ({ userId, userName, onSuccess }: CreateWorkoutP
     const [loading, setLoading] = useState(false);
 
     const [title, setTitle] = useState('');
+    const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
     const [startDate, setStartDate] = useState<Date>();
     const [endDate, setEndDate] = useState<Date>();
@@ -47,7 +48,9 @@ const CreateWorkoutPlanDialog = ({ userId, userName, onSuccess }: CreateWorkoutP
                     description,
                     start_date: format(startDate, 'yyyy-MM-dd'),
                     end_date: format(endDate, 'yyyy-MM-dd'),
-                    status: 'active'
+                    status: 'active',
+                    price: price ? parseInt(price) : 0,
+                    payment_status: (price && parseInt(price) > 0) ? 'pending' : 'paid'
                 });
 
             if (error) throw error;
@@ -92,6 +95,19 @@ const CreateWorkoutPlanDialog = ({ userId, userName, onSuccess }: CreateWorkoutP
                             onChange={e => setTitle(e.target.value)}
                             required
                         />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="price">Prezzo (FitCoin)</Label>
+                        <Input
+                            id="price"
+                            type="number"
+                            min="0"
+                            placeholder="Es. 20"
+                            value={price}
+                            onChange={e => setPrice(e.target.value)}
+                        />
+                        <p className="text-xs text-muted-foreground">Lascia 0 per gratuito.</p>
                     </div>
 
                     <div className="space-y-2">

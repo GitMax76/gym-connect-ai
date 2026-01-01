@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { useProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/contexts/AuthContext';
+import { useWallet } from '@/hooks/useWallet';
 import { useNavigate } from 'react-router-dom';
 import { Building, Users, Calendar, DollarSign, Star, TrendingUp, LogOut, Search, Tag, Pencil } from 'lucide-react';
 import GymProfileEditDialog from './GymProfileEditDialog';
@@ -15,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const GymDashboard = () => {
   const { profile, gymProfile, loading, refetch } = useProfile();
+  const { wallet } = useWallet();
   const { signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -48,7 +50,7 @@ const GymDashboard = () => {
       {/* Header */}
       <div className="bg-white border-b sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
             GymConnect AI
           </h1>
           <div className="flex items-center gap-4">
@@ -136,6 +138,17 @@ const GymDashboard = () => {
               <Card>
                 <CardContent className="p-6 flex items-center justify-between">
                   <div>
+                    <p className="text-sm font-medium text-slate-500">Saldo Wallet</p>
+                    <h3 className="text-2xl font-bold mt-1 text-orange-600">{wallet?.balance || 0} FC</h3>
+                  </div>
+                  <div className="p-3 bg-orange-100 rounded-full text-orange-600">
+                    <DollarSign className="h-5 w-5" />
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6 flex items-center justify-between">
+                  <div>
                     <p className="text-sm font-medium text-slate-500">Prenotazioni Oggi</p>
                     <h3 className="text-2xl font-bold mt-1">8</h3>
                   </div>
@@ -179,6 +192,10 @@ const GymDashboard = () => {
                   <Button className="w-full flex justify-start" onClick={() => navigate('/search')}>
                     <Search className="mr-2 h-4 w-4" />
                     Cerca Trainer/Atleti
+                  </Button>
+                  <Button className="w-full flex justify-start" variant="outline" onClick={() => navigate('/wallet')}>
+                    <DollarSign className="mr-2 h-4 w-4" />
+                    Il mio Portafoglio
                   </Button>
                   <Button className="w-full flex justify-start" variant="outline" onClick={() => setActiveTab("members")}>
                     <Users className="mr-2 h-4 w-4" />

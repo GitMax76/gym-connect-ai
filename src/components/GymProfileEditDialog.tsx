@@ -8,7 +8,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useProfile, GymProfile } from '@/hooks/useProfile';
 import { useToast } from "@/hooks/use-toast";
-import { Pencil, Save, ExternalLink, Plus, Trash2, Calendar, Clock } from 'lucide-react';
+import { Pencil, Save, ExternalLink, Plus, Trash2, Calendar, Clock, CheckCircle } from 'lucide-react';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface GymProfileEditDialogProps {
     currentProfile: GymProfile | null;
@@ -42,6 +51,7 @@ const GymProfileEditDialog = ({
     const [internalOpen, setInternalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState(defaultTab);
+    const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
     const isControlled = controlledOpen !== undefined;
     const isOpen = isControlled ? controlledOpen : internalOpen;
@@ -58,6 +68,9 @@ const GymProfileEditDialog = ({
     const [openingDays, setOpeningDays] = useState<string[]>(currentProfile?.opening_days || []);
     const [openingHours, setOpeningHours] = useState(currentProfile?.opening_hours || '07:00');
     const [closingHours, setClosingHours] = useState(currentProfile?.closing_hours || '22:00');
+    const [openingHoursMap, setOpeningHoursMap] = useState<Record<string, { open: string; close: string }>>(
+        currentProfile?.opening_hours_map || {}
+    );
 
     // Subscription Plans
     const [subscriptionPlans, setSubscriptionPlans] = useState<any[]>(currentProfile?.subscription_plans as any[] || []);
@@ -94,6 +107,7 @@ const GymProfileEditDialog = ({
                 setOpeningDays(currentProfile.opening_days || []);
                 setOpeningHours(currentProfile.opening_hours || '07:00');
                 setClosingHours(currentProfile.closing_hours || '22:00');
+                setOpeningHoursMap(currentProfile.opening_hours_map || {});
                 setSubscriptionPlans(currentProfile.subscription_plans as any[] || []);
             }
             if (profile) {
@@ -116,6 +130,13 @@ const GymProfileEditDialog = ({
                 ? prev.filter(d => d !== day)
                 : [...prev, day]
         );
+    };
+
+    const setDayHours = (day: string, open: string, close: string) => {
+        setOpeningHoursMap(prev => ({
+            ...prev,
+            [day]: { open, close }
+        }));
     };
 
     const addSubscriptionPlan = () => {
@@ -155,6 +176,14 @@ const GymProfileEditDialog = ({
             safeMonthlyFee = isNaN(price) ? 0 : price;
         }
 
+        // Build final openingHoursMap
+        const finalOpeningHoursMap = { ...openingHoursMap };
+        openingDays.forEach(day => {
+            if (!finalOpeningHoursMap[day]) {
+                finalOpeningHoursMap[day] = { open: openingHours, close: closingHours };
+            }
+        });
+
         const updates = {
             gym_name: gymName,
             address,
@@ -165,7 +194,8 @@ const GymProfileEditDialog = ({
             opening_hours: openingHours,
             closing_hours: closingHours,
             subscription_plans: subscriptionPlans,
-            monthly_fee: safeMonthlyFee
+            monthly_fee: safeMonthlyFee,
+            opening_hours_map: finalOpeningHoursMap
         };
 
         const { error } = await updateGymProfile(updates);
@@ -178,14 +208,16 @@ const GymProfileEditDialog = ({
                 description: `Impossibile aggiornare il profilo: ${error.message || error}`,
             });
         } else {
-            toast({
-                title: "Successo",
-                description: "Profilo aggiornato con successo!",
-            });
+            // Show success dialog instead of toast
+            setShowSuccessDialog(true);
             if (onProfileUpdated) onProfileUpdated();
-            if (setOpen) setOpen(false);
         }
         setLoading(false);
+    };
+
+    const handleSuccessClose = () => {
+        setShowSuccessDialog(false);
+        if (setOpen) setOpen(false);
     };
 
     const handleRedirectToPromotions = () => {
@@ -240,8 +272,8 @@ const GymProfileEditDialog = ({
                                 </div>
                             </div>
 
-                            <div className="space-y-2 pt-2">
-                                <Label className="flex items-center gap-2"><Clock className="h-4 w-4" /> Orari di Apertura</Label>
+                            <div className="space-y-4 pt-2">
+                                <Label className="flex items-center gap-2"><Clock className="h-4 w-4" /> Giorni e Orari di Apertura</Label>
                                 <div className="flex flex-wrap gap-2 mb-3">
                                     {daysOfWeek.map(day => (
                                         <div
@@ -256,28 +288,46 @@ const GymProfileEditDialog = ({
                                         </div>
                                     ))}
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Select value={openingHours} onValueChange={setOpeningHours}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Apertura" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {timeSlots.map(time => (
-                                                <SelectItem key={`open-${time}`} value={time}>{time}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <Select value={closingHours} onValueChange={setClosingHours}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Chiusura" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {timeSlots.map(time => (
-                                                <SelectItem key={`close-${time}`} value={time}>{time}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
+                                {openingDays.length > 0 ? (
+                                    <div className="space-y-3 border rounded-lg p-3 bg-slate-50">
+                                        {openingDays.map(day => (
+                                            <div key={day} className="flex items-center justify-between gap-2 text-sm">
+                                                <span className="w-8 font-medium">{day}</span>
+                                                <div className="flex items-center gap-2 flex-1">
+                                                    <Select
+                                                        value={openingHoursMap[day]?.open || openingHours}
+                                                        onValueChange={(val) => setDayHours(day, val, openingHoursMap[day]?.close || closingHours)}
+                                                    >
+                                                        <SelectTrigger className="h-8 text-xs">
+                                                            <SelectValue placeholder="Apertura" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {timeSlots.map(time => (
+                                                                <SelectItem key={`open-${day}-${time}`} value={time}>{time}</SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <span>-</span>
+                                                    <Select
+                                                        value={openingHoursMap[day]?.close || closingHours}
+                                                        onValueChange={(val) => setDayHours(day, openingHoursMap[day]?.open || openingHours, val)}
+                                                    >
+                                                        <SelectTrigger className="h-8 text-xs">
+                                                            <SelectValue placeholder="Chiusura" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {timeSlots.map(time => (
+                                                                <SelectItem key={`close-${day}-${time}`} value={time}>{time}</SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-xs text-slate-500 italic">Seleziona i giorni per configurare gli orari.</p>
+                                )}
                             </div>
 
                             <div className="space-y-2">
@@ -439,7 +489,27 @@ const GymProfileEditDialog = ({
                     </Button>
                 </form>
             </DialogContent>
-        </Dialog>
+
+            <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2 text-green-600">
+                            <CheckCircle className="h-6 w-6" />
+                            Modifiche Salvate!
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Il profilo della tua palestra è stato aggiornato con successo.
+                            Le nuove informazioni sono ora visibili.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogAction onClick={handleSuccessClose} className="bg-green-600 hover:bg-green-700">
+                            Ottimo, chiudi
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </Dialog >
     );
 };
 

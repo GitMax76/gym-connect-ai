@@ -177,8 +177,9 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
               <a href="/business.html" className="hover:text-primary transition-colors font-medium">
                 Investors & Partners
               </a>
-              <span className="cursor-pointer hover:text-slate-700">Privacy</span>
-              <span className="cursor-pointer hover:text-slate-700">Terms</span>
+              <Link to="/privacy" className="hover:text-primary transition-colors text-sm">Privacy</Link>
+              <Link to="/terms" className="hover:text-primary transition-colors text-sm">Terms</Link>
+              <Link to="/investors" className="hover:text-primary transition-colors text-sm font-semibold text-green-600">Investors</Link>
             </div>
           </div>
         </footer>

@@ -1,13 +1,13 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ],
-  "headers": [
     {
       "source": "/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-      ]
+      "destination": "/index.html"
     }
-  ]
+  ],
+  "framework": "vite",
+  "env": {
+    "VITE_SUPABASE_URL": "https://lowynmrxddcekcipynba.supabase.co",
+    "VITE_SUPABASE_ANON_KEY": "sb_publishable_AgpNehTMSwxQK3iW7dDUMg_oVJvA5tv"
+  }
 }

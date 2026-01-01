@@ -95,21 +95,23 @@ export const useBookings = () => {
     if (!user) return { error: 'No user logged in' };
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('bookings')
         .insert({
           ...bookingData,
           user_id: user.id
-        });
+        })
+        .select()
+        .single();
 
       if (!error) {
         await fetchUserBookings();
       }
 
-      return { error };
+      return { data, error };
     } catch (error: any) {
       console.error('Error creating booking:', error);
-      return { error };
+      return { data: null, error };
     }
   };
 

@@ -322,7 +322,8 @@ export const useProfile = () => {
         p_monthly_fee: merged.monthly_fee,
         p_day_pass_fee: merged.day_pass_fee,
         p_website_url: merged.website_url,
-        p_social_media: merged.social_media
+        p_social_media: merged.social_media,
+        p_opening_hours_map: merged.opening_hours_map || null
       };
       console.log('Calling RPC manage_gym_profile for update with params:', rpcParams);
 

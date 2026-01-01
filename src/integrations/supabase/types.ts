@@ -9,6 +9,79 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      wallets: {
+        Row: {
+          id: string
+          user_id: string
+          balance: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          balance?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          balance?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      transactions: {
+        Row: {
+          id: string
+          wallet_id: string
+          amount: number
+          type: string
+          status: string
+          description: string | null
+          related_entity_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          wallet_id: string
+          amount: number
+          type: string
+          status?: string
+          description?: string | null
+          related_entity_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          wallet_id?: string
+          amount?: number
+          type?: string
+          status?: string
+          description?: string | null
+          related_entity_id?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       bookings: {
         Row: {
           booking_date: string
@@ -83,7 +156,6 @@ export type Database = {
           member_capacity: number | null
           monthly_fee: number | null
           opening_hours: string | null
-          closing_hours: string | null
           opening_days: string[] | null
           subscription_plans: Json[] | null
           postal_code: string | null
@@ -104,7 +176,6 @@ export type Database = {
           member_capacity?: number | null
           monthly_fee?: number | null
           opening_hours?: string | null
-          closing_hours?: string | null
           opening_days?: string[] | null
           subscription_plans?: Json[] | null
           postal_code?: string | null
@@ -125,7 +196,6 @@ export type Database = {
           member_capacity?: number | null
           monthly_fee?: number | null
           opening_hours?: string | null
-          closing_hours?: string | null
           opening_days?: string[] | null
           subscription_plans?: Json[] | null
           postal_code?: string | null
@@ -306,6 +376,8 @@ export type Database = {
         Row: {
           avatar_url: string | null
           city: string | null
+          referral_code: string | null
+          referred_by: string | null
           created_at: string | null
           email: string | null
           first_name: string | null
@@ -646,6 +718,8 @@ export type Database = {
           end_date: string | null
           created_at: string | null
           status: string | null
+          price: number | null
+          payment_status: string | null
         }
         Insert: {
           id?: string
@@ -703,6 +777,12 @@ export type Database = {
           p_end_time: string
         }
         Returns: boolean
+      }
+      apply_referral_code: {
+        Args: {
+          code_input: string
+        }
+        Returns: Json
       }
     }
     Enums: {

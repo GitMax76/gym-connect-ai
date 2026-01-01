@@ -15,6 +15,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { searchPostalCode } from "@/utils/geocoding";
 
 interface GymRegistrationWizardProps {
     onSubmit: (data: any) => void;
@@ -143,11 +144,10 @@ const GymRegistrationWizard = ({ onSubmit, onBack }: GymRegistrationWizardProps)
         }
     }, [errors]);
 
-    // Auto-fill postal code when city changes
-    // Auto-fill postal code when both city and address are set (city first)
+    // Auto-fill postal code when city changes (basic map)
     const handleCityChange = useCallback((value: string) => {
         handleInputChange('city', value);
-        // Recalculate postal code if possible
+        // Recalculate postal code if possible using basic map
         const normalizedCity = value.toLowerCase().trim();
         const postalCode = cityPostalCodes[normalizedCity];
         if (postalCode) {
@@ -157,8 +157,26 @@ const GymRegistrationWizard = ({ onSubmit, onBack }: GymRegistrationWizardProps)
 
     const handleAddressChange = useCallback((value: string) => {
         handleInputChange('address', value);
-        // No extra logic for postal code here; city drives the code
     }, [handleInputChange]);
+
+    // Precise CAP calculation using Nominatim API
+    React.useEffect(() => {
+        const timer = setTimeout(async () => {
+            if (formData.city && formData.address && formData.address.length > 5) {
+                // Only search if we have both city and a substantial address
+                try {
+                    const preciseCap = await searchPostalCode(formData.city, formData.address);
+                    if (preciseCap) {
+                        setFormData(prev => ({ ...prev, postalCode: preciseCap }));
+                    }
+                } catch (console) {
+                    // Ignore errors, keep user-entered or default CAP
+                }
+            }
+        }, 1000); // 1s debounce
+
+        return () => clearTimeout(timer);
+    }, [formData.city, formData.address]);
 
     const handleArrayToggle = (field: 'facilities' | 'specializations' | 'openingDays', value: string) => {
         setFormData(prev => ({

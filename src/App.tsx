@@ -11,6 +11,8 @@ const RegisterPage = React.lazy(() => import('@/pages/RegisterPage'));
 const AuthPage = React.lazy(() => import('@/pages/AuthPage'));
 const HomePage = React.lazy(() => import('@/pages/HomePage'));
 const DashboardPage = React.lazy(() => import('@/pages/DashboardPage'));
+const WalletPage = React.lazy(() => import('@/pages/WalletPage'));
+const InvestorPage = React.lazy(() => import('@/pages/InvestorPage'));
 const SearchPage = React.lazy(() => import('@/pages/SearchPage'));
 const BookingsPage = React.lazy(() => import('@/pages/BookingsPage'));
 const ClientsPage = React.lazy(() => import('@/pages/ClientsPage'));
@@ -20,6 +22,8 @@ const ProfilePage = React.lazy(() => import('@/pages/ProfilePage'));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 const PitchPage = lazy(() => import("./pages/PitchPage"));
 const CreditsPage = lazy(() => import("./pages/CreditsPage"));
+const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
+const TermsPage = lazy(() => import("./pages/TermsPage"));
 
 
 const queryClient = new QueryClient();
@@ -46,6 +50,8 @@ function App() {
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/pitch" element={<PitchPage />} />
                 <Route path="/credits" element={<CreditsPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/terms" element={<TermsPage />} />
 
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />
@@ -56,6 +62,12 @@ function App() {
                     <DashboardPage />
                   </ProtectedRoute>
                 } />
+                <Route path="/wallet" element={
+                  <ProtectedRoute>
+                    <WalletPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/investors" element={<InvestorPage />} />
                 <Route path="/search" element={
                   <ProtectedRoute>
                     <SearchPage />
@@ -88,7 +100,7 @@ function App() {
           </div>
         </Router>
       </AuthProvider>
-    </QueryClientProvider>
+    </QueryClientProvider >
   );
 }
 
