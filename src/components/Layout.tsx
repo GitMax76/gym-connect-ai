@@ -4,7 +4,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from 'lucide-react';
+import { Menu, Dumbbell } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,7 +17,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 animate-gradient-x">
       {showNavigation && (
         <nav className="bg-white/90 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -163,9 +163,13 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
             <div className="mb-4 md:mb-0">
               &copy; {new Date().getFullYear()} GymConnect AI. <span className="mx-2">|</span>
-              <Link to="/credits" className="font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
-                Created by Massimiliano Sabato
-              </Link>
+              <div className="flex items-center group cursor-pointer">
+                <span className="mr-1">Created by</span>
+                <Link to="/credits" className="flex items-center font-extrabold text-base bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity ml-1">
+                  Massimiliano Sabato
+                  <Dumbbell className="ml-2 w-5 h-5 text-blue-500 animate-bounce" style={{ animationDuration: '2s' }} />
+                </Link>
+              </div>
             </div>
             <div className="flex space-x-6">
               <Link to="/pitch" className="hover:text-primary transition-colors text-sm">

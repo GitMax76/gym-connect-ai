@@ -1,11 +1,14 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dumbbell, Award, MapPin, Clock, DollarSign, Users } from 'lucide-react';
+import { Dumbbell, Award, Clock, Users } from 'lucide-react';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { trainerRegistrationSchema, TrainerRegistrationData } from "@/schemas/auth";
+import PasswordRequirements from "@/components/auth/PasswordRequirements";
 
 interface TrainerRegistrationFormProps {
   onSubmit: (data: any) => void;
@@ -13,24 +16,29 @@ interface TrainerRegistrationFormProps {
 }
 
 const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormProps) => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    phone: '',
-    dateOfBirth: '',
-    city: '',
-    bio: '',
-    certifications: [] as string[],
-    specializations: [] as string[],
-    experience: '',
-    personalRate: '',
-    groupRate: '',
-    availability: [] as string[],
-    preferredAreas: '',
-    languages: [] as string[]
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isValid }
+  } = useForm<TrainerRegistrationData>({
+    resolver: zodResolver(trainerRegistrationSchema),
+    mode: "onChange",
+    defaultValues: {
+      certifications: [],
+      specializations: [],
+      languages: [],
+      availability: [],
+      preferredAreas: ""
+    }
   });
+
+  const passwordValue = watch("password");
+  const watchedCertifications = watch("certifications");
+  const watchedSpecializations = watch("specializations");
+  const watchedLanguages = watch("languages");
+  const watchedAvailability = watch("availability");
 
   const certificationOptions = [
     'CONI', 'NASM', 'ACSM', 'ISSA', 'ACE', 'NSCA',
@@ -55,23 +63,15 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
 
   const languageOptions = ['Italiano', 'Inglese', 'Francese', 'Spagnolo', 'Tedesco'];
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleArrayToggle = (field: keyof TrainerRegistrationData, value: string, currentValues: string[]) => {
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter(item => item !== value)
+      : [...currentValues, value];
+    setValue(field, newValues as any, { shouldValidate: true });
   };
 
-  const handleArrayToggle = (field: keyof typeof formData, value: string) => {
-    const arrayField = formData[field] as string[];
-    setFormData(prev => ({
-      ...prev,
-      [field]: arrayField.includes(value)
-        ? arrayField.filter(item => item !== value)
-        : [...arrayField, value]
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
+  const onSubmitForm = (data: TrainerRegistrationData) => {
+    onSubmit(data);
   };
 
   return (
@@ -88,7 +88,7 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-8">
         {/* Informazioni Personali */}
         <Card>
           <CardHeader>
@@ -103,21 +103,21 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
                 <Label htmlFor="firstName">Nome *</Label>
                 <Input
                   id="firstName"
-                  value={formData.firstName}
-                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  {...register("firstName")}
                   placeholder="Il tuo nome"
-                  required
+                  className={errors.firstName ? "border-red-500" : ""}
                 />
+                {errors.firstName && <p className="text-sm text-red-500 mt-1">{errors.firstName.message}</p>}
               </div>
               <div>
                 <Label htmlFor="lastName">Cognome *</Label>
                 <Input
                   id="lastName"
-                  value={formData.lastName}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  {...register("lastName")}
                   placeholder="Il tuo cognome"
-                  required
+                  className={errors.lastName ? "border-red-500" : ""}
                 />
+                {errors.lastName && <p className="text-sm text-red-500 mt-1">{errors.lastName.message}</p>}
               </div>
             </div>
 
@@ -127,41 +127,43 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
                 <Input
                   id="email"
                   type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  {...register("email")}
                   placeholder="tua@email.com"
-                  required
+                  className={errors.email ? "border-red-500" : ""}
                 />
+                {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>}
               </div>
               <div>
                 <Label htmlFor="password">Password *</Label>
                 <Input
                   id="password"
                   type="password"
-                  value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  {...register("password")}
                   placeholder="Password sicura"
-                  required
+                  className={errors.password ? "border-red-500" : ""}
                 />
+                <PasswordRequirements password={passwordValue} />
+                {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>}
               </div>
               <div>
                 <Label htmlFor="phone">Telefono *</Label>
                 <Input
                   id="phone"
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  {...register("phone")}
                   placeholder="+39 123 456 7890"
-                  required
+                  className={errors.phone ? "border-red-500" : ""}
                 />
+                {errors.phone && <p className="text-sm text-red-500 mt-1">{errors.phone.message}</p>}
               </div>
               <div>
                 <Label htmlFor="dateOfBirth">Data di Nascita</Label>
                 <Input
                   id="dateOfBirth"
                   type="date"
-                  value={formData.dateOfBirth}
-                  onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
+                  {...register("dateOfBirth")}
+                  className={errors.dateOfBirth ? "border-red-500" : ""}
                 />
+                {errors.dateOfBirth && <p className="text-sm text-red-500 mt-1">{errors.dateOfBirth.message}</p>}
               </div>
             </div>
 
@@ -170,18 +172,17 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
                 <Label htmlFor="city">Città di Operatività *</Label>
                 <Input
                   id="city"
-                  value={formData.city}
-                  onChange={(e) => handleInputChange('city', e.target.value)}
+                  {...register("city")}
                   placeholder="Milano"
-                  required
+                  className={errors.city ? "border-red-500" : ""}
                 />
+                {errors.city && <p className="text-sm text-red-500 mt-1">{errors.city.message}</p>}
               </div>
               <div>
                 <Label htmlFor="preferredAreas">Zone Preferite</Label>
                 <Input
                   id="preferredAreas"
-                  value={formData.preferredAreas}
-                  onChange={(e) => handleInputChange('preferredAreas', e.target.value)}
+                  {...register("preferredAreas")}
                   placeholder="es. Centro, Porta Nuova, Navigli"
                 />
               </div>
@@ -199,37 +200,39 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Certificazioni e Titoli</Label>
+              <Label className={errors.certifications ? "text-red-500" : ""}>Certificazioni e Titoli *</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
                 {certificationOptions.map((cert) => (
                   <label key={cert} className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={formData.certifications.includes(cert)}
-                      onChange={() => handleArrayToggle('certifications', cert)}
+                      checked={watchedCertifications?.includes(cert)}
+                      onChange={() => handleArrayToggle('certifications', cert, watchedCertifications)}
                       className="rounded border-gray-300"
                     />
                     <span className="text-sm">{cert}</span>
                   </label>
                 ))}
               </div>
+              {errors.certifications && <p className="text-sm text-red-500 mt-1">{errors.certifications.message}</p>}
             </div>
 
             <div>
-              <Label>Specializzazioni</Label>
+              <Label className={errors.specializations ? "text-red-500" : ""}>Specializzazioni *</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
                 {specializationOptions.map((spec) => (
                   <label key={spec} className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={formData.specializations.includes(spec)}
-                      onChange={() => handleArrayToggle('specializations', spec)}
+                      checked={watchedSpecializations?.includes(spec)}
+                      onChange={() => handleArrayToggle('specializations', spec, watchedSpecializations)}
                       className="rounded border-gray-300"
                     />
                     <span className="text-sm">{spec}</span>
                   </label>
                 ))}
               </div>
+              {errors.specializations && <p className="text-sm text-red-500 mt-1">{errors.specializations.message}</p>}
             </div>
 
             <div>
@@ -237,28 +240,30 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
               <Input
                 id="experience"
                 type="number"
-                value={formData.experience}
-                onChange={(e) => handleInputChange('experience', e.target.value)}
+                {...register("experience")}
                 placeholder="es. 5"
                 min="0"
+                className={errors.experience ? "border-red-500" : ""}
               />
+              {errors.experience && <p className="text-sm text-red-500 mt-1">{errors.experience.message}</p>}
             </div>
 
             <div>
-              <Label>Lingue Parlate</Label>
+              <Label className={errors.languages ? "text-red-500" : ""}>Lingue Parlate *</Label>
               <div className="flex flex-wrap gap-3 mt-2">
                 {languageOptions.map((lang) => (
                   <label key={lang} className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={formData.languages.includes(lang)}
-                      onChange={() => handleArrayToggle('languages', lang)}
+                      checked={watchedLanguages?.includes(lang)}
+                      onChange={() => handleArrayToggle('languages', lang, watchedLanguages)}
                       className="rounded border-gray-300"
                     />
                     <span className="text-sm">{lang}</span>
                   </label>
                 ))}
               </div>
+              {errors.languages && <p className="text-sm text-red-500 mt-1">{errors.languages.message}</p>}
             </div>
           </CardContent>
         </Card>
@@ -273,20 +278,21 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Disponibilità Settimanale</Label>
+              <Label className={errors.availability ? "text-red-500" : ""}>Disponibilità Settimanale *</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2 max-h-48 overflow-y-auto">
                 {availabilityOptions.map((slot) => (
                   <label key={slot} className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={formData.availability.includes(slot)}
-                      onChange={() => handleArrayToggle('availability', slot)}
+                      checked={watchedAvailability?.includes(slot)}
+                      onChange={() => handleArrayToggle('availability', slot, watchedAvailability)}
                       className="rounded border-gray-300"
                     />
                     <span className="text-sm">{slot}</span>
                   </label>
                 ))}
               </div>
+              {errors.availability && <p className="text-sm text-red-500 mt-1">{errors.availability.message}</p>}
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
@@ -295,22 +301,24 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
                 <Input
                   id="personalRate"
                   type="number"
-                  value={formData.personalRate}
-                  onChange={(e) => handleInputChange('personalRate', e.target.value)}
+                  {...register("personalRate")}
                   placeholder="es. 50"
                   min="0"
+                  className={errors.personalRate ? "border-red-500" : ""}
                 />
+                {errors.personalRate && <p className="text-sm text-red-500 mt-1">{errors.personalRate.message}</p>}
               </div>
               <div>
                 <Label htmlFor="groupRate">Tariffa Lezioni di Gruppo (€/ora)</Label>
                 <Input
                   id="groupRate"
                   type="number"
-                  value={formData.groupRate}
-                  onChange={(e) => handleInputChange('groupRate', e.target.value)}
+                  {...register("groupRate")}
                   placeholder="es. 30"
                   min="0"
+                  className={errors.groupRate ? "border-red-500" : ""}
                 />
+                {errors.groupRate && <p className="text-sm text-red-500 mt-1">{errors.groupRate.message}</p>}
               </div>
             </div>
           </CardContent>
@@ -323,11 +331,12 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
               <Label htmlFor="bio">Presentati ai Tuoi Futuri Clienti</Label>
               <Textarea
                 id="bio"
-                value={formData.bio}
-                onChange={(e) => handleInputChange('bio', e.target.value)}
+                {...register("bio")}
                 placeholder="Racconta la tua storia, la tua filosofia di allenamento, i risultati che aiuti a raggiungere..."
                 rows={4}
+                className={errors.bio ? "border-red-500" : ""}
               />
+              {errors.bio && <p className="text-sm text-red-500 mt-1">{errors.bio.message}</p>}
             </div>
           </CardContent>
         </Card>
@@ -344,7 +353,8 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
           </Button>
           <Button
             type="submit"
-            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-lg transition-all"
+            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!isValid}
           >
             🚀 Diventa Coach
           </Button>

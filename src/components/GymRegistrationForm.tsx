@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, MapPin, Clock, Users, Dumbbell, Calendar, Plus, Trash2 } from 'lucide-react';
+import { Building2, MapPin, Clock, Dumbbell, Calendar, Plus, Trash2 } from 'lucide-react';
 import { useAuth } from "@/contexts/AuthContext";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { gymRegistrationSchema, GymRegistrationData } from "@/schemas/auth";
+import PasswordRequirements from "@/components/auth/PasswordRequirements";
 
 interface GymRegistrationFormProps {
   onSubmit: (data: any) => void;
@@ -16,25 +20,37 @@ interface GymRegistrationFormProps {
 const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => {
   const { user } = useAuth();
 
-  // Initialize with empty defaults, will populate email from auth
-  const [formData, setFormData] = useState({
-    gymName: '',
-    ownerName: '',
-    email: user?.email || '',
-    password: '',
-    phone: '',
-    address: '',
-    city: '',
-    postalCode: '',
-    description: '',
-    facilities: [] as string[],
-    openingDays: [] as string[],
-    openingHours: '07:00',
-    closingHours: '22:00',
-    memberCapacity: '',
-    specializations: [] as string[],
-    subscriptionPlans: [] as { title: string; price: string; duration: string; description: string }[]
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    watch,
+    formState: { errors, isValid }
+  } = useForm<GymRegistrationData>({
+    resolver: zodResolver(gymRegistrationSchema),
+    mode: "onChange",
+    defaultValues: {
+      email: user?.email || '',
+      facilities: [],
+      openingDays: [],
+      specializations: [], // Added initialization
+      subscriptionPlans: [],
+      openingHours: '07:00',
+      closingHours: '22:00'
+    }
   });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "subscriptionPlans"
+  });
+
+  const passwordValue = watch("password");
+  const watchedFacilities = watch("facilities");
+  const watchedOpeningDays = watch("openingDays");
+  const watchedSpecializations = watch("specializations");
+  const watchedSubscriptionPlans = watch("subscriptionPlans");
 
   const [newPlan, setNewPlan] = useState({ title: '', price: '', duration: 'Mensile', description: '' });
 
@@ -64,39 +80,22 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
 
   const timeSlots = generateTimeSlots();
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleArrayToggle = (field: 'facilities' | 'specializations' | 'openingDays', value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: prev[field].includes(value)
-        ? prev[field].filter(item => item !== value)
-        : [...prev[field], value]
-    }));
+  const handleArrayToggle = (field: 'facilities' | 'specializations' | 'openingDays', value: string, currentValues: string[]) => {
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter(item => item !== value)
+      : [...currentValues, value];
+    setValue(field, newValues as any, { shouldValidate: true });
   };
 
   const addSubscriptionPlan = () => {
     if (newPlan.title && newPlan.price) {
-      setFormData(prev => ({
-        ...prev,
-        subscriptionPlans: [...prev.subscriptionPlans, newPlan]
-      }));
+      append(newPlan);
       setNewPlan({ title: '', price: '', duration: 'Mensile', description: '' });
     }
   };
 
-  const removePlan = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      subscriptionPlans: prev.subscriptionPlans.filter((_, i) => i !== index)
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
+  const onSubmitForm = (data: GymRegistrationData) => {
+    onSubmit(data);
   };
 
   return (
@@ -113,7 +112,7 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-8">
         {/* Informazioni Base */}
         <Card>
           <CardHeader>
@@ -128,21 +127,21 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
                 <Label htmlFor="gymName">Nome Palestra/Centro *</Label>
                 <Input
                   id="gymName"
-                  value={formData.gymName}
-                  onChange={(e) => handleInputChange('gymName', e.target.value)}
+                  {...register("gymName")}
                   placeholder="es. FitZone Premium"
-                  required
+                  className={errors.gymName ? "border-red-500" : ""}
                 />
+                {errors.gymName && <p className="text-sm text-red-500 mt-1">{errors.gymName.message}</p>}
               </div>
               <div>
                 <Label htmlFor="ownerName">Nome Proprietario/Manager *</Label>
                 <Input
                   id="ownerName"
-                  value={formData.ownerName}
-                  onChange={(e) => handleInputChange('ownerName', e.target.value)}
+                  {...register("ownerName")}
                   placeholder="Il tuo nome"
-                  required
+                  className={errors.ownerName ? "border-red-500" : ""}
                 />
+                {errors.ownerName && <p className="text-sm text-red-500 mt-1">{errors.ownerName.message}</p>}
               </div>
             </div>
 
@@ -152,21 +151,21 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
                 <Input
                   id="email"
                   type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  {...register("email")}
                   placeholder="info@tuapalestra.it"
-                  required
+                  className={errors.email ? "border-red-500" : ""}
                 />
+                {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>}
               </div>
               <div>
                 <Label htmlFor="phone">Telefono *</Label>
                 <Input
                   id="phone"
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  {...register("phone")}
                   placeholder="+39 123 456 7890"
-                  required
+                  className={errors.phone ? "border-red-500" : ""}
                 />
+                {errors.phone && <p className="text-sm text-red-500 mt-1">{errors.phone.message}</p>}
               </div>
             </div>
 
@@ -176,13 +175,13 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
                 <Input
                   id="password"
                   type="password"
-                  value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  {...register("password")}
                   placeholder="Password sicura"
-                  required
-                  className="mt-1"
+                  className={`mt-1 ${errors.password ? "border-red-500" : ""}`}
                 />
+                <PasswordRequirements password={passwordValue} />
                 <p className="text-xs text-slate-500 mt-1">La password per accedere al tuo account GymConnect.</p>
+                {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>}
               </div>
             )}
           </CardContent>
@@ -201,11 +200,11 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
               <Label htmlFor="address">Indirizzo Completo *</Label>
               <Input
                 id="address"
-                value={formData.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
+                {...register("address")}
                 placeholder="Via Roma 123"
-                required
+                className={errors.address ? "border-red-500" : ""}
               />
+              {errors.address && <p className="text-sm text-red-500 mt-1">{errors.address.message}</p>}
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
@@ -213,21 +212,21 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
                 <Label htmlFor="city">Città *</Label>
                 <Input
                   id="city"
-                  value={formData.city}
-                  onChange={(e) => handleInputChange('city', e.target.value)}
+                  {...register("city")}
                   placeholder="Milano"
-                  required
+                  className={errors.city ? "border-red-500" : ""}
                 />
+                {errors.city && <p className="text-sm text-red-500 mt-1">{errors.city.message}</p>}
               </div>
               <div>
                 <Label htmlFor="postalCode">CAP *</Label>
                 <Input
                   id="postalCode"
-                  value={formData.postalCode}
-                  onChange={(e) => handleInputChange('postalCode', e.target.value)}
+                  {...register("postalCode")}
                   placeholder="20121"
-                  required
+                  className={errors.postalCode ? "border-red-500" : ""}
                 />
+                {errors.postalCode && <p className="text-sm text-red-500 mt-1">{errors.postalCode.message}</p>}
               </div>
             </div>
           </CardContent>
@@ -243,20 +242,21 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Strutture Disponibili</Label>
+              <Label className={errors.facilities ? "text-red-500" : ""}>Strutture Disponibili *</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
                 {facilityOptions.map((facility) => (
                   <label key={facility} className="flex items-center space-x-2 cursor-pointer p-2 border rounded-md hover:bg-slate-50 transition-colors">
                     <input
                       type="checkbox"
-                      checked={formData.facilities.includes(facility)}
-                      onChange={() => handleArrayToggle('facilities', facility)}
+                      checked={watchedFacilities?.includes(facility)}
+                      onChange={() => handleArrayToggle('facilities', facility, watchedFacilities)}
                       className="rounded border-gray-300 text-green-600 focus:ring-green-500"
                     />
                     <span className="text-sm">{facility}</span>
                   </label>
                 ))}
               </div>
+              {errors.facilities && <p className="text-sm text-red-500 mt-1">{errors.facilities.message}</p>}
             </div>
 
             <div>
@@ -266,8 +266,8 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
                   <label key={spec} className="flex items-center space-x-2 cursor-pointer p-2 border rounded-md hover:bg-slate-50 transition-colors">
                     <input
                       type="checkbox"
-                      checked={formData.specializations.includes(spec)}
-                      onChange={() => handleArrayToggle('specializations', spec)}
+                      checked={watchedSpecializations?.includes(spec)}
+                      onChange={() => handleArrayToggle('specializations', spec, watchedSpecializations)}
                       className="rounded border-gray-300 text-green-600 focus:ring-green-500"
                     />
                     <span className="text-sm">{spec}</span>
@@ -288,13 +288,13 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <Label className="mb-2 block">Giorni di Apertura</Label>
+              <Label className={`mb-2 block ${errors.openingDays ? "text-red-500" : ""}`}>Giorni di Apertura *</Label>
               <div className="flex flex-wrap gap-2">
                 {daysOfWeek.map(day => (
                   <div
                     key={day}
-                    onClick={() => handleArrayToggle('openingDays', day)}
-                    className={`cursor-pointer px-4 py-2 rounded-full text-sm font-medium transition-colors ${formData.openingDays.includes(day)
+                    onClick={() => handleArrayToggle('openingDays', day, watchedOpeningDays)}
+                    className={`cursor-pointer px-4 py-2 rounded-full text-sm font-medium transition-colors ${watchedOpeningDays?.includes(day)
                       ? 'bg-purple-600 text-white shadow-md'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                       }`}
@@ -303,40 +303,47 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
                   </div>
                 ))}
               </div>
+              {errors.openingDays && <p className="text-sm text-red-500 mt-1">{errors.openingDays.message}</p>}
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="openingHours">Orario Apertura</Label>
-                <Select
-                  value={formData.openingHours}
-                  onValueChange={(val) => handleInputChange('openingHours', val)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleziona orario" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {timeSlots.map(time => (
-                      <SelectItem key={`open-${time}`} value={time}>{time}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="openingHours"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleziona orario" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {timeSlots.map(time => (
+                          <SelectItem key={`open-${time}`} value={time}>{time}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
               <div>
                 <Label htmlFor="closingHours">Orario Chiusura</Label>
-                <Select
-                  value={formData.closingHours}
-                  onValueChange={(val) => handleInputChange('closingHours', val)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleziona orario" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {timeSlots.map(time => (
-                      <SelectItem key={`close-${time}`} value={time}>{time}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="closingHours"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleziona orario" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {timeSlots.map(time => (
+                          <SelectItem key={`close-${time}`} value={time}>{time}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
             </div>
 
@@ -345,10 +352,11 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
               <Input
                 id="memberCapacity"
                 type="number"
-                value={formData.memberCapacity}
-                onChange={(e) => handleInputChange('memberCapacity', e.target.value)}
+                {...register("memberCapacity")}
                 placeholder="es. 200"
+                className={errors.memberCapacity ? "border-red-500" : ""}
               />
+              {errors.memberCapacity && <p className="text-sm text-red-500 mt-1">{errors.memberCapacity.message}</p>}
             </div>
           </CardContent>
         </Card>
@@ -415,24 +423,24 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
             </div>
 
             <div className="space-y-3">
-              <Label>Piani Inseriti</Label>
-              {formData.subscriptionPlans.length === 0 ? (
+              <Label className={errors.subscriptionPlans ? "text-red-500" : ""}>Piani Inseriti *</Label>
+              {fields.length === 0 ? (
                 <div className="text-center py-6 text-slate-500 italic bg-gray-50 rounded-md border border-dashed">
                   Nessun piano inserito. Aggiungi almeno un piano base.
                 </div>
               ) : (
                 <div className="grid gap-3">
-                  {formData.subscriptionPlans.map((plan, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-white border rounded-md shadow-sm">
+                  {fields.map((field, index) => (
+                    <div key={field.id} className="flex items-center justify-between p-3 bg-white border rounded-md shadow-sm">
                       <div>
-                        <div className="font-semibold text-slate-800">{plan.title}</div>
-                        <div className="text-sm text-slate-500">{plan.duration} • €{plan.price}</div>
+                        <div className="font-semibold text-slate-800">{watchedSubscriptionPlans[index]?.title}</div>
+                        <div className="text-sm text-slate-500">{watchedSubscriptionPlans[index]?.duration} • €{watchedSubscriptionPlans[index]?.price}</div>
                       </div>
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        onClick={() => removePlan(index)}
+                        onClick={() => remove(index)}
                         className="text-red-500 hover:text-red-700 hover:bg-red-50"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -441,6 +449,7 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
                   ))}
                 </div>
               )}
+              {errors.subscriptionPlans && <p className="text-sm text-red-500 mt-1">{errors.subscriptionPlans.message}</p>}
             </div>
           </CardContent>
         </Card>
@@ -449,14 +458,15 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
         <Card>
           <CardContent className="pt-6">
             <div>
-              <Label htmlFor="description">Descrizione della Struttura</Label>
+              <Label htmlFor="description">Descrizione della Struttura *</Label>
               <Textarea
                 id="description"
-                value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+                {...register("description")}
                 placeholder="Racconta cosa rende speciale la tua palestra, i tuoi punti di forza, l'atmosfera che crei..."
                 rows={4}
+                className={errors.description ? "border-red-500" : ""}
               />
+              {errors.description && <p className="text-sm text-red-500 mt-1">{errors.description.message}</p>}
             </div>
           </CardContent>
         </Card>
@@ -473,8 +483,8 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
           </Button>
           <Button
             type="submit"
-            className="px-8 py-3 bg-gradient-to-r from-orange-600 to-red-500 text-white hover:shadow-lg transition-all"
-            disabled={formData.subscriptionPlans.length === 0}
+            className="px-8 py-3 bg-gradient-to-r from-orange-600 to-red-500 text-white hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!isValid || fields.length === 0}
           >
             🚀 Registra la Palestra
           </Button>
@@ -485,3 +495,4 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
 };
 
 export default GymRegistrationForm;
+

@@ -8,6 +8,7 @@ import TrainerRegistrationForm from '@/components/TrainerRegistrationForm';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
+import { UserRegistrationData, TrainerRegistrationData, GymRegistrationData } from '@/schemas/auth';
 
 const RegisterPage = () => {
   const [step, setStep] = useState<'role' | 'form'>('role');
@@ -18,10 +19,10 @@ const RegisterPage = () => {
   const { profile, updateProfile, createUserProfile, createTrainerProfile, createGymProfile, loading } = useProfile();
 
   useEffect(() => {
-    if (!user) {
-      navigate('/auth');
-      return;
-    }
+    // if (!user) {
+    //   navigate('/auth');
+    //   return;
+    // }
 
     // Se l'utente ha già completato la profilazione, vai alla dashboard
     if (profile?.user_type && (profile.first_name || profile.last_name)) {
@@ -69,19 +70,20 @@ const RegisterPage = () => {
 
       switch (selectedRole) {
         case 'user':
+          const userData = data as UserRegistrationData;
           // Transform form data to match database schema
           const userProfileData = {
-            age: data.age ? parseInt(data.age) : undefined,
-            weight: data.weight ? parseFloat(data.weight) : undefined,
-            height: data.height ? parseInt(data.height) : undefined,
-            fitness_level: data.fitnessLevel,
-            primary_goal: data.goals,
-            availability_hours_per_week: getHoursFromAvailability(data.availability),
-            budget_min: getBudgetRange(data.budget).min,
-            budget_max: getBudgetRange(data.budget).max,
-            preferred_location: data.location,
-            health_conditions: data.healthConditions,
-            experience_description: data.goals
+            age: userData.age,
+            weight: userData.weight,
+            height: userData.height,
+            fitness_level: userData.fitnessLevel,
+            primary_goal: userData.goals,
+            availability_hours_per_week: getHoursFromAvailability(userData.availability),
+            budget_min: getBudgetRange(userData.budget).min,
+            budget_max: getBudgetRange(userData.budget).max,
+            preferred_location: userData.location,
+            health_conditions: userData.healthConditions,
+            experience_description: userData.goals
           };
 
           const userResult = await createUserProfile(userProfileData);
@@ -89,18 +91,19 @@ const RegisterPage = () => {
           break;
 
         case 'instructor':
+          const trainerData = data as TrainerRegistrationData;
           // Transform form data to match database schema
           const trainerProfileData = {
-            date_of_birth: data.dateOfBirth,
-            bio: data.bio,
-            certifications: data.certifications,
-            specializations: data.specializations,
-            years_experience: data.experience ? parseInt(data.experience) : undefined,
-            languages: data.languages,
-            personal_rate_per_hour: data.personalRate ? parseFloat(data.personalRate) : undefined,
-            group_rate_per_hour: data.groupRate ? parseFloat(data.groupRate) : undefined,
-            preferred_areas: data.preferredAreas,
-            availability_schedule: { slots: data.availability }
+            date_of_birth: trainerData.dateOfBirth,
+            bio: trainerData.bio,
+            certifications: trainerData.certifications,
+            specializations: trainerData.specializations,
+            years_experience: trainerData.experience,
+            languages: trainerData.languages,
+            personal_rate_per_hour: trainerData.personalRate,
+            group_rate_per_hour: trainerData.groupRate,
+            preferred_areas: trainerData.preferredAreas,
+            availability_schedule: { slots: trainerData.availability } // Wrap in object as expected by schema
           };
 
           const trainerResult = await createTrainerProfile(trainerProfileData);
@@ -108,21 +111,22 @@ const RegisterPage = () => {
           break;
 
         case 'gym':
+          const gymData = data as GymRegistrationData;
           // Transform form data to match database schema
           const gymProfileData = {
-            gym_name: data.gymName,
-            business_email: data.email,
-            address: data.address,
-            city: data.city,
-            postal_code: data.postalCode,
-            description: data.description,
-            facilities: data.facilities,
-            specializations: data.specializations,
-            opening_days: data.openingDays,
-            opening_hours: data.openingHours,
-            closing_hours: data.closingHours,
-            member_capacity: data.memberCapacity ? parseInt(data.memberCapacity) : undefined,
-            subscription_plans: data.subscriptionPlans as any // Cast to any/Json for Supabase
+            gym_name: gymData.gymName,
+            business_email: gymData.email,
+            address: gymData.address,
+            city: gymData.city,
+            postal_code: gymData.postalCode,
+            description: gymData.description,
+            facilities: gymData.facilities,
+            specializations: gymData.specializations,
+            opening_days: gymData.openingDays,
+            opening_hours: gymData.openingHours,
+            closing_hours: gymData.closingHours,
+            member_capacity: gymData.memberCapacity,
+            subscription_plans: gymData.subscriptionPlans as any
           };
 
           const gymResult = await createGymProfile(gymProfileData);
@@ -140,11 +144,19 @@ const RegisterPage = () => {
       }
 
       // Update base profile with additional info
+      // Handle the diversity of data keys safely
+      const firstName = 'firstName' in data ? data.firstName :
+        'ownerName' in data ? data.ownerName :
+          'name' in data ? data.name?.split(' ')[0] : '';
+
+      const lastName = 'lastName' in data ? data.lastName :
+        'name' in data ? data.name?.split(' ').slice(1).join(' ') : '';
+
       await updateProfile({
-        first_name: data.firstName || data.ownerName || data.name?.split(' ')[0],
-        last_name: data.lastName || data.name?.split(' ').slice(1).join(' '),
+        first_name: firstName,
+        last_name: lastName,
         phone: data.phone,
-        city: data.city
+        city: data.city || data.location // Use location for user if city not present
       });
 
       let welcomeMessage = '';
@@ -261,3 +273,4 @@ const RegisterPage = () => {
 };
 
 export default RegisterPage;
+

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Heart, Dumbbell, Activity } from 'lucide-react';
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { userRegistrationSchema, UserRegistrationData } from "@/schemas/auth";
+import PasswordRequirements from "@/components/auth/PasswordRequirements";
 
 interface UserRegistrationFormProps {
   onSubmit: (data: any) => void;
@@ -14,25 +17,26 @@ interface UserRegistrationFormProps {
 }
 
 const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    age: '',
-    weight: '',
-    height: '',
-    fitnessLevel: '',
-    goals: '',
-    availability: '',
-    budget: '',
-    location: '',
-    healthConditions: '',
-    referralCode: ''
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    formState: { errors, isValid }
+  } = useForm<UserRegistrationData>({
+    resolver: zodResolver(userRegistrationSchema),
+    mode: "onChange",
+    defaultValues: {
+      location: "",
+      referralCode: "",
+      healthConditions: ""
+    }
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
+  const passwordValue = watch("password");
+
+  const onSubmitForm = (data: UserRegistrationData) => {
+    onSubmit(data);
   };
 
   const fitnessGoals = [
@@ -81,7 +85,7 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
         </CardHeader>
 
         <CardContent className="p-8">
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-8">
             {/* Sezione Informazioni Personali */}
             <div className="bg-slate-50 p-6 rounded-xl">
               <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
@@ -92,53 +96,50 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
                   <Label htmlFor="name">Nome Completo</Label>
                   <Input
                     id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    required
+                    {...register("name")}
                     placeholder="Il tuo nome"
-                    className="mt-1"
+                    className={`mt-1 ${errors.name ? 'border-red-500' : ''}`}
                   />
+                  {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>}
                 </div>
                 <div>
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
                     type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    required
+                    {...register("email")}
                     placeholder="la.tua@email.com"
-                    className="mt-1"
+                    className={`mt-1 ${errors.email ? 'border-red-500' : ''}`}
                   />
+                  {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>}
                 </div>
                 <div>
                   <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
                     type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                    required
-                    className="mt-1"
+                    {...register("password")}
+                    className={`mt-1 ${errors.password ? 'border-red-500' : ''}`}
                   />
+                  <PasswordRequirements password={passwordValue} />
+                  {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>}
                 </div>
                 <div>
                   <Label htmlFor="age">Età</Label>
                   <Input
                     id="age"
                     type="number"
-                    value={formData.age}
-                    onChange={(e) => setFormData(prev => ({ ...prev, age: e.target.value }))}
+                    {...register("age")}
                     placeholder="Es. 28"
-                    className="mt-1"
+                    className={`mt-1 ${errors.age ? 'border-red-500' : ''}`}
                   />
+                  {errors.age && <p className="text-sm text-red-500 mt-1">{errors.age.message}</p>}
                 </div>
                 <div className="md:col-span-2">
                   <Label htmlFor="referralCode" className="text-blue-600 font-bold">Hai un codice amico? (Opzionale)</Label>
                   <Input
                     id="referralCode"
-                    value={formData.referralCode || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, referralCode: e.target.value }))}
+                    {...register("referralCode")}
                     placeholder="Inserisci il codice per 15 FC bonus"
                     className="mt-1 border-blue-200 bg-blue-50"
                   />
@@ -157,45 +158,51 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
                   <Input
                     id="weight"
                     type="number"
-                    value={formData.weight}
-                    onChange={(e) => setFormData(prev => ({ ...prev, weight: e.target.value }))}
+                    {...register("weight")}
                     placeholder="Es. 70"
-                    className="mt-1"
+                    className={`mt-1 ${errors.weight ? 'border-red-500' : ''}`}
                   />
+                  {errors.weight && <p className="text-sm text-red-500 mt-1">{errors.weight.message}</p>}
                 </div>
                 <div>
                   <Label htmlFor="height">Altezza (cm)</Label>
                   <Input
                     id="height"
                     type="number"
-                    value={formData.height}
-                    onChange={(e) => setFormData(prev => ({ ...prev, height: e.target.value }))}
+                    {...register("height")}
                     placeholder="Es. 175"
-                    className="mt-1"
+                    className={`mt-1 ${errors.height ? 'border-red-500' : ''}`}
                   />
+                  {errors.height && <p className="text-sm text-red-500 mt-1">{errors.height.message}</p>}
                 </div>
                 <div>
                   <Label htmlFor="fitnessLevel">Livello di Fitness</Label>
-                  <Select value={formData.fitnessLevel} onValueChange={(value) => setFormData(prev => ({ ...prev, fitnessLevel: value }))}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Seleziona il tuo livello" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {fitnessLevels.map((level) => (
-                        <SelectItem key={level.value} value={level.value}>
-                          {level.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name="fitnessLevel"
+                    control={control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <SelectTrigger className={`mt-1 ${errors.fitnessLevel ? 'border-red-500' : ''}`}>
+                          <SelectValue placeholder="Seleziona livello" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {fitnessLevels.map((level) => (
+                            <SelectItem key={level.value} value={level.value}>
+                              {level.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.fitnessLevel && <p className="text-sm text-red-500 mt-1">{errors.fitnessLevel.message}</p>}
                 </div>
               </div>
               <div className="mt-6">
                 <Label htmlFor="healthConditions">Condizioni di Salute o Infortuni Passati</Label>
                 <Textarea
                   id="healthConditions"
-                  value={formData.healthConditions}
-                  onChange={(e) => setFormData(prev => ({ ...prev, healthConditions: e.target.value }))}
+                  {...register("healthConditions")}
                   placeholder="Es. Mal di schiena, problemi al ginocchio, allergie... (opzionale)"
                   className="mt-1"
                   rows={3}
@@ -210,18 +217,25 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
               </h3>
               <div>
                 <Label htmlFor="goals">Obiettivo Principale</Label>
-                <Select value={formData.goals} onValueChange={(value) => setFormData(prev => ({ ...prev, goals: value }))}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Cosa vuoi raggiungere?" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {fitnessGoals.map((goal) => (
-                      <SelectItem key={goal.value} value={goal.value}>
-                        {goal.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="goals"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <SelectTrigger className={`mt-1 ${errors.goals ? 'border-red-500' : ''}`}>
+                        <SelectValue placeholder="Cosa vuoi raggiungere?" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {fitnessGoals.map((goal) => (
+                          <SelectItem key={goal.value} value={goal.value}>
+                            {goal.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.goals && <p className="text-sm text-red-500 mt-1">{errors.goals.message}</p>}
               </div>
             </div>
 
@@ -233,42 +247,52 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <Label htmlFor="availability">Disponibilità Settimanale</Label>
-                  <Select value={formData.availability} onValueChange={(value) => setFormData(prev => ({ ...prev, availability: value }))}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Quanto tempo puoi dedicare?" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1-2-hours">🕐 1-2 ore/settimana</SelectItem>
-                      <SelectItem value="3-4-hours">⏰ 3-4 ore/settimana</SelectItem>
-                      <SelectItem value="5-6-hours">⏳ 5-6 ore/settimana</SelectItem>
-                      <SelectItem value="7-plus-hours">💪 7+ ore/settimana</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name="availability"
+                    control={control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <SelectTrigger className={`mt-1 ${errors.availability ? 'border-red-500' : ''}`}>
+                          <SelectValue placeholder="Quanto tempo puoi dedicare?" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1-2-hours">🕐 1-2 ore/settimana</SelectItem>
+                          <SelectItem value="3-4-hours">⏰ 3-4 ore/settimana</SelectItem>
+                          <SelectItem value="5-6-hours">⏳ 5-6 ore/settimana</SelectItem>
+                          <SelectItem value="7-plus-hours">💪 7+ ore/settimana</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.availability && <p className="text-sm text-red-500 mt-1">{errors.availability.message}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="budget">Budget Mensile (FC)</Label>
-                  <Select
-                    onValueChange={(val) => setFormData(prev => ({ ...prev, budget: val }))}
-                    defaultValue={formData.budget}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Il tuo budget" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="50-100">💰 50-100 FC/mese</SelectItem>
-                      <SelectItem value="100-200">💎 100-200 FC/mese</SelectItem>
-                      <SelectItem value="200-300">🌟 200-300 FC/mese</SelectItem>
-                      <SelectItem value="300-plus">👑 300+ FC/mese</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name="budget"
+                    control={control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <SelectTrigger className={`mt-1 ${errors.budget ? 'border-red-500' : ''}`}>
+                          <SelectValue placeholder="Il tuo budget" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="50-100">💰 50-100 FC/mese</SelectItem>
+                          <SelectItem value="100-200">💎 100-200 FC/mese</SelectItem>
+                          <SelectItem value="200-300">🌟 200-300 FC/mese</SelectItem>
+                          <SelectItem value="300-plus">👑 300+ FC/mese</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.budget && <p className="text-sm text-red-500 mt-1">{errors.budget.message}</p>}
                 </div>
               </div>
               <div className="mt-6">
                 <Label htmlFor="location">Zona Preferita</Label>
                 <Input
                   id="location"
-                  value={formData.location}
-                  onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                  {...register("location")}
                   placeholder="Es. Milano Centro, Roma Prati, Napoli Vomero..."
                   className="mt-1"
                 />
@@ -277,7 +301,8 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
 
             <Button
               type="submit"
-              className="w-full gradient-primary text-white text-lg py-4 rounded-xl hover:scale-105 transition-transform"
+              className="w-full gradient-primary text-white text-lg py-4 rounded-xl hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!isValid}
             >
               🚀 Inizia il Tuo Percorso Fitness
             </Button>

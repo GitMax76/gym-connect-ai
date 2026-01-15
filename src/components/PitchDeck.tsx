@@ -275,9 +275,176 @@ const SimulationSlide = ({ active }: SimulationSlideProps) => {
     );
 };
 
+// Sub-componente per Advantage (Interactive Graph)
+const AdvantageSlide = ({ active }: { active: boolean }) => {
+    const [selectedNode, setSelectedNode] = useState<number | null>(null);
+
+    const nodes = [
+        {
+            id: 1,
+            title: "Libertà Totale",
+            subtitle: "Per gli Atleti",
+            description: "Accesso flessibile a migliaia di trainer e palestre senza abbonamenti vincolanti.",
+            color: "red",
+            icon: Search,
+            position: "top-0 left-1/2 -translate-x-1/2 -translate-y-4" // Top Center
+        },
+        {
+            id: 2,
+            title: "Business Autonomo",
+            subtitle: "Per i Trainer",
+            description: "Zero costi di marketing, riempimento automatico slot vuoti e gestione pagamenti integrata.",
+            color: "amber",
+            icon: Dumbbell,
+            position: "bottom-10 left-0 -translate-x-4" // Bottom Left
+        },
+        {
+            id: 3,
+            title: "Revenue Optimization",
+            subtitle: "Per le Strutture",
+            description: "Monetizza gli spazi inutilizzati e acquisisci nuovi membri senza sforzo commerciale.",
+            color: "blue",
+            icon: Building2,
+            position: "bottom-10 right-0 translate-x-4" // Bottom Right
+        }
+    ];
+
+    if (!active) return null;
+
+    return (
+        <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-slate-50 animate-fadeIn overflow-hidden">
+            <h2 className="text-3xl md:text-4xl font-bold mb-8 text-gray-900 z-10">GymConnect Advantage™</h2>
+
+            <div className="relative w-full max-w-2xl h-[500px] flex items-center justify-center">
+
+                {/* Background Connecting Lines */}
+                <svg className="absolute w-full h-full z-0 pointer-events-none opacity-30" viewBox="0 0 400 400">
+                    <circle cx="200" cy="200" r="140" fill="none" stroke="#CBD5E1" strokeWidth="2" strokeDasharray="10 10" className="animate-spin-slow-static" />
+                    {/* Dynamic Lines to Nodes */}
+                    {selectedNode === 1 && <line x1="200" y1="200" x2="200" y2="60" stroke="#EF4444" strokeWidth="4" className="animate-draw" />}
+                    {selectedNode === 2 && <line x1="200" y1="200" x2="60" y2="340" stroke="#F59E0B" strokeWidth="4" className="animate-draw" />}
+                    {selectedNode === 3 && <line x1="200" y1="200" x2="340" y2="340" stroke="#3B82F6" strokeWidth="4" className="animate-draw" />}
+                </svg>
+
+                {/* Central Hub - AI CORE */}
+                <div
+                    className={`absolute z-20 transition-all duration-700 ease-in-out transform flex flex-col items-center justify-center
+                        ${selectedNode === 1 ? 'translate-y-[60px]' : ''}
+                        ${selectedNode === 2 ? 'translate-x-[60px] -translate-y-[30px]' : ''} 
+                        ${selectedNode === 3 ? '-translate-x-[60px] -translate-y-[30px]' : ''}
+                    `}
+                >
+                    <div className={`
+                        w-32 h-32 md:w-40 md:h-40 rounded-full shadow-2xl flex flex-col items-center justify-center border-4 relative overflow-hidden bg-white
+                        ${selectedNode === 1 ? 'border-red-500 shadow-red-200' : ''}
+                        ${selectedNode === 2 ? 'border-amber-500 shadow-amber-200' : ''}
+                        ${selectedNode === 3 ? 'border-blue-500 shadow-blue-200' : 'border-blue-500'}
+                        transition-all duration-500
+                    `}>
+                        <Zap size={40} className={`mb-1 relative z-10 transition-colors ${selectedNode === 1 ? 'text-red-500' : selectedNode === 2 ? 'text-amber-500' : selectedNode === 3 ? 'text-blue-500' : 'text-blue-600'}`} />
+                        <span className="font-bold text-gray-800 text-sm md:text-base relative z-10">AI CORE</span>
+                    </div>
+                    {/* Info Box Appearing Below Hub */}
+                    {selectedNode && (
+                        <div className="absolute top-full mt-4 w-64 bg-white/90 backdrop-blur p-4 rounded-xl shadow-xl border border-gray-200 animate-slideUp text-center">
+                            <p className="font-bold text-gray-800 mb-1">{nodes.find(n => n.id === selectedNode)?.subtitle}</p>
+                            <p className="text-sm text-gray-600 leading-tight">{nodes.find(n => n.id === selectedNode)?.description}</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Nodes */}
+                {nodes.map((node) => (
+                    <div
+                        key={node.id}
+                        className={`absolute w-64 cursor-pointer transition-all duration-300 z-30 hover:scale-105 group
+                            ${node.position}
+                        `}
+                        onClick={() => setSelectedNode(node.id === selectedNode ? null : node.id)}
+                    >
+                        <div className={`p-4 rounded-xl border-2 shadow-lg text-center transition-colors bg-white
+                            ${selectedNode === node.id ? `border-${node.color}-500 ring-4 ring-${node.color}-100` : `border-${node.color}-200 hover:border-${node.color}-400`}
+                        `}>
+                            <h4 className={`font-bold text-${node.color}-600 mb-1`}>{node.title}</h4>
+                            <p className="text-sm text-gray-600">{node.subtitle}</p>
+                        </div>
+                    </div>
+                ))}
+
+            </div>
+
+            <p className="mt-8 text-gray-400 text-sm animate-pulse">Clicca sui nodi per connettere l'AI Core</p>
+        </div>
+    );
+};
+
+// Sub-componente per FitCoin Strategy
+const FitCoinSlide = ({ active }: { active: boolean }) => {
+    if (!active) return null;
+    return (
+        <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-slate-900 text-white animate-fadeIn">
+            <h2 className="text-4xl font-bold mb-8 text-green-400">Il Motore Finanziario: FitCoin (FC)</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-6xl w-full items-center">
+                {/* Sinistra: La Valuta */}
+                <div className="space-y-8">
+                    <div className="bg-white/10 p-6 rounded-2xl border border-green-500/30 backdrop-blur-sm">
+                        <div className="flex items-center gap-4 mb-4">
+                            <div className="p-3 bg-green-500 rounded-full text-white">
+                                <DollarSign size={24} />
+                            </div>
+                            <h3 className="text-2xl font-bold">Economia a Circuito Chiuso</h3>
+                        </div>
+                        <p className="text-gray-300 leading-relaxed">
+                            Una valuta interna che genera <strong>cash flow immediato</strong>. Gli utenti pre-pagano i servizi, massimizzando la liquidità della piattaforma e riducendo l'attrito.
+                        </p>
+                    </div>
+
+                    <div className="bg-white/10 p-6 rounded-2xl border border-blue-500/30 backdrop-blur-sm">
+                        <div className="flex items-center gap-4 mb-4">
+                            <div className="p-3 bg-blue-500 rounded-full text-white">
+                                <Users size={24} />
+                            </div>
+                            <h3 className="text-2xl font-bold">Referral Loop Virale</h3>
+                        </div>
+                        <p className="text-gray-300 leading-relaxed">
+                            <strong>Dai 15 FC, Ricevi 15 FC</strong>. Nessuna percentuale complessa. Valore tangibile che porta il CAC (Costo Acquisizione Cliente) vicino allo zero.
+                        </p>
+                    </div>
+                </div>
+
+                {/* Destra: Le Metriche */}
+                <div className="relative">
+                    <div className="absolute inset-0 bg-green-500/20 blur-3xl rounded-full" />
+                    <div className="relative bg-black/40 p-8 rounded-3xl border border-green-500/50 space-y-6">
+                        <h3 className="text-xl font-bold text-gray-400 uppercase tracking-widest mb-4">Economia Unitaria</h3>
+
+                        <div className="flex justify-between items-center border-b border-gray-700 pb-4">
+                            <span>Cash Flow</span>
+                            <span className="text-green-400 font-bold text-xl">Anticipato (T-0)</span>
+                        </div>
+                        <div className="flex justify-between items-center border-b border-gray-700 pb-4">
+                            <span>Payout Trainer</span>
+                            <span className="text-white font-bold text-xl">All'Erogazione (T+X)</span>
+                        </div>
+                        <div className="flex justify-between items-center border-b border-gray-700 pb-4">
+                            <span>Fee Piattaforma</span>
+                            <span className="text-blue-400 font-bold text-xl">15% - 25%</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-2">
+                            <span>Breakage (Non Speso)</span>
+                            <span className="text-amber-400 font-bold text-xl">~12% (Est.)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export default function PitchDeck() {
     const [currentSlide, setCurrentSlide] = useState(0);
-    const totalSlides = 6;
+    const totalSlides = 7; // Increased for FitCoin Strategy
 
     const nextSlide = () => {
         if (currentSlide < totalSlides - 1) setCurrentSlide(curr => curr + 1);
@@ -340,6 +507,8 @@ export default function PitchDeck() {
                     <div className="absolute bottom-20 right-20 opacity-20 animate-float-slow" style={{ animationDelay: '1s' }}><Building2 size={80} /></div>
                 </SlideContainer>
 
+
+
                 {/* SLIDE 2: IL PROBLEMA (THE GAP) */}
                 <SlideContainer active={currentSlide === 1}>
                     <div className="max-w-6xl mx-auto w-full">
@@ -373,73 +542,19 @@ export default function PitchDeck() {
                 </SlideContainer>
 
                 {/* SLIDE 3: LA SOLUZIONE (CORE VALUE) */}
-                <SlideContainer active={currentSlide === 2} className="bg-slate-50 overflow-y-auto">
-                    <div className="max-w-5xl mx-auto text-center py-8">
-                        <h2 className="text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-gray-900">GymConnect Advantage™</h2>
-
-                        {/* Interactive Graph */}
-                        <div className="relative w-full max-w-2xl mx-auto min-h-[600px] md:h-[500px] flex flex-col md:block items-center justify-center gap-6">
-
-                            {/* Mobile Guide Text */}
-                            <p className="md:hidden text-sm text-gray-500 mb-4 animate-pulse">Tocca le card per i dettagli</p>
-
-                            {/* Central Hub */}
-                            <div className="relative md:absolute z-20 top-1/2 left-1/2 transform md:-translate-x-1/2 md:-translate-y-1/2 bg-white w-32 h-32 md:w-40 md:h-40 rounded-full shadow-2xl flex flex-col items-center justify-center border-4 border-blue-500 animate-pulse-slow my-4 md:my-0">
-                                <Zap size={36} className="text-blue-600 mb-1" />
-                                <span className="font-bold text-gray-800 text-sm md:text-base">CONNECT</span>
-                                <span className="text-[10px] md:text-xs text-gray-500">AI Engine</span>
-                            </div>
-
-                            {/* Connecting Lines (SVG) - Hidden on Mobile to reduce clutter or adjusted */}
-                            <svg className="hidden md:block absolute w-full h-full z-0 animate-spin-slow-static opacity-30 pointer-events-none" viewBox="0 0 400 400">
-                                <circle cx="200" cy="200" r="140" fill="none" stroke="#CBD5E1" strokeWidth="2" strokeDasharray="10 10" />
-                            </svg>
-
-                            {/* Nodes - Interactive */}
-                            {/* Node 1: Atleti */}
-                            <div
-                                className="relative md:absolute md:top-0 md:left-1/2 md:transform md:-translate-x-1/2 md:-translate-y-4 w-64 cursor-pointer transition-transform hover:scale-105 z-30"
-                                onClick={() => alert("Per gli Atleti:\nAccesso flessibile a migliaia di trainer e palestre senza abbonamenti vincolanti.")}
-                            >
-                                <div className="bg-red-50 p-4 rounded-xl border border-red-200 shadow-lg text-center hover:bg-red-100 transition-colors">
-                                    <h4 className="font-bold text-red-600 mb-1">Libertà Totale</h4>
-                                    <p className="text-sm text-gray-600">Per gli Atleti <span className="text-xs text-red-400 block mt-1">(Tocca per info)</span></p>
-                                </div>
-                            </div>
-
-                            {/* Node 2: Trainer */}
-                            <div
-                                className="relative md:absolute md:bottom-10 md:left-0 md:transform md:-translate-x-4 w-64 cursor-pointer transition-transform hover:scale-105 z-30"
-                                onClick={() => alert("Per i Trainer:\nZero costi di marketing, riempimento automatico slot vuoti e gestione pagamenti integrata.")}
-                            >
-                                <div className="bg-amber-50 p-4 rounded-xl border border-amber-200 shadow-lg text-center hover:bg-amber-100 transition-colors">
-                                    <h4 className="font-bold text-amber-600 mb-1">Business Autonomo</h4>
-                                    <p className="text-sm text-gray-600">Per i Trainer <span className="text-xs text-amber-400 block mt-1">(Tocca per info)</span></p>
-                                </div>
-                            </div>
-
-                            {/* Node 3: Strutture */}
-                            <div
-                                className="relative md:absolute md:bottom-10 md:right-0 md:transform md:translate-x-4 w-64 cursor-pointer transition-transform hover:scale-105 z-30"
-                                onClick={() => alert("Per le Strutture:\nMonetizza gli spazi inutilizzati e acquisisci nuovi membri senza sforzo commerciale.")}
-                            >
-                                <div className="bg-blue-50 p-4 rounded-xl border border-blue-200 shadow-lg text-center hover:bg-blue-100 transition-colors">
-                                    <h4 className="font-bold text-blue-600 mb-1">Revenue Optimization</h4>
-                                    <p className="text-sm text-gray-600">Per le Strutture <span className="text-xs text-blue-400 block mt-1">(Tocca per info)</span></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </SlideContainer>
+                <AdvantageSlide active={currentSlide === 2} />
 
                 {/* SLIDE 4: DEEP DIVE INTERATTIVO */}
                 <DeepDiveSlide active={currentSlide === 3} />
 
-                {/* SLIDE 5: SIMULAZIONE (USE CASE) */}
-                <SimulationSlide active={currentSlide === 4} />
+                {/* SLIDE 5: FITCOIN ECONOMY (NEW) */}
+                <FitCoinSlide active={currentSlide === 4} />
 
-                {/* SLIDE 6: CONCLUSIONE */}
-                <SlideContainer active={currentSlide === 5} className="bg-gradient-to-br from-gray-900 to-blue-900 text-white">
+                {/* SLIDE 6: SIMULAZIONE (USE CASE) */}
+                <SimulationSlide active={currentSlide === 5} />
+
+                {/* SLIDE 7: CONCLUSIONE */}
+                <SlideContainer active={currentSlide === 6} className="bg-gradient-to-br from-gray-900 to-blue-900 text-white">
                     <div className="max-w-3xl mx-auto text-center">
                         <div className="mb-8">
                             <TrendingUp size={64} className="mx-auto text-green-400 mb-4" />

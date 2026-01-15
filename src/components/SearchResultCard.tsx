@@ -25,7 +25,7 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({
   const gym = !isTrainer ? result as GymSearchResult : null;
 
   return (
-    <Card className="w-full hover:shadow-lg transition-shadow duration-200">
+    <Card className="w-full hover:shadow-lg transition-all duration-300 hover-lift border-transparent hover:border-primary/20">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold">

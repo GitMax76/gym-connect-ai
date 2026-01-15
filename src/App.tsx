@@ -5,6 +5,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { Toaster } from 'sonner';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
+import FitnessLoader from '@/components/FitnessLoader';
 
 const LoginPage = React.lazy(() => import('@/pages/LoginPage'));
 const RegisterPage = React.lazy(() => import('@/pages/RegisterPage'));
@@ -30,10 +31,7 @@ const queryClient = new QueryClient();
 
 const LoadingFallback = () => (
   <div className="h-screen w-full flex items-center justify-center bg-slate-50">
-    <div className="flex flex-col items-center gap-2">
-      <Loader2 className="h-8 w-8 animate-spin text-green-600" />
-      <p className="text-sm text-slate-500">Caricamento...</p>
-    </div>
+    <FitnessLoader />
   </div>
 );
 
@@ -46,12 +44,14 @@ function App() {
             <Toaster />
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
-                <Route path="/business.html" element={<Navigate to="/business.html" replace />} />
+                <Route path="/business.html" element={<InvestorPage />} />
+                <Route path="/investors" element={<InvestorPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/pitch" element={<PitchPage />} />
                 <Route path="/credits" element={<CreditsPage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/terms" element={<TermsPage />} />
+                {/* Draft Route removed */}
 
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />

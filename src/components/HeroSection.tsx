@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Users, Calendar, Search, Dumbbell, MapPin, Trophy, Building2, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import RoleSelector from './RoleSelector';
-import { motion } from 'framer-motion';
+
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -223,7 +223,7 @@ const HeroSection = () => {
               <div className="flex justify-center gap-4 mb-16">
                 <Button
                   size="lg"
-                  className={`text-white text-lg px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 ${selectedRole === 'user' ? 'bg-green-600 hover:bg-green-700' :
+                  className={`text-white text-lg px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 animate-heartbeat ${selectedRole === 'user' ? 'bg-green-600 hover:bg-green-700' :
                     selectedRole === 'instructor' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-orange-600 hover:bg-orange-700'
                     }`}
                   onClick={() => navigate('/register')}
