@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import RoleSelector from '@/components/RoleSelector';
 import UserRegistrationForm from '@/components/UserRegistrationForm';
@@ -15,63 +15,105 @@ const RegisterPage = () => {
   const [selectedRole, setSelectedRole] = useState<'user' | 'instructor' | 'gym' | ''>('');
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { profile, updateProfile, createUserProfile, createTrainerProfile, createGymProfile, loading } = useProfile();
+  const { user, signUp } = useAuth();
+  const { profile, createUserProfile, createTrainerProfile, createGymProfile, loading } = useProfile();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    // if (!user) {
-    //   navigate('/auth');
-    //   return;
-    // }
+    // Check URL parameters first
+    const roleParam = searchParams.get('role');
+    if (roleParam && ['user', 'instructor', 'gym'].includes(roleParam)) {
+      setSelectedRole(roleParam as 'user' | 'instructor' | 'gym');
+      setStep('form');
+      return;
+    }
 
-    // Se l'utente ha già completato la profilazione, vai alla dashboard
-    if (profile?.user_type && (profile.first_name || profile.last_name)) {
+    // Redirect to dashboard if profile is fully complete
+    if (user && profile?.user_type && (profile.first_name || profile.last_name)) {
       navigate('/dashboard');
       return;
     }
 
-    // Se l'utente ha già un tipo ma non ha completato il profilo, vai direttamente al form
-    if (profile?.user_type) {
+    // This block might be annoying if users want to create a new role? 
+    // But for now keeping logic: if user has a type but incomplete profile, send to form.
+    if (user && profile?.user_type && !profile.first_name) {
       const roleMapping = {
         'user': 'user',
         'trainer': 'instructor',
         'gym_owner': 'gym'
       } as const;
 
-      setSelectedRole(roleMapping[profile.user_type]);
-      setStep('form');
+      // Only force if matches valid roles
+      if (profile.user_type in roleMapping) {
+        setSelectedRole(roleMapping[profile.user_type as keyof typeof roleMapping]);
+        setStep('form');
+      }
     }
-  }, [user, profile, navigate, loading]);
+  }, [user, profile, navigate, loading, searchParams]);
 
-  const handleRoleSelect = async (role: 'user' | 'instructor' | 'gym') => {
-    const userType = role === 'instructor' ? 'trainer' : role === 'gym' ? 'gym_owner' : 'user';
-
-    // Update the base profile with the selected user type
-    const { error } = await updateProfile({ user_type: userType });
-
-    if (error) {
-      toast({
-        title: "Errore",
-        description: "Errore nel salvare il tipo di utente",
-        variant: "destructive"
-      });
-      return;
-    }
-
+  const handleRoleSelect = (role: 'user' | 'instructor' | 'gym') => {
     setSelectedRole(role);
     setStep('form');
+    // We do NOT save to DB yet. We wait for registration form submission.
   };
 
   const handleFormSubmit = async (data: any) => {
     console.log('Registration data:', { role: selectedRole, ...data });
+    let currentUserId = user?.id;
 
     try {
+      // 1. If no user, Sign Up first
+      if (!currentUserId) {
+        if (!data.email || !data.password) {
+          toast({
+            title: "Dati mancanti",
+            description: "Email e Password sono richiesti per la registrazione.",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        const userTypeMap = {
+          'user': 'user',
+          'instructor': 'trainer',
+          'gym': 'gym_owner'
+        };
+
+        // Prepare metadata for the trigger to create initial profile
+        const metadata = {
+          user_type: userTypeMap[selectedRole],
+          first_name: data.firstName || data.name?.split(' ')[0] || data.ownerName || '',
+          last_name: data.lastName || data.name?.split(' ').slice(1).join(' ') || '',
+        };
+
+        const { data: authData, error: authError } = await signUp(data.email, data.password, metadata);
+
+        if (authError || !authData?.user) {
+          // Error is already toasted in signUp check if needed? 
+          // signUp function in AuthContext toasts on error.
+          return;
+        }
+
+        currentUserId = authData.user.id;
+
+        // If session is null (email verification required), we stop here?
+        // We can try to create profile, but RLS might block.
+        if (!authData.session) {
+          // We can't proceed with profile creation without a session usually
+          // But the Trigger likely created the basic profile row.
+          // We return, as we can't complete the secondary profile tables.
+          // toast in signUp likely already said "Check email".
+          return;
+        }
+      }
+
+      // 2. Create Specific Role Profile
       let error = null;
+      let result = null;
 
       switch (selectedRole) {
         case 'user':
           const userData = data as UserRegistrationData;
-          // Transform form data to match database schema
           const userProfileData = {
             age: userData.age,
             weight: userData.weight,
@@ -85,14 +127,12 @@ const RegisterPage = () => {
             health_conditions: userData.healthConditions,
             experience_description: userData.goals
           };
-
-          const userResult = await createUserProfile(userProfileData);
-          error = userResult.error;
+          // Pass currentUserId explicitly
+          result = await createUserProfile(userProfileData, currentUserId);
           break;
 
         case 'instructor':
           const trainerData = data as TrainerRegistrationData;
-          // Transform form data to match database schema
           const trainerProfileData = {
             date_of_birth: trainerData.dateOfBirth,
             bio: trainerData.bio,
@@ -105,14 +145,11 @@ const RegisterPage = () => {
             preferred_areas: trainerData.preferredAreas,
             availability_schedule: { slots: trainerData.availability } // Wrap in object as expected by schema
           };
-
-          const trainerResult = await createTrainerProfile(trainerProfileData);
-          error = trainerResult.error;
+          result = await createTrainerProfile(trainerProfileData, currentUserId);
           break;
 
         case 'gym':
           const gymData = data as GymRegistrationData;
-          // Transform form data to match database schema
           const gymProfileData = {
             gym_name: gymData.gymName,
             business_email: gymData.email,
@@ -128,37 +165,22 @@ const RegisterPage = () => {
             member_capacity: gymData.memberCapacity,
             subscription_plans: gymData.subscriptionPlans as any
           };
-
-          const gymResult = await createGymProfile(gymProfileData);
-          error = gymResult.error;
+          result = await createGymProfile(gymProfileData, currentUserId);
           break;
       }
+
+      error = result?.error;
 
       if (error) {
         toast({
           title: "Errore",
-          description: "Errore nel salvare il profilo",
+          description: "Errore nel salvare il profilo: " + (typeof error === 'string' ? error : JSON.stringify(error)),
           variant: "destructive"
         });
         return;
       }
 
-      // Update base profile with additional info
-      // Handle the diversity of data keys safely
-      const firstName = 'firstName' in data ? data.firstName :
-        'ownerName' in data ? data.ownerName :
-          'name' in data ? data.name?.split(' ')[0] : '';
-
-      const lastName = 'lastName' in data ? data.lastName :
-        'name' in data ? data.name?.split(' ').slice(1).join(' ') : '';
-
-      await updateProfile({
-        first_name: firstName,
-        last_name: lastName,
-        phone: data.phone,
-        city: data.city || data.location // Use location for user if city not present
-      });
-
+      // 3. Success Feedback
       let welcomeMessage = '';
       let description = '';
 
@@ -186,7 +208,7 @@ const RegisterPage = () => {
     } catch (error) {
       console.error('Error during registration:', error);
       toast({
-        title: "Errore",
+        title: "Errore Non Gestito",
         description: "Errore durante la registrazione",
         variant: "destructive"
       });
@@ -194,8 +216,11 @@ const RegisterPage = () => {
   };
 
   const handleBack = () => {
+    // If URL has param, maybe go home? But simple back to role is fine
     setStep('role');
     setSelectedRole('');
+    // Optional: Clear URL param?
+    navigate('/register');
   };
 
   // Helper functions
