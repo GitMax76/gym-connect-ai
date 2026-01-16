@@ -5,6 +5,7 @@ import RoleSelector from '@/components/RoleSelector';
 import UserRegistrationForm from '@/components/UserRegistrationForm';
 import GymRegistrationForm from '@/components/GymRegistrationForm';
 import TrainerRegistrationForm from '@/components/TrainerRegistrationForm';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
@@ -295,15 +296,17 @@ const RegisterPage = () => {
             </div>
           ) : (
             <div className="animate-slide-up">
-              {selectedRole === 'user' && (
-                <UserRegistrationForm onSubmit={handleFormSubmit} onBack={handleBack} isSubmitting={isSubmitting} />
-              )}
-              {selectedRole === 'instructor' && (
-                <TrainerRegistrationForm onSubmit={handleFormSubmit} onBack={handleBack} isSubmitting={isSubmitting} />
-              )}
-              {selectedRole === 'gym' && (
-                <GymRegistrationForm onSubmit={handleFormSubmit} onBack={handleBack} isSubmitting={isSubmitting} />
-              )}
+              <ErrorBoundary>
+                {selectedRole === 'user' && (
+                  <UserRegistrationForm onSubmit={handleFormSubmit} onBack={handleBack} isSubmitting={isSubmitting} />
+                )}
+                {selectedRole === 'instructor' && (
+                  <TrainerRegistrationForm onSubmit={handleFormSubmit} onBack={handleBack} isSubmitting={isSubmitting} />
+                )}
+                {selectedRole === 'gym' && (
+                  <GymRegistrationForm onSubmit={handleFormSubmit} onBack={handleBack} isSubmitting={isSubmitting} />
+                )}
+              </ErrorBoundary>
             </div>
           )}
         </div>

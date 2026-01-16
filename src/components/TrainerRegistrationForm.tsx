@@ -49,11 +49,11 @@ const TrainerRegistrationForm = ({ onSubmit, onBack, isSubmitting = false }: Tra
     }
   });
 
-  const passwordValue = watch("password");
-  const watchedCertifications = watch("certifications");
-  const watchedSpecializations = watch("specializations");
-  const watchedLanguages = watch("languages");
-  const watchedAvailability = watch("availability");
+  const passwordValue = watch("password") || "";
+  const watchedCertifications = watch("certifications") || [];
+  const watchedSpecializations = watch("specializations") || [];
+  const watchedLanguages = watch("languages") || [];
+  const watchedAvailability = watch("availability") || [];
 
   const certificationOptions = [
     'CONI', 'NASM', 'ACSM', 'ISSA', 'ACE', 'NSCA',

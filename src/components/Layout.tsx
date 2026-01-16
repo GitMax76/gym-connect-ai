@@ -68,8 +68,8 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
               <div className="hidden md:flex items-center space-x-4">
                 {location.pathname === '/' ? (
                   <>
-                    <Button variant="ghost" onClick={() => navigate('/login')}>
-                      {t('nav.login')}
+                    <Button variant="outline" className="border-green-600 text-green-700 hover:bg-green-50" onClick={() => navigate('/login')}>
+                      {t('nav.login') || "ACCEDI"}
                     </Button>
                     <Button onClick={() => navigate('/register')} className="gradient-primary text-white">
                       {t('nav.register')}
@@ -90,8 +90,8 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                   </>
                 ) : (
                   <>
-                    <Button variant="ghost" onClick={() => navigate('/login')}>
-                      {t('nav.login')}
+                    <Button variant="outline" className="border-green-600 text-green-700 hover:bg-green-50" onClick={() => navigate('/login')}>
+                      {t('nav.login') || "ACCEDI"}
                     </Button>
                     <Button variant="outline" onClick={() => navigate('/')}>
                       {t('nav.home')}
@@ -143,8 +143,8 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                         </>
                       ) : (
                         <>
-                          <Button variant="ghost" onClick={() => navigate('/login')}>
-                            {t('nav.login')}
+                          <Button variant="outline" className="w-full justify-start border-green-600 text-green-700" onClick={() => navigate('/login')}>
+                            {t('nav.login') || "ACCEDI"}
                           </Button>
                           <Button className="gradient-primary text-white" onClick={() => navigate('/register')}>
                             {t('nav.register')}
