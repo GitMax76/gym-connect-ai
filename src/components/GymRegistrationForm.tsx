@@ -16,9 +16,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 interface GymRegistrationFormProps {
   onSubmit: (data: any) => void;
   onBack: () => void;
+  isSubmitting?: boolean;
 }
 
-const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => {
+const GymRegistrationForm = ({ onSubmit, onBack, isSubmitting = false }: GymRegistrationFormProps) => {
   const { t } = useLanguage();
   const { user } = useAuth();
 
@@ -33,15 +34,22 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
     resolver: zodResolver(gymRegistrationSchema),
     mode: "onChange",
     defaultValues: {
+      gymName: "",
+      ownerName: "",
       email: user?.email || '',
       password: "",
       phone: "+39 ",
+      address: "",
+      city: "",
+      postalCode: "",
+      description: "",
       facilities: [],
       openingDays: [],
-      specializations: [], // Added initialization
-      subscriptionPlans: [],
-      openingHours: '07:00',
-      closingHours: '22:00'
+      openingHours: "",
+      closingHours: "",
+      memberCapacity: undefined,
+      specializations: [],
+      subscriptionPlans: []
     }
   });
 
@@ -487,10 +495,17 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
           </Button>
           <Button
             type="submit"
-            className="px-8 py-3 bg-gradient-to-r from-orange-600 to-red-500 text-white hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!isValid || fields.length === 0}
+            className="px-8 py-3 bg-gradient-to-r from-orange-600 to-red-500 text-white hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            disabled={!isValid || fields.length === 0 || isSubmitting}
           >
-            🚀 {t('form.submit.gym')}
+            {isSubmitting ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Wait...
+              </>
+            ) : (
+              <>🚀 {t('form.submit.gym')}</>
+            )}
           </Button>
         </div>
       </form>

@@ -23,6 +23,7 @@ export const userRegistrationSchema = z.object({
     location: z.string().optional(),
     healthConditions: z.string().optional(),
     referralCode: z.string().optional(),
+    city: z.string().min(2, "Inserisci una città valida"),
 });
 
 export const trainerRegistrationSchema = z.object({

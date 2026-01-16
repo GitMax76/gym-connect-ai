@@ -15,9 +15,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 interface TrainerRegistrationFormProps {
   onSubmit: (data: any) => void;
   onBack: () => void;
+  isSubmitting?: boolean;
 }
 
-const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormProps) => {
+const TrainerRegistrationForm = ({ onSubmit, onBack, isSubmitting = false }: TrainerRegistrationFormProps) => {
   const { t } = useLanguage();
   const {
     register,
@@ -30,8 +31,16 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
     resolver: zodResolver(trainerRegistrationSchema),
     mode: "onChange",
     defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
       phone: "+39 ",
       password: "",
+      city: "",
+      bio: "",
+      experience: undefined, // Number inputs prefer undefined or empty string, handled by coercion
+      personalRate: undefined,
+      groupRate: undefined,
       certifications: [],
       specializations: [],
       languages: [],
@@ -373,10 +382,17 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
           </Button>
           <Button
             type="submit"
-            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!isValid}
+            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            disabled={!isValid || isSubmitting}
           >
-            🚀 {t('form.submit.trainer')}
+            {isSubmitting ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Wait...
+              </>
+            ) : (
+              <>🚀 {t('form.submit.trainer')}</>
+            )}
           </Button>
         </div>
         {!isValid && (

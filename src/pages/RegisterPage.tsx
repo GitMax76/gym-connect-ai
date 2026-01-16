@@ -13,6 +13,7 @@ import { UserRegistrationData, TrainerRegistrationData, GymRegistrationData } fr
 const RegisterPage = () => {
   const [step, setStep] = useState<'role' | 'form'>('role');
   const [selectedRole, setSelectedRole] = useState<'user' | 'instructor' | 'gym' | ''>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user, signUp } = useAuth();
@@ -58,6 +59,7 @@ const RegisterPage = () => {
   };
 
   const handleFormSubmit = async (data: any) => {
+    setIsSubmitting(true);
     console.log('Registration data:', { role: selectedRole, ...data });
     let currentUserId = user?.id;
 
@@ -70,6 +72,7 @@ const RegisterPage = () => {
             description: "Email e Password sono richiesti per la registrazione.",
             variant: "destructive"
           });
+          setIsSubmitting(false);
           return;
         }
 
@@ -91,6 +94,7 @@ const RegisterPage = () => {
         if (authError || !authData?.user) {
           // Error is already toasted in signUp check if needed? 
           // signUp function in AuthContext toasts on error.
+          setIsSubmitting(false);
           return;
         }
 
@@ -103,6 +107,7 @@ const RegisterPage = () => {
           // But the Trigger likely created the basic profile row.
           // We return, as we can't complete the secondary profile tables.
           // toast in signUp likely already said "Check email".
+          setIsSubmitting(false);
           return;
         }
       }
@@ -177,6 +182,7 @@ const RegisterPage = () => {
           description: "Errore nel salvare il profilo: " + (typeof error === 'string' ? error : JSON.stringify(error)),
           variant: "destructive"
         });
+        setIsSubmitting(false);
         return;
       }
 
@@ -212,6 +218,7 @@ const RegisterPage = () => {
         description: "Errore durante la registrazione",
         variant: "destructive"
       });
+      setIsSubmitting(false); // Added setIsSubmitting(false) here
     }
   };
 
@@ -273,21 +280,29 @@ const RegisterPage = () => {
                 Unisciti alla rivoluzione del fitness intelligente. Scegli il tuo ruolo e inizia a creare
                 connessioni autentiche nel mondo del benessere e della forma fisica.
               </p>
-              <p className="text-lg text-green-600 font-medium mb-12">
+              <p className="text-lg text-green-600 font-medium mb-8">
                 ✨ Oltre 10.000 professionisti già connessi ✨
               </p>
+
+              <div className="mb-12">
+                <p className="text-slate-500 mb-2">Hai già un account?</p>
+                <Button variant="outline" onClick={() => navigate('/login')} className="border-green-600 text-green-700 hover:bg-green-50">
+                  Accedi qui
+                </Button>
+              </div>
+
               <RoleSelector onRoleSelect={handleRoleSelect} selectedRole={selectedRole} />
             </div>
           ) : (
             <div className="animate-slide-up">
               {selectedRole === 'user' && (
-                <UserRegistrationForm onSubmit={handleFormSubmit} onBack={handleBack} />
+                <UserRegistrationForm onSubmit={handleFormSubmit} onBack={handleBack} isSubmitting={isSubmitting} />
               )}
               {selectedRole === 'instructor' && (
-                <TrainerRegistrationForm onSubmit={handleFormSubmit} onBack={handleBack} />
+                <TrainerRegistrationForm onSubmit={handleFormSubmit} onBack={handleBack} isSubmitting={isSubmitting} />
               )}
               {selectedRole === 'gym' && (
-                <GymRegistrationForm onSubmit={handleFormSubmit} onBack={handleBack} />
+                <GymRegistrationForm onSubmit={handleFormSubmit} onBack={handleBack} isSubmitting={isSubmitting} />
               )}
             </div>
           )}

@@ -15,9 +15,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 interface UserRegistrationFormProps {
   onSubmit: (data: any) => void;
   onBack: () => void;
+  isSubmitting?: boolean;
 }
 
-const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) => {
+const UserRegistrationForm = ({ onSubmit, onBack, isSubmitting = false }: UserRegistrationFormProps) => {
   const { t } = useLanguage();
   const {
     register,
@@ -30,10 +31,20 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
     mode: "onChange",
 
     defaultValues: {
-      location: "",
+      name: "",
+      email: "",
       password: "",
+      age: undefined,
+      weight: undefined,
+      height: undefined,
+      city: "",
+      location: "",
       referralCode: "",
-      healthConditions: ""
+      healthConditions: "",
+      goals: undefined, // Selects might need distinct defaults or undefined
+      fitnessLevel: undefined,
+      availability: undefined,
+      budget: undefined
     }
   });
 
@@ -139,7 +150,19 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
                   />
                   {errors.age && <p className="text-sm text-red-500 mt-1">{errors.age.message}</p>}
                 </div>
-                <div className="md:col-span-2">
+              </div>
+              <div className="md:col-span-2 grid md:grid-cols-2 gap-6">
+                <div>
+                  <Label htmlFor="city">{t('form.city')}</Label>
+                  <Input
+                    id="city"
+                    {...register("city")}
+                    placeholder="La tua città"
+                    className={`mt-1 ${errors.city ? 'border-red-500' : ''}`}
+                  />
+                  {errors.city && <p className="text-sm text-red-500 mt-1">{errors.city.message}</p>}
+                </div>
+                <div>
                   <Label htmlFor="referralCode" className="text-blue-600 font-bold">Hai un codice amico? (Opzionale)</Label>
                   <Input
                     id="referralCode"
@@ -150,170 +173,178 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Sezione Dati Fisici */}
-            <div className="bg-green-50 p-6 rounded-xl">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
-                📊 Dati Fisici & Salute
-              </h3>
-              <div className="grid md:grid-cols-3 gap-6">
-                <div>
-                  <Label htmlFor="weight">Peso (kg)</Label>
-                  <Input
-                    id="weight"
-                    type="number"
-                    {...register("weight")}
-                    placeholder="Es. 70"
-                    className={`mt-1 ${errors.weight ? 'border-red-500' : ''}`}
-                  />
-                  {errors.weight && <p className="text-sm text-red-500 mt-1">{errors.weight.message}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="height">Altezza (cm)</Label>
-                  <Input
-                    id="height"
-                    type="number"
-                    {...register("height")}
-                    placeholder="Es. 175"
-                    className={`mt-1 ${errors.height ? 'border-red-500' : ''}`}
-                  />
-                  {errors.height && <p className="text-sm text-red-500 mt-1">{errors.height.message}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="fitnessLevel">Livello di Fitness</Label>
-                  <Controller
-                    name="fitnessLevel"
-                    control={control}
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <SelectTrigger className={`mt-1 ${errors.fitnessLevel ? 'border-red-500' : ''}`}>
-                          <SelectValue placeholder="Seleziona livello" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {fitnessLevels.map((level) => (
-                            <SelectItem key={level.value} value={level.value}>
-                              {level.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.fitnessLevel && <p className="text-sm text-red-500 mt-1">{errors.fitnessLevel.message}</p>}
-                </div>
-              </div>
-              <div className="mt-6">
-                <Label htmlFor="healthConditions">Condizioni di Salute o Infortuni Passati</Label>
-                <Textarea
-                  id="healthConditions"
-                  {...register("healthConditions")}
-                  placeholder="Es. Mal di schiena, problemi al ginocchio, allergie... (opzionale)"
-                  className="mt-1"
-                  rows={3}
-                />
-              </div>
-            </div>
-
-            {/* Sezione Obiettivi Fitness */}
-            <div className="bg-blue-50 p-6 rounded-xl">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
-                🎯 I Tuoi Obiettivi Fitness
-              </h3>
+          {/* Sezione Dati Fisici */}
+          <div className="bg-green-50 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+              📊 Dati Fisici & Salute
+            </h3>
+            <div className="grid md:grid-cols-3 gap-6">
               <div>
-                <Label htmlFor="goals">Obiettivo Principale</Label>
+                <Label htmlFor="weight">Peso (kg)</Label>
+                <Input
+                  id="weight"
+                  type="number"
+                  {...register("weight")}
+                  placeholder="Es. 70"
+                  className={`mt-1 ${errors.weight ? 'border-red-500' : ''}`}
+                />
+                {errors.weight && <p className="text-sm text-red-500 mt-1">{errors.weight.message}</p>}
+              </div>
+              <div>
+                <Label htmlFor="height">Altezza (cm)</Label>
+                <Input
+                  id="height"
+                  type="number"
+                  {...register("height")}
+                  placeholder="Es. 175"
+                  className={`mt-1 ${errors.height ? 'border-red-500' : ''}`}
+                />
+                {errors.height && <p className="text-sm text-red-500 mt-1">{errors.height.message}</p>}
+              </div>
+              <div>
+                <Label htmlFor="fitnessLevel">Livello di Fitness</Label>
                 <Controller
-                  name="goals"
+                  name="fitnessLevel"
                   control={control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <SelectTrigger className={`mt-1 ${errors.goals ? 'border-red-500' : ''}`}>
-                        <SelectValue placeholder="Cosa vuoi raggiungere?" />
+                      <SelectTrigger className={`mt-1 ${errors.fitnessLevel ? 'border-red-500' : ''}`}>
+                        <SelectValue placeholder="Seleziona livello" />
                       </SelectTrigger>
                       <SelectContent>
-                        {fitnessGoals.map((goal) => (
-                          <SelectItem key={goal.value} value={goal.value}>
-                            {goal.label}
+                        {fitnessLevels.map((level) => (
+                          <SelectItem key={level.value} value={level.value}>
+                            {level.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   )}
                 />
-                {errors.goals && <p className="text-sm text-red-500 mt-1">{errors.goals.message}</p>}
+                {errors.fitnessLevel && <p className="text-sm text-red-500 mt-1">{errors.fitnessLevel.message}</p>}
               </div>
             </div>
+            <div className="mt-6">
+              <Label htmlFor="healthConditions">Condizioni di Salute o Infortuni Passati</Label>
+              <Textarea
+                id="healthConditions"
+                {...register("healthConditions")}
+                placeholder="Es. Mal di schiena, problemi al ginocchio, allergie... (opzionale)"
+                className="mt-1"
+                rows={3}
+              />
+            </div>
+          </div>
 
-            {/* Sezione Preferenze */}
-            <div className="bg-orange-50 p-6 rounded-xl">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
-                ⚙️ Preferenze di Allenamento
-              </h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <Label htmlFor="availability">Disponibilità Settimanale</Label>
-                  <Controller
-                    name="availability"
-                    control={control}
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <SelectTrigger className={`mt-1 ${errors.availability ? 'border-red-500' : ''}`}>
-                          <SelectValue placeholder="Quanto tempo puoi dedicare?" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1-2-hours">🕐 1-2 ore/settimana</SelectItem>
-                          <SelectItem value="3-4-hours">⏰ 3-4 ore/settimana</SelectItem>
-                          <SelectItem value="5-6-hours">⏳ 5-6 ore/settimana</SelectItem>
-                          <SelectItem value="7-plus-hours">💪 7+ ore/settimana</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.availability && <p className="text-sm text-red-500 mt-1">{errors.availability.message}</p>}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="budget">Budget Mensile (FC)</Label>
-                  <Controller
-                    name="budget"
-                    control={control}
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <SelectTrigger className={`mt-1 ${errors.budget ? 'border-red-500' : ''}`}>
-                          <SelectValue placeholder="Il tuo budget" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="50-100">💰 50-100 FC/mese</SelectItem>
-                          <SelectItem value="100-200">💎 100-200 FC/mese</SelectItem>
-                          <SelectItem value="200-300">🌟 200-300 FC/mese</SelectItem>
-                          <SelectItem value="300-plus">👑 300+ FC/mese</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.budget && <p className="text-sm text-red-500 mt-1">{errors.budget.message}</p>}
-                </div>
-              </div>
-              <div className="mt-6">
-                <Label htmlFor="location">Zona Preferita</Label>
-                <Input
-                  id="location"
-                  {...register("location")}
-                  placeholder="Es. Milano Centro, Roma Prati, Napoli Vomero..."
-                  className="mt-1"
+          {/* Sezione Obiettivi Fitness */}
+          <div className="bg-blue-50 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+              🎯 I Tuoi Obiettivi Fitness
+            </h3>
+            <div>
+              <Label htmlFor="goals">Obiettivo Principale</Label>
+              <Controller
+                name="goals"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger className={`mt-1 ${errors.goals ? 'border-red-500' : ''}`}>
+                      <SelectValue placeholder="Cosa vuoi raggiungere?" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fitnessGoals.map((goal) => (
+                        <SelectItem key={goal.value} value={goal.value}>
+                          {goal.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.goals && <p className="text-sm text-red-500 mt-1">{errors.goals.message}</p>}
+            </div>
+          </div>
+
+          {/* Sezione Preferenze */}
+          <div className="bg-orange-50 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+              ⚙️ Preferenze di Allenamento
+            </h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="availability">Disponibilità Settimanale</Label>
+                <Controller
+                  name="availability"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <SelectTrigger className={`mt-1 ${errors.availability ? 'border-red-500' : ''}`}>
+                        <SelectValue placeholder="Quanto tempo puoi dedicare?" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1-2-hours">🕐 1-2 ore/settimana</SelectItem>
+                        <SelectItem value="3-4-hours">⏰ 3-4 ore/settimana</SelectItem>
+                        <SelectItem value="5-6-hours">⏳ 5-6 ore/settimana</SelectItem>
+                        <SelectItem value="7-plus-hours">💪 7+ ore/settimana</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
+                {errors.availability && <p className="text-sm text-red-500 mt-1">{errors.availability.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="budget">Budget Mensile (FC)</Label>
+                <Controller
+                  name="budget"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <SelectTrigger className={`mt-1 ${errors.budget ? 'border-red-500' : ''}`}>
+                        <SelectValue placeholder="Il tuo budget" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="50-100">💰 50-100 FC/mese</SelectItem>
+                        <SelectItem value="100-200">💎 100-200 FC/mese</SelectItem>
+                        <SelectItem value="200-300">🌟 200-300 FC/mese</SelectItem>
+                        <SelectItem value="300-plus">👑 300+ FC/mese</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.budget && <p className="text-sm text-red-500 mt-1">{errors.budget.message}</p>}
               </div>
             </div>
+            <div className="mt-6">
+              <Label htmlFor="location">Zona Preferita</Label>
+              <Input
+                id="location"
+                {...register("location")}
+                placeholder="Es. Milano Centro, Roma Prati, Napoli Vomero..."
+                className="mt-1"
+              />
+            </div>
+          </div>
 
-            <Button
-              type="submit"
-              className="w-full gradient-primary text-white text-lg py-4 rounded-xl hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={!isValid}
-            >
-              🚀 {t('form.submit.user')}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+          <Button
+            type="submit"
+            className="w-full gradient-primary text-white text-lg py-4 rounded-xl hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            disabled={!isValid || isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Elaborazione...
+              </>
+            ) : (
+              <>🚀 {t('form.submit.user')}</>
+            )}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+    </div >
   );
 };
 
