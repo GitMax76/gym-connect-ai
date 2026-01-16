@@ -4,7 +4,6 @@ import ScrollReveal from '@/components/ScrollReveal';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import Footer from '@/components/Footer';
 import Layout from '@/components/Layout';
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
