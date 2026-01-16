@@ -31,6 +31,7 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
 
     defaultValues: {
       location: "",
+      password: "",
       referralCode: "",
       healthConditions: ""
     }

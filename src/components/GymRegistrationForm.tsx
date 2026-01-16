@@ -34,6 +34,7 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
     mode: "onChange",
     defaultValues: {
       email: user?.email || '',
+      password: "",
       phone: "+39 ",
       facilities: [],
       openingDays: [],

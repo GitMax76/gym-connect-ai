@@ -31,6 +31,7 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
     mode: "onChange",
     defaultValues: {
       phone: "+39 ",
+      password: "",
       certifications: [],
       specializations: [],
       languages: [],
