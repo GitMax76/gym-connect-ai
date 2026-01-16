@@ -11,6 +11,7 @@ import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { gymRegistrationSchema, GymRegistrationData } from "@/schemas/auth";
 import PasswordRequirements from "@/components/auth/PasswordRequirements";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface GymRegistrationFormProps {
   onSubmit: (data: any) => void;
@@ -18,6 +19,7 @@ interface GymRegistrationFormProps {
 }
 
 const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => {
+  const { t } = useLanguage();
   const { user } = useAuth();
 
   const {
@@ -32,6 +34,7 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
     mode: "onChange",
     defaultValues: {
       email: user?.email || '',
+      phone: "+39 ",
       facilities: [],
       openingDays: [],
       specializations: [], // Added initialization
@@ -147,7 +150,7 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
 
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="email">Email Aziendale *</Label>
+                <Label htmlFor="email">{t('form.email')} *</Label>
                 <Input
                   id="email"
                   type="email"
@@ -158,7 +161,7 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
                 {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>}
               </div>
               <div>
-                <Label htmlFor="phone">Telefono *</Label>
+                <Label htmlFor="phone">{t('form.phone')} *</Label>
                 <Input
                   id="phone"
                   {...register("phone")}
@@ -486,7 +489,7 @@ const GymRegistrationForm = ({ onSubmit, onBack }: GymRegistrationFormProps) => 
             className="px-8 py-3 bg-gradient-to-r from-orange-600 to-red-500 text-white hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!isValid || fields.length === 0}
           >
-            🚀 Registra la Palestra
+            🚀 {t('form.submit.gym')}
           </Button>
         </div>
       </form>

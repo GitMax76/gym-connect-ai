@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Shared validation rules
-const phoneRegex = /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/;
+const phoneRegex = /^\+?[0-9\s-]{5,}$/;
 const passwordValidation = z
     .string()
     .min(8, "La password deve essere di almeno 8 caratteri")
@@ -40,7 +40,9 @@ export const trainerRegistrationSchema = z.object({
     personalRate: z.coerce.number().min(1, "La tariffa deve essere maggiore di 0"),
     groupRate: z.coerce.number().min(1, "La tariffa deve essere maggiore di 0"),
     availability: z.array(z.string()).min(1, "Seleziona almeno una disponibilità"),
-    preferredAreas: z.string().optional(),
+    preferredAreas: z.enum(["Nord", "Sud", "Centro", "Est", "Ovest"], {
+        required_error: "Seleziona una zona preferita",
+    }),
     languages: z.array(z.string()).min(1, "Seleziona almeno una lingua"),
 });
 

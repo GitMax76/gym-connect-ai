@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Toaster } from 'sonner';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -39,66 +40,68 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router>
-          <div className="App">
-            <Toaster />
-            <Suspense fallback={<LoadingFallback />}>
-              <Routes>
-                <Route path="/business.html" element={<InvestorPage />} />
-                <Route path="/investors" element={<InvestorPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/pitch" element={<PitchPage />} />
-                <Route path="/credits" element={<CreditsPage />} />
-                <Route path="/privacy" element={<PrivacyPage />} />
-                <Route path="/terms" element={<TermsPage />} />
-                {/* Draft Route removed */}
+        <LanguageProvider>
+          <Router>
+            <div className="App">
+              <Toaster />
+              <Suspense fallback={<LoadingFallback />}>
+                <Routes>
+                  <Route path="/business.html" element={<InvestorPage />} />
+                  <Route path="/investors" element={<InvestorPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/pitch" element={<PitchPage />} />
+                  <Route path="/credits" element={<CreditsPage />} />
+                  <Route path="/privacy" element={<PrivacyPage />} />
+                  <Route path="/terms" element={<TermsPage />} />
+                  {/* Draft Route removed */}
 
-                <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/dashboard" element={
-                  <ProtectedRoute>
-                    <DashboardPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/wallet" element={
-                  <ProtectedRoute>
-                    <WalletPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/investors" element={<InvestorPage />} />
-                <Route path="/search" element={
-                  <ProtectedRoute>
-                    <SearchPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/bookings" element={
-                  <ProtectedRoute>
-                    <BookingsPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/clients" element={
-                  <ProtectedRoute>
-                    <ClientsPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/workout-plans" element={
-                  <ProtectedRoute>
-                    <WorkoutPlansPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/seed" element={<SeedPage />} />
-                <Route path="/profile/:id" element={
-                  <ProtectedRoute>
-                    <ProfilePage />
-                  </ProtectedRoute>
-                } />
-              </Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/auth" element={<AuthPage />} />
+                  <Route path="/dashboard" element={
+                    <ProtectedRoute>
+                      <DashboardPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/wallet" element={
+                    <ProtectedRoute>
+                      <WalletPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/investors" element={<InvestorPage />} />
+                  <Route path="/search" element={
+                    <ProtectedRoute>
+                      <SearchPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/bookings" element={
+                    <ProtectedRoute>
+                      <BookingsPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/clients" element={
+                    <ProtectedRoute>
+                      <ClientsPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/workout-plans" element={
+                    <ProtectedRoute>
+                      <WorkoutPlansPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/seed" element={<SeedPage />} />
+                  <Route path="/profile/:id" element={
+                    <ProtectedRoute>
+                      <ProfilePage />
+                    </ProtectedRoute>
+                  } />
+                </Routes>
 
-            </Suspense>
-          </div>
-        </Router>
+              </Suspense>
+            </div>
+          </Router>
+        </LanguageProvider>
       </AuthProvider>
     </QueryClientProvider >
   );

@@ -4,11 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dumbbell, Award, Clock, Users } from 'lucide-react';
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { trainerRegistrationSchema, TrainerRegistrationData } from "@/schemas/auth";
 import PasswordRequirements from "@/components/auth/PasswordRequirements";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TrainerRegistrationFormProps {
   onSubmit: (data: any) => void;
@@ -16,21 +18,24 @@ interface TrainerRegistrationFormProps {
 }
 
 const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormProps) => {
+  const { t } = useLanguage();
   const {
     register,
     handleSubmit,
     setValue,
     watch,
+    control,
     formState: { errors, isValid }
   } = useForm<TrainerRegistrationData>({
     resolver: zodResolver(trainerRegistrationSchema),
     mode: "onChange",
     defaultValues: {
+      phone: "+39 ",
       certifications: [],
       specializations: [],
       languages: [],
       availability: [],
-      preferredAreas: ""
+      preferredAreas: "Nord"
     }
   });
 
@@ -81,7 +86,7 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
           <Dumbbell className="w-12 h-12 text-white" />
         </div>
         <h1 className="text-4xl font-bold text-slate-900 mb-4">
-          Diventa un <span className="text-blue-600">Coach di Eccellenza</span>
+          <span className="text-blue-600">{t('form.submit.trainer')}</span>
         </h1>
         <p className="text-xl text-slate-600">
           💪 Trasforma la tua passione in una carriera di successo
@@ -100,7 +105,7 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
           <CardContent className="space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="firstName">Nome *</Label>
+                <Label htmlFor="firstName">{t('form.firstName')} *</Label>
                 <Input
                   id="firstName"
                   {...register("firstName")}
@@ -110,7 +115,7 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
                 {errors.firstName && <p className="text-sm text-red-500 mt-1">{errors.firstName.message}</p>}
               </div>
               <div>
-                <Label htmlFor="lastName">Cognome *</Label>
+                <Label htmlFor="lastName">{t('form.lastName')} *</Label>
                 <Input
                   id="lastName"
                   {...register("lastName")}
@@ -123,7 +128,7 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
 
             <div className="grid md:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="email">{t('form.email')} *</Label>
                 <Input
                   id="email"
                   type="email"
@@ -134,7 +139,7 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
                 {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>}
               </div>
               <div>
-                <Label htmlFor="password">Password *</Label>
+                <Label htmlFor="password">{t('form.password')} *</Label>
                 <Input
                   id="password"
                   type="password"
@@ -146,7 +151,7 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
                 {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>}
               </div>
               <div>
-                <Label htmlFor="phone">Telefono *</Label>
+                <Label htmlFor="phone">{t('form.phone')} *</Label>
                 <Input
                   id="phone"
                   {...register("phone")}
@@ -179,12 +184,26 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
                 {errors.city && <p className="text-sm text-red-500 mt-1">{errors.city.message}</p>}
               </div>
               <div>
-                <Label htmlFor="preferredAreas">Zone Preferite</Label>
-                <Input
-                  id="preferredAreas"
-                  {...register("preferredAreas")}
-                  placeholder="es. Centro, Porta Nuova, Navigli"
+                <Label htmlFor="preferredAreas">Zona Preferita *</Label>
+                <Controller
+                  name="preferredAreas"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <SelectTrigger className={errors.preferredAreas ? "border-red-500" : ""}>
+                        <SelectValue placeholder="Seleziona zona" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Nord">Nord</SelectItem>
+                        <SelectItem value="Sud">Sud</SelectItem>
+                        <SelectItem value="Centro">Centro</SelectItem>
+                        <SelectItem value="Est">Est</SelectItem>
+                        <SelectItem value="Ovest">Ovest</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
+                {errors.preferredAreas && <p className="text-sm text-red-500 mt-1">{errors.preferredAreas.message}</p>}
               </div>
             </div>
           </CardContent>
@@ -356,10 +375,19 @@ const TrainerRegistrationForm = ({ onSubmit, onBack }: TrainerRegistrationFormPr
             className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!isValid}
           >
-            🚀 Diventa Coach
+            🚀 {t('form.submit.trainer')}
           </Button>
         </div>
+        {!isValid && (
+          <p className="text-center text-red-500 text-sm mt-2">
+            {t('form.error.required')}
+          </p>
+        )}
       </form>
+      <div className="mt-8 p-4 bg-gray-100 rounded text-xs font-mono">
+        <p className="font-bold mb-2">Debug Errors:</p>
+        <pre id="form-errors">{JSON.stringify(errors, null, 2)}</pre>
+      </div>
     </div>
   );
 };

@@ -2,9 +2,11 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Dumbbell } from 'lucide-react';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -15,6 +17,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 animate-gradient-x">
@@ -42,22 +45,23 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                     onClick={() => navigate('/dashboard')}
                     className={location.pathname === '/dashboard' ? 'bg-slate-100' : ''}
                   >
-                    Dashboard
+                    {t('nav.dashboard')}
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={() => navigate('/search')}
                     className={location.pathname === '/search' ? 'bg-slate-100' : ''}
                   >
-                    Cerca
+                    {t('nav.search')}
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={() => navigate('/bookings')}
                     className={location.pathname === '/bookings' ? 'bg-slate-100' : ''}
                   >
-                    Prenotazioni
+                    {t('nav.bookings')}
                   </Button>
+                  <LanguageSwitcher />
                 </div>
               )}
 
@@ -65,41 +69,43 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                 {location.pathname === '/' ? (
                   <>
                     <Button variant="ghost" onClick={() => navigate('/login')}>
-                      Accedi
+                      {t('nav.login')}
                     </Button>
                     <Button onClick={() => navigate('/register')} className="gradient-primary text-white">
-                      Registrati
+                      {t('nav.register')}
                     </Button>
                     <Link
                       to="/contact"
                       className="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
                     >
-                      Contatti
+                      {t('nav.contact')}
                     </Link>
                     <Link
                       to="/pitch"
                       className="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
                     >
-                      Vision
+                      {t('nav.vision')}
                     </Link>
+                    <LanguageSwitcher />
                   </>
                 ) : (
                   <>
                     <Button variant="outline" onClick={() => navigate('/')}>
-                      Home
+                      {t('nav.home')}
                     </Button>
                     <Link
                       to="/pitch"
                       className="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
                     >
-                      Vision
+                      {t('nav.vision')}
                     </Link>
                     <Link
                       to="/contact"
                       className="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
                     >
-                      Contatti
+                      {t('nav.contact')}
                     </Link>
+                    <LanguageSwitcher />
                   </>
                 )}
               </div>
@@ -117,34 +123,34 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                       {user ? (
                         <>
                           <Button variant="ghost" onClick={() => navigate('/dashboard')}>
-                            Dashboard
+                            {t('nav.dashboard')}
                           </Button>
                           <Button variant="ghost" onClick={() => navigate('/search')}>
-                            Cerca
+                            {t('nav.search')}
                           </Button>
                           <Button variant="ghost" onClick={() => navigate('/bookings')}>
-                            Prenotazioni
+                            {t('nav.bookings')}
                           </Button>
                           <Button variant="ghost" onClick={() => navigate('/pitch')}>
-                            Vision
+                            {t('nav.vision')}
                           </Button>
                           <Button variant="ghost" onClick={() => navigate('/contact')}>
-                            Contatti
+                            {t('nav.contact')}
                           </Button>
                         </>
                       ) : (
                         <>
                           <Button variant="ghost" onClick={() => navigate('/login')}>
-                            Accedi
+                            {t('nav.login')}
                           </Button>
                           <Button className="gradient-primary text-white" onClick={() => navigate('/register')}>
-                            Registrati
+                            {t('nav.register')}
                           </Button>
                           <Button variant="ghost" onClick={() => navigate('/pitch')}>
-                            Vision
+                            {t('nav.vision')}
                           </Button>
                           <Button variant="ghost" onClick={() => navigate('/contact')}>
-                            Contatti
+                            {t('nav.contact')}
                           </Button>
                         </>
                       )}
@@ -164,7 +170,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
             <div className="mb-4 md:mb-0">
               &copy; {new Date().getFullYear()} GymConnect AI. <span className="mx-2">|</span>
               <div className="flex items-center group cursor-pointer">
-                <span className="mr-1">Created by</span>
+                <span className="mr-1">{t('footer.created_by')}</span>
                 <Link to="/credits" className="flex items-center font-extrabold text-base bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity ml-1">
                   Massimiliano Sabato
                   <Dumbbell className="ml-2 w-5 h-5 text-blue-500 animate-bounce" style={{ animationDuration: '2s' }} />
@@ -173,17 +179,17 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
             </div>
             <div className="flex space-x-6">
               <Link to="/pitch" className="hover:text-primary transition-colors text-sm">
-                Vision
+                {t('nav.vision')}
               </Link>
               <Link to="/contact" className="hover:text-primary transition-colors text-sm">
-                Contatti
+                {t('nav.contact')}
               </Link>
               <a href="/business.html" className="hover:text-primary transition-colors font-medium">
-                Investors & Partners
+                {t('nav.investors')} & Partners
               </a>
-              <Link to="/privacy" className="hover:text-primary transition-colors text-sm">Privacy</Link>
-              <Link to="/terms" className="hover:text-primary transition-colors text-sm">Terms</Link>
-              <Link to="/investors" className="hover:text-primary transition-colors text-sm font-semibold text-green-600">Investors</Link>
+              <Link to="/privacy" className="hover:text-primary transition-colors text-sm">{t('nav.privacy')}</Link>
+              <Link to="/terms" className="hover:text-primary transition-colors text-sm">{t('nav.terms')}</Link>
+              <Link to="/investors" className="hover:text-primary transition-colors text-sm font-semibold text-green-600">{t('nav.investors')}</Link>
             </div>
           </div>
         </footer>

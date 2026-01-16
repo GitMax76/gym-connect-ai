@@ -10,6 +10,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userRegistrationSchema, UserRegistrationData } from "@/schemas/auth";
 import PasswordRequirements from "@/components/auth/PasswordRequirements";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface UserRegistrationFormProps {
   onSubmit: (data: any) => void;
@@ -17,6 +18,7 @@ interface UserRegistrationFormProps {
 }
 
 const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) => {
+  const { t } = useLanguage();
   const {
     register,
     handleSubmit,
@@ -26,6 +28,7 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
   } = useForm<UserRegistrationData>({
     resolver: zodResolver(userRegistrationSchema),
     mode: "onChange",
+
     defaultValues: {
       location: "",
       referralCode: "",
@@ -93,7 +96,7 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
               </h3>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="name">Nome Completo</Label>
+                  <Label htmlFor="name">{t('form.firstName')}</Label>
                   <Input
                     id="name"
                     {...register("name")}
@@ -304,7 +307,7 @@ const UserRegistrationForm = ({ onSubmit, onBack }: UserRegistrationFormProps) =
               className="w-full gradient-primary text-white text-lg py-4 rounded-xl hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!isValid}
             >
-              🚀 Inizia il Tuo Percorso Fitness
+              🚀 {t('form.submit.user')}
             </Button>
           </form>
         </CardContent>

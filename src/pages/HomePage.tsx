@@ -7,9 +7,11 @@ import { useNavigate } from 'react-router-dom';
 import Footer from '@/components/Footer';
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const startTour = () => {
     const driverObj = driver({
@@ -51,10 +53,10 @@ const HomePage = () => {
               </div>
             </ScrollReveal>
             <ScrollReveal animation="fade-left">
-              <span className="text-green-600 font-semibold tracking-wider text-sm">PER ATLETI</span>
-              <h2 className="text-4xl font-bold text-slate-900 mt-2 mb-6">Non cerchi, trovi.</h2>
+              <span className="text-green-600 font-semibold tracking-wider text-sm">{t('section.athlete.title')}</span>
+              <h2 className="text-4xl font-bold text-slate-900 mt-2 mb-6">{t('section.athlete.heading')}</h2>
               <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                L’AI abbina il tuo stile (powerlifter, wellness, busy pro) con trainer verificati e palestre vicine.
+                {t('section.athlete.desc')}
               </p>
               <ul className="space-y-4 mb-10">
                 <li className="flex items-center gap-3"><CheckCircle className="text-green-600 w-5 h-5" /> <span>Match Istantaneo con IA</span></li>
@@ -96,7 +98,7 @@ const HomePage = () => {
                 className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8"
                 onClick={() => navigate('/register?role=instructor')}
               >
-                Unisciti come Pro
+                {t('hero.cta.trainer')}
               </Button>
             </ScrollReveal>
             <ScrollReveal animation="fade-left" className="order-1 md:order-2">
