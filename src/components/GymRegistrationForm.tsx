@@ -32,7 +32,7 @@ const GymRegistrationForm = ({ onSubmit, onBack, isSubmitting = false }: GymRegi
     formState: { errors, isValid }
   } = useForm<GymRegistrationData>({
     resolver: zodResolver(gymRegistrationSchema),
-    mode: "onChange",
+    mode: "onTouched",
     defaultValues: {
       gymName: "",
       ownerName: "",

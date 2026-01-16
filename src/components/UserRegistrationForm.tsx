@@ -28,7 +28,7 @@ const UserRegistrationForm = ({ onSubmit, onBack, isSubmitting = false }: UserRe
     formState: { errors, isValid }
   } = useForm<UserRegistrationData>({
     resolver: zodResolver(userRegistrationSchema),
-    mode: "onChange",
+    mode: "onTouched",
 
     defaultValues: {
       name: "",

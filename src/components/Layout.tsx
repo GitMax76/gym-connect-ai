@@ -90,6 +90,9 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                   </>
                 ) : (
                   <>
+                    <Button variant="ghost" onClick={() => navigate('/login')}>
+                      {t('nav.login')}
+                    </Button>
                     <Button variant="outline" onClick={() => navigate('/')}>
                       {t('nav.home')}
                     </Button>

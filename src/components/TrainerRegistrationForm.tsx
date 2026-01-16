@@ -29,7 +29,7 @@ const TrainerRegistrationForm = ({ onSubmit, onBack, isSubmitting = false }: Tra
     formState: { errors, isValid }
   } = useForm<TrainerRegistrationData>({
     resolver: zodResolver(trainerRegistrationSchema),
-    mode: "onChange",
+    mode: "onTouched",
     defaultValues: {
       firstName: "",
       lastName: "",
