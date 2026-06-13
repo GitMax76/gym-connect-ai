@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { BrandingProvider } from '@/contexts/BrandingContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Toaster } from 'sonner';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -41,9 +42,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <LanguageProvider>
-          <Router>
-            <div className="App">
-              <Toaster />
+          <BrandingProvider>
+            <Router>
+              <div className="App">
+                <Toaster />
               <Suspense fallback={<LoadingFallback />}>
                 <Routes>
                   <Route path="/business.html" element={<InvestorPage />} />
@@ -101,9 +103,10 @@ function App() {
               </Suspense>
             </div>
           </Router>
-        </LanguageProvider>
-      </AuthProvider>
-    </QueryClientProvider >
+        </BrandingProvider>
+      </LanguageProvider>
+    </AuthProvider>
+  </QueryClientProvider >
   );
 }
 
