@@ -1,8 +1,10 @@
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from './types';
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@/utils/env';
+import { isFirebaseConfigured } from '@/utils/env';
+import { firebaseClientAdapter } from '@/integrations/firebase/adapter';
+import { mockSupabaseClient } from './mockClient';
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
-
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Export the client facade. 
+// If Firebase environment variables are set, use the Firebase Adapter.
+// Otherwise, fallback to the Local Storage Mock (Demo Mode).
+export const supabase = isFirebaseConfigured()
+  ? (firebaseClientAdapter as any)
+  : (mockSupabaseClient as any);

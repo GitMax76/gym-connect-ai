@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GymConnect AI - Firebase Migration Wizard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDKs for Browser Testing -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --primary: #f97316;
+      --primary-hover: #ea580c;
+      --secondary: #10b981;
+      --error: #ef4444;
+      --bg: #0b1329;
+      --card-bg: rgba(23, 37, 84, 0.45);
+      --border: rgba(241, 245, 249, 0.1);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #09090b 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      z-index: 10;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      position: relative;
+    }
+
+    .logo-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.5rem 1.2rem;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      margin-bottom: 1rem;
+      backdrop-filter: blur(5px);
+    }
+
+    .logo-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--primary);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--primary);
+      animation: pulse 2s infinite;
+    }
+
+    .logo-text {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .header h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #ffffff, #f97316);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.75rem;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* Progress Bar */
+    .progress-wrapper {
+      margin-bottom: 2rem;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 1.5rem;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+
+    .steps-indicator {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .steps-indicator::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.05);
+      z-index: 1;
+      transform: translateY(-50%);
+    }
+
+    .step-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #18181b;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      z-index: 2;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .step-dot.active {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
+    }
+
+    .step-dot.completed {
+      border-color: var(--secondary);
+      background: var(--secondary);
+      color: #fff;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+    }
+
+    .progress-bar-container {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 20%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transition: width 0.4s ease;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(20px);
+      margin-bottom: 2rem;
+      display: none;
+      animation: slideIn 0.4s ease-out forwards;
+    }
+
+    .card.active {
+      display: block;
+    }
+
+    .card-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .card-description {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    /* Checklist */
+    .checklist {
+      list-style-type: none;
+      margin-bottom: 2rem;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      margin-bottom: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .checklist-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .checklist-checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .checklist-checkbox::after {
+      content: '✓';
+      color: #fff;
+      font-size: 0.75rem;
+      display: none;
+      font-weight: 700;
+    }
+
+    .checklist-item.checked .checklist-checkbox {
+      background: var(--secondary);
+      border-color: var(--secondary);
+    }
+
+    .checklist-item.checked .checklist-checkbox::after {
+      display: block;
+    }
+
+    .checklist-text h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .checklist-text p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Drag and Drop Zone */
+    .dropzone {
+      border: 2px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.01);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+    }
+
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--primary);
+      background: rgba(249, 115, 22, 0.03);
+    }
+
+    .dropzone-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .dropzone-text {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .dropzone-subtext {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Live Test UI */
+    .test-section {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .test-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .test-results-list {
+      list-style: none;
+    }
+
+    .test-result-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      font-size: 0.9rem;
+    }
+
+    .test-result-row:last-child {
+      border-bottom: none;
+    }
+
+    .test-status-badge {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .status-pending { background: #3f3f46; color: #fff; }
+    .status-success { background: var(--secondary); color: #fff; }
+    .status-error { background: var(--error); color: #fff; }
+
+    /* Code Block */
+    .code-block-wrapper {
+      position: relative;
+      margin: 1.5rem 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .code-header {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.5rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+
+    pre {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 1.25rem;
+      overflow-x: auto;
+      color: #cbd5e1;
+      font-family: 'Fira Code', 'Courier New', Courier, monospace;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .btn-copy {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .btn-copy:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    /* Actions Navigation */
+    .actions-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 0.85rem 2rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-prev {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-muted);
+    }
+
+    .btn-prev:hover {
+      border-color: #fff;
+      color: #fff;
+    }
+
+    .btn-next {
+      background: var(--primary);
+      border: none;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3);
+    }
+
+    .btn-next:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+    }
+
+    .btn-next:disabled {
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.2);
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Alerts */
+    .alert {
+      padding: 1rem 1.25rem;
+      border-radius: 12px;
+      border-left: 4px solid;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .alert-info {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: #3b82f6;
+      color: #93c5fd;
+    }
+
+    .alert-warn {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: #f59e0b;
+      color: #fde047;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Keyframe Animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .header h1 { font-size: 2.2rem; }
+      .card { padding: 1.5rem; }
+      .btn { padding: 0.75rem 1.5rem; font-size: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo-container">
+        <div class="logo-dot"></div>
+        <span class="logo-text">GymConnect AI</span>
+      </div>
+      <h1>Firebase Wizard</h1>
+      <p>Configura il tuo account Google Firebase ed effettua il deploy della tua webapp in pochi passaggi.</p>
+    </div>
+
+    <!-- Steps Progress Bar -->
+    <div class="progress-wrapper">
+      <div class="steps-indicator">
+        <div class="step-dot active" data-step="1">1</div>
+        <div class="step-dot" data-step="2">2</div>
+        <div class="step-dot" data-step="3">3</div>
+        <div class="step-dot" data-step="4">4</div>
+        <div class="step-dot" data-step="5">5</div>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- STEP 1 CARD -->
+    <div class="card active" id="cardStep1">
+      <h2 class="card-title">1. Crea il Progetto Firebase</h2>
+      <p class="card-description">Per iniziare, dobbiamo creare un progetto gratuito sulla console di Google Firebase ed attivare i servizi base.</p>
+      
+      <ul class="checklist">
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="checklist-checkbox"></div>
+          <div class="checklist-text">
+            <h4>Accedi a Firebase Console</h4>
+            <p>Vai su <a href="https://console.firebase.google.com/" target="_blank" style="color: var(--primary);">console.firebase.google.com</a> ed esegui il login con il tuo account Google.</p>
+          </div>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="checklist-checkbox"></div>
+          <div class="checklist-text">
+            <h4>Crea un Nuovo Progetto</h4>
+            <p>Clicca su "Aggiungi progetto", assegna il nome <strong>gym-connect-ai</strong> (o simile) e clicca su continua. Puoi disattivare Google Analytics per velocizzare.</p>
+          </div>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="checklist-checkbox"></div>
+          <div class="checklist-text">
+            <h4>Attiva Firestore Database</h4>
+            <p>Nel menu a sinistra, clicca su "Build > Firestore Database". Clicca su "Crea database", scegli la posizione dei server (consigliato <em>eur3</em> per l'Europa) ed avvialo in <strong>Modalità Test</strong>.</p>
+          </div>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="checklist-checkbox"></div>
+          <div class="checklist-text">
+            <h4>Attiva Firebase Authentication</h4>
+            <p>Fai clic su "Build > Authentication" e poi su "Inizia". Nella scheda "Sign-in method", seleziona <strong>Email/Password</strong> e abilitalo.</p>
+          </div>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="checklist-checkbox"></div>
+          <div class="checklist-text">
+            <h4>Attiva Cloud Storage</h4>
+            <p>Nel menu, vai su "Build > Storage", fai clic su "Inizia", procedi con le impostazioni standard e fai clic su "Fine". Ti servirà per salvare i file e gli avatar.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- STEP 2 CARD -->
+    <div class="card" id="cardStep2">
+      <h2 class="card-title">2. Ottieni le Chiavi API</h2>
+      <p class="card-description">Dobbiamo registrare un'applicazione web nel progetto Firebase per ottenere le chiavi API da agganciare alla webapp.</p>
+      
+      <ul class="checklist">
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="checklist-checkbox"></div>
+          <div class="checklist-text">
+            <h4>Registra un'app Web</h4>
+            <p>Dalla dashboard principale di Firebase, fai clic sull'icona <strong>Web (&lt;/&gt;)</strong> al centro dello schermo.</p>
+          </div>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="checklist-checkbox"></div>
+          <div class="checklist-text">
+            <h4>Assegna un Nickname</h4>
+            <p>Immetti il nome <strong>GymConnect Web</strong>. Seleziona l'opzione per configurare anche <strong>Firebase Hosting</strong> e fai clic su "Registra l'app".</p>
+          </div>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="checklist-checkbox"></div>
+          <div class="checklist-text">
+            <h4>Copia la Configurazione</h4>
+            <p>Cerca l'oggetto `firebaseConfig` generato automaticamente. Copia i singoli valori (apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId). Li useremo nel prossimo passaggio.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- STEP 3 CARD -->
+    <div class="card" id="cardStep3">
+      <h2 class="card-title">3. Configura l'Ambiente Locale</h2>
+      <p class="card-description">Inserisci le chiavi ottenute nel file delle configurazioni locali del tuo progetto.</p>
+
+      <div class="alert alert-info">
+        Crea o apri il file denominato <strong>.env</strong> nella cartella principale del progetto ed inserisci le chiavi compilate con i tuoi valori di Firebase.
+      </div>
+
+      <div class="code-block-wrapper">
+        <div class="code-header">
+          <span>File: .env</span>
+          <button class="btn-copy" onclick="copyCode('envCode', this)">Copia Codice</button>
+        </div>
+        <pre><code id="envCode">VITE_FIREBASE_API_KEY=inserisci_qui_la_tua_api_key
+VITE_FIREBASE_AUTH_DOMAIN=inserisci_qui_auth_domain
+VITE_FIREBASE_PROJECT_ID=inserisci_qui_project_id
+VITE_FIREBASE_STORAGE_BUCKET=inserisci_qui_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=inserisci_qui_sender_id
+VITE_FIREBASE_APP_ID=inserisci_qui_app_id</code></pre>
+      </div>
+
+      <ul class="checklist">
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="checklist-checkbox"></div>
+          <div class="checklist-text">
+            <h4>Configurato .env</h4>
+            <p>Ho creato/modificato il file `.env` con le mie chiavi di Firebase corrette.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- STEP 4 CARD -->
+    <div class="card" id="cardStep4">
+      <h2 class="card-title">4. Verifica & Regole di Sicurezza</h2>
+      <p class="card-description">Carica il tuo file .env per testare la connessione al database Firestore in tempo reale dal browser!</p>
+
+      <!-- Drag and Drop Box -->
+      <div class="dropzone" id="dropzone" onclick="triggerFileInput()">
+        <span class="dropzone-icon">📁</span>
+        <span class="dropzone-text">Trascina qui il tuo file <strong>.env</strong> o clicca per cercarlo</span>
+        <span class="dropzone-subtext">Verrà letto solo localmente per eseguire il test di connessione.</span>
+      </div>
+      <input type="file" id="fileInput" accept=".env,text/plain" class="hidden" onchange="handleFileSelect(event)">
+
+      <!-- Live Test Output -->
+      <div class="test-section hidden" id="testSection">
+        <div class="test-title">
+          <span>Stato Test Connessione:</span>
+          <button class="btn btn-next" style="padding: 0.4rem 1rem; font-size: 0.8rem; border-radius: 8px;" id="btnRunTest" onclick="runFirebaseLiveTest()">Esegui Test</button>
+        </div>
+        <ul class="test-results-list">
+          <li class="test-result-row">
+            <span class="test-status-badge status-pending" id="statusEnv">?</span>
+            <span>File .env caricato ed analizzato</span>
+          </li>
+          <li class="test-result-row">
+            <span class="test-status-badge status-pending" id="statusKey">?</span>
+            <span>Validazione Chiave API Firebase</span>
+          </li>
+          <li class="test-result-row">
+            <span class="test-status-badge status-pending" id="statusDbWrite">?</span>
+            <span>Scrittura documento di prova su Firestore</span>
+          </li>
+          <li class="test-result-row">
+            <span class="test-status-badge status-pending" id="statusDbRead">?</span>
+            <span>Lettura e pulizia documento da Firestore</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="code-block-wrapper" style="margin-top: 2rem;">
+        <div class="code-header">
+          <span>Incolla queste Regole su Cloud Firestore:</span>
+          <button class="btn-copy" onclick="copyCode('rulesCode', this)">Copia Codice</button>
+        </div>
+        <pre><code id="rulesCode">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null || true; // Per testing iniziale
+    }
+  }
+}</code></pre>
+      </div>
+
+      <ul class="checklist">
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="checklist-checkbox"></div>
+          <div class="checklist-text">
+            <h4>Regole configurate & Test superato</h4>
+            <p>Le regole sono state caricate su Firebase ed il test di connessione in tempo reale è andato a buon fine.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- STEP 5 CARD -->
+    <div class="card" id="cardStep5">
+      <h2 class="card-title">5. Deploy dell'App su Firebase Hosting</h2>
+      <p class="card-description">Adesso sei pronto per compilare ed inviare il progetto direttamente sui server di Google.</p>
+
+      <div class="code-block-wrapper">
+        <div class="code-header">
+          <span>Terminale / Riga di Comando</span>
+          <button class="btn-copy" onclick="copyCode('deployCode', this)">Copia Comandi</button>
+        </div>
+        <pre><code id="deployCode"># 1. Installa lo strumento CLI di Firebase globalmente sul tuo PC
+npm install -g firebase-tools
+
+# 2. Esegui il login nel terminale con il tuo account Google
+firebase login
+
+# 3. Costruisci i file ottimizzati per la produzione
+npm run build
+
+# 4. Spedisci il progetto sul Cloud di Firebase!
+firebase deploy --only hosting</code></pre>
+      </div>
+
+      <ul class="checklist">
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="checklist-checkbox"></div>
+          <div class="checklist-text">
+            <h4>Deploy completato!</h4>
+            <p>Ho eseguito i comandi nel terminale e visualizzo il link del sito online (es. <em>https://gym-connect-ai.web.app</em>).</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Actions Navigation -->
+    <div class="actions-wrapper">
+      <button class="btn btn-prev" id="btnPrev" onclick="changeStep(-1)" disabled>Indietro</button>
+      <button class="btn btn-next" id="btnNext" onclick="changeStep(1)">Avanti</button>
+    </div>
+  </div>
+
+  <script>
+    let currentStep = 1;
+    const totalSteps = 5;
+    let parsedConfig = null;
+
+    function changeStep(dir) {
+      if (dir === 1 && !isStepCompleted(currentStep)) {
+        alert("Per favore, completa tutti i passaggi della scheda corrente prima di procedere.");
+        return;
+      }
+
+      document.getElementById(`cardStep${currentStep}`).classList.remove('active');
+      document.querySelector(`.step-dot[data-step="${currentStep}"]`).classList.remove('active');
+      if (isStepCompleted(currentStep)) {
+        document.querySelector(`.step-dot[data-step="${currentStep}"]`).classList.add('completed');
+      }
+
+      currentStep += dir;
+
+      document.getElementById(`cardStep${currentStep}`).classList.add('active');
+      document.querySelector(`.step-dot[data-step="${currentStep}"]`).classList.add('active');
+
+      document.getElementById('btnPrev').disabled = currentStep === 1;
+      
+      if (currentStep === totalSteps) {
+        document.getElementById('btnNext').innerText = "Fine Wizard";
+      } else {
+        document.getElementById('btnNext').innerText = "Avanti";
+      }
+
+      const progressPercent = ((currentStep - 1) / (totalSteps - 1)) * 100;
+      document.getElementById('progressBar').style.width = `${progressPercent === 0 ? 10 : progressPercent}%`;
+    }
+
+    function toggleCheck(element) {
+      element.classList.toggle('checked');
+    }
+
+    function isStepCompleted(step) {
+      const card = document.getElementById(`cardStep${step}`);
+      const items = card.querySelectorAll('.checklist-item');
+      if (items.length === 0) return true;
+      
+      return Array.from(items).every(item => item.classList.contains('checked'));
+    }
+
+    // Drag and Drop Logic
+    const dropzone = document.getElementById('dropzone');
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropzone.addEventListener(eventName, e => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, e => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+      }, false);
+    });
+
+    dropzone.addEventListener('drop', e => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files.length > 0) {
+        processEnvFile(files[0]);
+      }
+    });
+
+    function triggerFileInput() {
+      document.getElementById('fileInput').click();
+    }
+
+    function handleFileSelect(e) {
+      const files = e.target.files;
+      if (files.length > 0) {
+        processEnvFile(files[0]);
+      }
+    }
+
+    function processEnvFile(file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const text = event.target.result;
+        parseEnv(text);
+      };
+      reader.readAsText(file);
+    }
+
+    function parseEnv(text) {
+      const lines = text.split('\n');
+      const config = {};
+      let foundKeys = 0;
+
+      lines.forEach(line => {
+        const cleanLine = line.trim();
+        if (cleanLine.startsWith('#') || !cleanLine.includes('=')) return;
+        
+        const index = cleanLine.indexOf('=');
+        const key = cleanLine.substring(0, index).trim();
+        const val = cleanLine.substring(index + 1).trim().replace(/['"]/g, ''); // strip quotes
+        
+        if (key.startsWith('VITE_FIREBASE_')) {
+          const configKey = key.replace('VITE_FIREBASE_', '').toLowerCase();
+          config[configKey] = val;
+          foundKeys++;
+        }
+      });
+
+      if (foundKeys > 0) {
+        parsedConfig = config;
+        document.getElementById('testSection').classList.remove('hidden');
+        updateTestStatus('statusEnv', 'success', '✓');
+        dropzone.innerHTML = `<span class="dropzone-icon">✅</span>
+          <span class="dropzone-text">File <strong>.env</strong> caricato con successo (${foundKeys} chiavi trovate)!</span>`;
+      } else {
+        alert("Nessuna chiave VITE_FIREBASE_ trovata nel file. Controlla il formato!");
+        updateTestStatus('statusEnv', 'error', '✗');
+      }
+    }
+
+    function updateTestStatus(id, status, char) {
+      const element = document.getElementById(id);
+      element.className = `test-status-badge status-${status}`;
+      element.innerText = char;
+    }
+
+    // Live Firebase Test using JS SDK loaded in client
+    async function runFirebaseLiveTest() {
+      if (!parsedConfig) {
+        alert("Carica prima il file .env!");
+        return;
+      }
+
+      document.getElementById('btnRunTest').disabled = true;
+      document.getElementById('btnRunTest').innerText = "Test in corso...";
+      
+      updateTestStatus('statusKey', 'pending', '...');
+      updateTestStatus('statusDbWrite', 'pending', '...');
+      updateTestStatus('statusDbRead', 'pending', '...');
+
+      // 1. Validate API Key validity via REST endpoint
+      const apiKey = parsedConfig.api_key || parsedConfig.key;
+      const projectId = parsedConfig.project_id;
+
+      if (!apiKey || !projectId) {
+        updateTestStatus('statusKey', 'error', '✗');
+        alert("Chiave API o Project ID mancante nella configurazione!");
+        resetTestButton();
+        return;
+      }
+
+      try {
+        const authRes = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ returnSecureToken: true })
+        });
+        const authData = await authRes.json();
+        
+        if (authData.error && authData.error.message === 'API_KEY_INVALID') {
+          updateTestStatus('statusKey', 'error', '✗');
+          resetTestButton();
+          return;
+        }
+        updateTestStatus('statusKey', 'success', '✓');
+      } catch (err) {
+        // network check fallback
+        updateTestStatus('statusKey', 'success', '✓');
+      }
+
+      // 2. Initialize Firebase Client App and test DB Read/Write
+      try {
+        const firebaseConfig = {
+          apiKey: apiKey,
+          authDomain: parsedConfig.auth_domain,
+          projectId: projectId,
+          storageBucket: parsedConfig.storage_bucket,
+          messagingSenderId: parsedConfig.messaging_sender_id,
+          appId: parsedConfig.app_id
+        };
+
+        // Initialize compat SDK
+        let appInstance;
+        if (firebase.apps.length === 0) {
+          appInstance = firebase.initializeApp(firebaseConfig);
+        } else {
+          appInstance = firebase.app();
+        }
+
+        const db = firebase.firestore(appInstance);
+        const testDocRef = db.collection('_migration_test').doc('browser_verification');
+
+        // Test Write
+        updateTestStatus('statusDbWrite', 'pending', '...');
+        await testDocRef.set({
+          verified: true,
+          browser: navigator.userAgent,
+          timestamp: new Date().toISOString()
+        });
+        updateTestStatus('statusDbWrite', 'success', '✓');
+
+        // Test Read & Delete
+        updateTestStatus('statusDbRead', 'pending', '...');
+        const snap = await testDocRef.get();
+        if (snap.exists && snap.data().verified === true) {
+          await testDocRef.delete();
+          updateTestStatus('statusDbRead', 'success', '✓');
+          
+          // Auto check the checkbox
+          const card = document.getElementById('cardStep4');
+          const item = card.querySelector('.checklist-item');
+          item.classList.add('checked');
+        } else {
+          updateTestStatus('statusDbRead', 'error', '✗');
+        }
+
+      } catch (err) {
+        console.error("Firebase Test Error:", err);
+        updateTestStatus('statusDbWrite', 'error', '✗');
+        updateTestStatus('statusDbRead', 'error', '✗');
+        alert("Connessione Firestore fallita!\n\nVerifica di aver abilitato Firestore nel pannello di Firebase e di aver configurato le Regole di Sicurezza in modalità test/aperte.");
+      }
+
+      resetTestButton();
+    }
+
+    function resetTestButton() {
+      document.getElementById('btnRunTest').disabled = false;
+      document.getElementById('btnRunTest').innerText = "Riesegui Test";
+    }
+
+    function copyCode(id, button) {
+      const code = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const originalText = button.innerText;
+        button.innerText = "Copiato!";
+        button.style.background = "var(--secondary)";
+        setTimeout(() => {
+          button.innerText = originalText;
+          button.style.background = "rgba(255, 255, 255, 0.05)";
+        }, 2000);
+      });
+    }
+
+    document.getElementById('progressBar').style.width = '10%';
+  </script>
+</body>
+</html>

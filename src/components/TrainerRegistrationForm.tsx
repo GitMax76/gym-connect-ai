@@ -401,10 +401,6 @@ const TrainerRegistrationForm = ({ onSubmit, onBack, isSubmitting = false }: Tra
           </p>
         )}
       </form>
-      <div className="mt-8 p-4 bg-gray-100 rounded text-xs font-mono">
-        <p className="font-bold mb-2">Debug Errors:</p>
-        <pre id="form-errors">{JSON.stringify(errors, null, 2)}</pre>
-      </div>
     </div>
   );
 };

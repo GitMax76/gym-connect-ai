@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Dumbbell } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { isFirebaseConfigured, HIDE_DEMO_BANNER } from '@/utils/env';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -18,9 +19,29 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
   const location = useLocation();
   const { user } = useAuth();
   const { t } = useLanguage();
+  const isDemoMode = !isFirebaseConfigured() && !HIDE_DEMO_BANNER;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 animate-gradient-x">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 animate-gradient-x flex flex-col">
+      {isDemoMode && (
+        <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-center py-2 px-4 text-xs font-semibold tracking-wide flex justify-center items-center gap-2 shadow-inner relative z-50">
+          <span className="flex items-center gap-1.5 flex-wrap justify-center">
+            <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+            ⚠️ <strong>Modalità Demo Locale Attiva</strong>: I dati sono salvati nel browser.
+            <button 
+              onClick={() => {
+                if (confirm("Vuoi resettare il database locale ai dati di partenza? Questo eliminerà tutte le modifiche correnti.")) {
+                  localStorage.clear();
+                  window.location.reload();
+                }
+              }} 
+              className="underline ml-2 hover:text-amber-100 transition-colors font-bold"
+            >
+              [Resetta Dati]
+            </button>
+          </span>
+        </div>
+      )}
       {showNavigation && (
         <nav className="bg-white/90 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
