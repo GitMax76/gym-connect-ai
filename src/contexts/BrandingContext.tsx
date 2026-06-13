@@ -5,6 +5,7 @@ type BrandName = 'FitFlow' | 'GymConnect' | 'FitWeb';
 interface BrandingContextType {
   brandName: BrandName;
   brandNameFull: string;
+  brandInitials: string;
   setBrandName: (name: BrandName) => void;
   toggleBrandName: () => void;
 }
@@ -40,9 +41,10 @@ export const BrandingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const brandNameFull = brandName === 'GymConnect' ? 'GymConnect AI' : `${brandName} AI`;
+  const brandInitials = brandName === 'FitFlow' ? 'FF' : brandName === 'GymConnect' ? 'GC' : 'FW';
 
   return (
-    <BrandingContext.Provider value={{ brandName, brandNameFull, setBrandName, toggleBrandName }}>
+    <BrandingContext.Provider value={{ brandName, brandNameFull, brandInitials, setBrandName, toggleBrandName }}>
       {children}
     </BrandingContext.Provider>
   );

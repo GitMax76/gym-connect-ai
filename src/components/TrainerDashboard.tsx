@@ -9,39 +9,42 @@ import { Notifications } from './Notifications';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import AvailabilitySettings from './AvailabilitySettings';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { supabase } from '@/integrations/supabase/client';
+import CreateWorkoutPlanDialog from './CreateWorkoutPlanDialog';
 
 const TrainerDashboard = () => {
   const { profile, trainerProfile, loading } = useProfile();
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
       </div>
     );
   }
 
   const handleComingSoon = () => {
     toast({
-      title: "In arrivo",
-      description: "Questa funzionalità sarà presto disponibile!",
+      title: t('trainer.coming_soon.title'),
+      description: t('trainer.coming_soon.desc'),
     });
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg p-6 text-white flex justify-between items-start">
-        {/* ... existing header code ... */}
+      <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 rounded-lg p-6 text-white flex justify-between items-start shadow-md">
         <div>
           <h1 className="text-3xl font-bold mb-2">
-            Ciao, Trainer {profile?.first_name || 'Professionista'}! 👋
+            {t('trainer.welcome')}, {profile?.first_name || t('trainer.pro')}! 👋
           </h1>
-          <p className="text-blue-100">
-            Gestisci i tuoi clienti e le tue sessioni
+          <p className="text-indigo-100">
+            {t('trainer.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -50,74 +53,74 @@ const TrainerDashboard = () => {
             variant="secondary"
             size="sm"
             onClick={signOut}
-            className="bg-white/20 hover:bg-white/30 text-white border-0"
+            className="bg-white/20 hover:bg-white/30 text-white border-0 transition-transform active:scale-95"
           >
             <LogOut className="w-4 h-4 mr-2" />
-            Esci
+            {t('dashboard.logout')}
           </Button>
         </div>
       </div>
 
-      {/* Quick Stats - No changes needed implicitly, but keeping context */}
+      {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
+        <Card className="border-slate-200/80 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Clienti Attivi</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">{t('trainer.stats.active_clients')}</CardTitle>
+            <Users className="h-4 w-4 text-slate-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">+2 questo mese</p>
+            <div className="text-2xl font-bold text-slate-800">12</div>
+            <p className="text-xs text-emerald-600 mt-1">{t('trainer.stats.monthly_growth')}</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-slate-200/80 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tariffa Oraria</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">{t('trainer.stats.hourly_rate')}</CardTitle>
+            <DollarSign className="h-4 w-4 text-slate-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-slate-800">
               €{trainerProfile?.personal_rate_per_hour || 0}
             </div>
-            <p className="text-xs text-muted-foreground">Sessioni individuali</p>
+            <p className="text-xs text-slate-400 mt-1">{t('trainer.stats.rate_desc')}</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-slate-200/80 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Valutazione</CardTitle>
-            <Star className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">{t('trainer.stats.rating')}</CardTitle>
+            <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">4.8</div>
-            <p className="text-xs text-muted-foreground">15 recensioni</p>
+            <div className="text-2xl font-bold text-slate-800">4.8</div>
+            <p className="text-xs text-slate-400 mt-1">15 {t('trainer.stats.reviews')}</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-slate-200/80 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Esperienza</CardTitle>
-            <Award className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">{t('trainer.stats.experience')}</CardTitle>
+            <Award className="h-4 w-4 text-slate-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-slate-800">
               {trainerProfile?.years_experience || 0}
             </div>
-            <p className="text-xs text-muted-foreground">Anni di esperienza</p>
+            <p className="text-xs text-slate-400 mt-1">{t('trainer.stats.experience_desc')}</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Profile Summary - No changes needed implicitly */}
-        <Card>
+        {/* Profile Summary */}
+        <Card className="border-slate-200/80 shadow-sm">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Award className="h-5 w-5" />
-                Il Tuo Profilo Trainer
+              <CardTitle className="flex items-center gap-2 text-lg font-bold text-slate-800">
+                <Award className="h-5 w-5 text-indigo-500" />
+                {t('trainer.profile.title')}
               </CardTitle>
               {trainerProfile && <TrainerProfileEditDialog currentProfile={trainerProfile} />}
             </div>
@@ -126,109 +129,111 @@ const TrainerDashboard = () => {
             {trainerProfile ? (
               <>
                 <div>
-                  <p className="text-sm text-muted-foreground">Specializzazioni</p>
-                  <div className="flex flex-wrap gap-2 mt-1">
+                  <p className="text-sm text-slate-400">{t('trainer.profile.specializations')}</p>
+                  <div className="flex flex-wrap gap-2 mt-2">
                     {trainerProfile.specializations?.map((spec, index) => (
-                      <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                      <span key={index} className="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-full font-medium border border-indigo-100">
                         {spec}
                       </span>
-                    )) || <span className="text-muted-foreground">Nessuna specializzazione</span>}
+                    )) || <span className="text-slate-400 text-sm">{t('trainer.profile.no_specializations')}</span>}
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Certificazioni</p>
-                  <div className="flex flex-wrap gap-2 mt-1">
+                  <p className="text-sm text-slate-400">{t('trainer.profile.certifications')}</p>
+                  <div className="flex flex-wrap gap-2 mt-2">
                     {trainerProfile.certifications?.map((cert, index) => (
-                      <span key={index} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                      <span key={index} className="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-medium border border-emerald-100">
                         {cert}
                       </span>
-                    )) || <span className="text-muted-foreground">Nessuna certificazione</span>}
+                    )) || <span className="text-slate-400 text-sm">{t('trainer.profile.no_certifications')}</span>}
                   </div>
                 </div>
                 {trainerProfile.bio && (
                   <div>
-                    <p className="text-sm text-muted-foreground">Bio</p>
-                    <p className="text-sm">{trainerProfile.bio}</p>
+                    <p className="text-sm text-slate-400">{t('trainer.profile.bio')}</p>
+                    <p className="text-sm text-slate-700 mt-1 leading-relaxed">{trainerProfile.bio}</p>
                   </div>
                 )}
               </>
             ) : (
               <div className="text-center py-8">
-                <p className="text-muted-foreground mb-4">Completa il tuo profilo trainer</p>
-                <Button>Completa Profilo</Button>
+                <p className="text-slate-400 mb-4">{t('trainer.profile.incomplete')}</p>
+                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white transition-all active:scale-95">
+                  {t('trainer.profile.complete_btn')}
+                </Button>
               </div>
             )}
           </CardContent>
         </Card>
 
         {/* Quick Actions */}
-        <Card>
+        <Card className="border-slate-200/80 shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Azioni Rapide
+            <CardTitle className="flex items-center gap-2 text-lg font-bold text-slate-800">
+              <Calendar className="h-5 w-5 text-indigo-500" />
+              {t('trainer.actions.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {user && <AvailabilitySettings trainerId={user.id} />}
-            <Button className="w-full" variant="outline" onClick={() => navigate('/clients')}>
-              <Users className="mr-2 h-4 w-4" />
-              I Miei Clienti
+            <Button className="w-full justify-start hover:bg-indigo-50 border-slate-200 hover:text-indigo-700 transition-all active:scale-98" variant="outline" onClick={() => navigate('/clients')}>
+              <Users className="mr-2 h-4 w-4 text-indigo-500" />
+              {t('trainer.actions.my_clients')}
             </Button>
-            <Button className="w-full" variant="outline" onClick={() => navigate('/bookings')}>
-              <Clock className="mr-2 h-4 w-4" />
-              Prenotazioni Oggi
+            <Button className="w-full justify-start hover:bg-indigo-50 border-slate-200 hover:text-indigo-700 transition-all active:scale-98" variant="outline" onClick={() => navigate('/bookings')}>
+              <Clock className="mr-2 h-4 w-4 text-indigo-500" />
+              {t('trainer.actions.today_bookings')}
             </Button>
-            <Button className="w-full" variant="outline" onClick={handleComingSoon}>
-              <DollarSign className="mr-2 h-4 w-4" />
-              Guadagni
+            <Button className="w-full justify-start hover:bg-indigo-50 border-slate-200 hover:text-indigo-700 transition-all active:scale-98" variant="outline" onClick={handleComingSoon}>
+              <DollarSign className="mr-2 h-4 w-4 text-indigo-500" />
+              {t('trainer.actions.earnings')}
             </Button>
           </CardContent>
         </Card>
       </div>
 
       {/* Today's Schedule */}
-      <Card>
+      <Card className="border-slate-200/80 shadow-sm">
         <CardHeader>
-          <CardTitle>Programma di Oggi</CardTitle>
+          <CardTitle className="text-lg font-bold text-slate-800">{t('trainer.schedule.today')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-100">
               <div>
-                <p className="font-medium">Marco Rossi</p>
-                <p className="text-sm text-muted-foreground">Allenamento Personal Training</p>
+                <p className="font-semibold text-slate-800">Marco Rossi</p>
+                <p className="text-sm text-slate-500">{t('trainer.schedule.pt')}</p>
               </div>
               <div className="text-right">
-                <p className="font-medium">09:00 - 10:00</p>
-                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Confermato</span>
+                <p className="font-semibold text-slate-700">09:00 - 10:00</p>
+                <span className="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full border border-emerald-100 font-medium">{t('trainer.status.confirmed')}</span>
               </div>
             </div>
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-100">
               <div>
-                <p className="font-medium">Laura Bianchi</p>
-                <p className="text-sm text-muted-foreground">Sessione di Yoga</p>
+                <p className="font-semibold text-slate-800">Laura Bianchi</p>
+                <p className="text-sm text-slate-500">{t('trainer.schedule.yoga')}</p>
               </div>
               <div className="text-right">
-                <p className="font-medium">14:00 - 15:00</p>
-                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">In attesa</span>
+                <p className="font-semibold text-slate-700">14:00 - 15:00</p>
+                <span className="text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded-full border border-amber-100 font-medium">{t('trainer.status.pending')}</span>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
+
       {/* Requests Section */}
-      <Card className="md:col-span-2 lg:col-span-2">
+      <Card className="border-slate-200/80 shadow-sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5" />
-            Richieste di Schede (Remote Coaching)
+          <CardTitle className="flex items-center gap-2 text-lg font-bold text-slate-800">
+            <Target className="h-5 w-5 text-indigo-500" />
+            {t('trainer.coaching.requests')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {/* Fetch and map requests logic would go here. For now, static placeholder or basic fetch if easy */}
-            <RequestsList />
+            <RequestsList t={t} user={user} />
           </div>
         </CardContent>
       </Card>
@@ -236,12 +241,12 @@ const TrainerDashboard = () => {
   );
 };
 
-// Simple internal component for Requests List
-import { supabase } from '@/integrations/supabase/client';
-import CreateWorkoutPlanDialog from './CreateWorkoutPlanDialog';
+interface RequestsListProps {
+  t: (key: string) => string;
+  user: any;
+}
 
-const RequestsList = () => {
-  const { user } = useAuth();
+const RequestsList: React.FC<RequestsListProps> = ({ t, user }) => {
   const [requests, setRequests] = React.useState<any[]>([]);
 
   React.useEffect(() => {
@@ -258,25 +263,23 @@ const RequestsList = () => {
   }, [user]);
 
   if (requests.length === 0) {
-    return <p className="text-muted-foreground text-sm">Nessuna richiesta pending.</p>;
+    return <p className="text-slate-400 text-sm">{t('trainer.coaching.no_requests')}</p>;
   }
 
   return (
     <div className="space-y-4">
       {requests.map((req) => (
-        <div key={req.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border">
+        <div key={req.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200/80">
           <div>
-            <p className="font-semibold">{req.profiles?.first_name} {req.profiles?.last_name}</p>
-            <p className="text-sm text-slate-600">Obiettivo: {req.goals}</p>
-            <p className="text-xs text-slate-500">{req.days_per_week} giorni/settimana</p>
-            {req.injuries && <p className="text-xs text-red-500 mt-1">⚠️ {req.injuries}</p>}
+            <p className="font-semibold text-slate-800">{req.profiles?.first_name} {req.profiles?.last_name}</p>
+            <p className="text-sm text-slate-600">{t('trainer.coaching.goal')}: {req.goals}</p>
+            <p className="text-xs text-slate-500 mt-0.5">{req.days_per_week} {t('trainer.coaching.days_per_week')}</p>
+            {req.injuries && <p className="text-xs text-red-500 mt-1 font-medium">⚠️ {req.injuries}</p>}
           </div>
           <CreateWorkoutPlanDialog
             userId={req.user_id}
             userName={`${req.profiles?.first_name} ${req.profiles?.last_name}`}
             onSuccess={() => {
-              // Mark request as handled? ideally yes, but keeping it simple
-              // For now just refetch
               window.location.reload();
             }}
           />
@@ -285,6 +288,5 @@ const RequestsList = () => {
     </div>
   );
 };
-
 
 export default TrainerDashboard;

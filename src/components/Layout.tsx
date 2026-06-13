@@ -20,7 +20,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
   const location = useLocation();
   const { user } = useAuth();
   const { t } = useLanguage();
-  const { brandNameFull, toggleBrandName } = useBranding();
+  const { brandName, brandNameFull, brandInitials, toggleBrandName } = useBranding();
   const isDemoMode = !isFirebaseConfigured() && !HIDE_DEMO_BANNER;
 
   return (
@@ -53,7 +53,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                   className="w-8 h-8 bg-gradient-to-r from-indigo-600 to-lime-500 rounded-lg mr-3 flex items-center justify-center cursor-pointer hover:opacity-85 transition-opacity"
                   onClick={() => navigate('/')}
                 >
-                  <span className="text-white font-bold text-sm">FF</span>
+                  <span className="text-white font-bold text-sm">{brandInitials}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span

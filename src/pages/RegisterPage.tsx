@@ -10,6 +10,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { UserRegistrationData, TrainerRegistrationData, GymRegistrationData } from '@/schemas/auth';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useBranding } from '@/contexts/BrandingContext';
 
 const RegisterPage = () => {
   const [step, setStep] = useState<'role' | 'form'>('role');
@@ -20,6 +22,8 @@ const RegisterPage = () => {
   const { user, signUp } = useAuth();
   const { profile, createUserProfile, createTrainerProfile, createGymProfile, loading } = useProfile();
   const [searchParams] = useSearchParams();
+  const { t } = useLanguage();
+  const { brandNameFull } = useBranding();
 
   useEffect(() => {
     // Check URL parameters first
@@ -36,8 +40,6 @@ const RegisterPage = () => {
       return;
     }
 
-    // This block might be annoying if users want to create a new role? 
-    // But for now keeping logic: if user has a type but incomplete profile, send to form.
     if (user && profile?.user_type && !profile.first_name) {
       const roleMapping = {
         'user': 'user',
@@ -56,7 +58,6 @@ const RegisterPage = () => {
   const handleRoleSelect = (role: 'user' | 'instructor' | 'gym') => {
     setSelectedRole(role);
     setStep('form');
-    // We do NOT save to DB yet. We wait for registration form submission.
   };
 
   const handleFormSubmit = async (data: any) => {
@@ -69,8 +70,8 @@ const RegisterPage = () => {
       if (!currentUserId) {
         if (!data.email || !data.password) {
           toast({
-            title: "Dati mancanti",
-            description: "Email e Password sono richiesti per la registrazione.",
+            title: t('register.missing_data'),
+            description: t('register.missing_credentials'),
             variant: "destructive"
           });
           setIsSubmitting(false);
@@ -93,21 +94,13 @@ const RegisterPage = () => {
         const { data: authData, error: authError } = await signUp(data.email, data.password, metadata);
 
         if (authError || !authData?.user) {
-          // Error is already toasted in signUp check if needed? 
-          // signUp function in AuthContext toasts on error.
           setIsSubmitting(false);
           return;
         }
 
         currentUserId = authData.user.id;
 
-        // If session is null (email verification required), we stop here?
-        // We can try to create profile, but RLS might block.
         if (!authData.session) {
-          // We can't proceed with profile creation without a session usually
-          // But the Trigger likely created the basic profile row.
-          // We return, as we can't complete the secondary profile tables.
-          // toast in signUp likely already said "Check email".
           setIsSubmitting(false);
           return;
         }
@@ -133,7 +126,6 @@ const RegisterPage = () => {
             health_conditions: userData.healthConditions,
             experience_description: userData.goals
           };
-          // Pass currentUserId explicitly
           result = await createUserProfile(userProfileData, currentUserId);
           break;
 
@@ -149,7 +141,7 @@ const RegisterPage = () => {
             personal_rate_per_hour: trainerData.personalRate,
             group_rate_per_hour: trainerData.groupRate,
             preferred_areas: trainerData.preferredAreas,
-            availability_schedule: { slots: trainerData.availability } // Wrap in object as expected by schema
+            availability_schedule: { slots: trainerData.availability } 
           };
           result = await createTrainerProfile(trainerProfileData, currentUserId);
           break;
@@ -178,9 +170,11 @@ const RegisterPage = () => {
       error = result?.error;
 
       if (error) {
+        // Safe stringification to prevent circular reference HTMLInputElement fiber crashes
+        const errorMsg = error?.message || (typeof error === 'string' ? error : (error?.error || String(error)));
         toast({
-          title: "Errore",
-          description: "Errore nel salvare il profilo: " + (typeof error === 'string' ? error : JSON.stringify(error)),
+          title: t('register.unhandled_error'),
+          description: t('register.error_saving') + errorMsg,
           variant: "destructive"
         });
         setIsSubmitting(false);
@@ -193,16 +187,16 @@ const RegisterPage = () => {
 
       switch (selectedRole) {
         case 'user':
-          welcomeMessage = "🎉 Benvenuto in GymConnect AI!";
-          description = "Il tuo profilo atleta è stato creato. Preparati a scoprire il tuo match perfetto nel mondo del fitness!";
+          welcomeMessage = `🎉 Welcome to ${brandNameFull}!`;
+          description = "Your athlete profile has been created. Get ready to find your perfect fitness match!";
           break;
         case 'instructor':
-          welcomeMessage = "💪 Benvenuto Coach!";
-          description = "Il tuo profilo trainer è stato attivato. Inizia a costruire la tua community di atleti motivati!";
+          welcomeMessage = "💪 Welcome Coach!";
+          description = "Your trainer profile is active. Start building your client network today!";
           break;
         case 'gym':
-          welcomeMessage = "🏢 Palestra Registrata!";
-          description = "La tua struttura è ora parte del network GymConnect. Attrai nuovi membri e ottimizza la gestione!";
+          welcomeMessage = "🏢 Gym Registered!";
+          description = `Your gym is now part of the ${brandNameFull} network. Attract new members and optimize schedules!`;
           break;
       }
 
@@ -215,23 +209,20 @@ const RegisterPage = () => {
     } catch (error) {
       console.error('Error during registration:', error);
       toast({
-        title: "Errore Non Gestito",
-        description: "Errore durante la registrazione",
+        title: t('register.unhandled_error'),
+        description: t('register.error_generic'),
         variant: "destructive"
       });
-      setIsSubmitting(false); // Added setIsSubmitting(false) here
+      setIsSubmitting(false); 
     }
   };
 
   const handleBack = () => {
-    // If URL has param, maybe go home? But simple back to role is fine
     setStep('role');
     setSelectedRole('');
-    // Optional: Clear URL param?
     navigate('/register');
   };
 
-  // Helper functions
   const getHoursFromAvailability = (availability: string) => {
     const mapping: { [key: string]: number } = {
       '1-2-hours': 1.5,
@@ -255,8 +246,8 @@ const RegisterPage = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+        <div className="min-h-screen flex items-center justify-center bg-slate-50">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
         </div>
       </Layout>
     );
@@ -264,31 +255,34 @@ const RegisterPage = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-blue-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-slate-50 py-12 flex flex-col justify-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           {step === 'role' ? (
-            <div className="text-center mb-12 animate-fade-in">
-              <span className="inline-block py-1 px-3 rounded-full bg-green-100 text-green-700 text-sm font-semibold mb-4">
-                GymConnect AI
+            <div className="text-center mb-12 animate-fade-in max-w-3xl mx-auto">
+              <span className="inline-block py-1.5 px-4 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100 mb-4 uppercase tracking-wider">
+                {brandNameFull}
               </span>
-              <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-6">
-                Trasforma la Tua
-                <span className="block bg-gradient-to-r from-green-600 via-blue-600 to-orange-500 bg-clip-text text-transparent">
-                  Passione Fitness
+              <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight leading-none mb-6">
+                {t('register.transform_passion').split('\n')[0]}
+                <span className="block bg-gradient-to-r from-indigo-600 to-indigo-800 bg-clip-text text-transparent">
+                  {t('register.transform_passion').split('\n')[1] || ''}
                 </span>
               </h1>
-              <p className="text-xl text-slate-600 mb-4 max-w-4xl mx-auto leading-relaxed">
-                Unisciti alla rivoluzione del fitness intelligente. Scegli il tuo ruolo e inizia a creare
-                connessioni autentiche nel mondo del benessere e della forma fisica.
+              <p className="text-base text-slate-500 mb-6 leading-relaxed">
+                {t('register.revolution_desc')}
               </p>
-              <p className="text-lg text-green-600 font-medium mb-8">
-                ✨ Oltre 10.000 professionisti già connessi ✨
+              <p className="text-sm text-indigo-600 font-semibold mb-8">
+                {t('register.professionals_connected')}
               </p>
 
-              <div className="mb-12">
-                <p className="text-slate-500 mb-2">Hai già un account?</p>
-                <Button variant="outline" onClick={() => navigate('/login')} className="border-green-600 text-green-700 hover:bg-green-50">
-                  Accedi qui
+              <div className="mb-12 bg-white rounded-xl p-6 border border-slate-100 shadow-sm max-w-md mx-auto">
+                <p className="text-slate-400 text-sm mb-3 font-medium">{t('register.already_have_account')}</p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate('/login')} 
+                  className="border-indigo-600 text-indigo-600 hover:bg-indigo-50 w-full transition-all active:scale-98 font-semibold"
+                >
+                  {t('register.login_here')}
                 </Button>
               </div>
 

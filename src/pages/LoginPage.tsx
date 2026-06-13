@@ -9,17 +9,18 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useBranding } from '@/contexts/BrandingContext';
 
 const LoginPage = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const { user, signIn } = useAuth();
   const navigate = useNavigate();
+  const { user, signIn } = useAuth();
+  const { t } = useLanguage();
+  const { brandNameFull, brandInitials } = useBranding();
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -29,24 +30,23 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-
     if (!formData.email || !formData.password) {
-      setError('Per favore inserisci email e password');
-      setLoading(false);
+      setError(t('login.enter_credentials'));
       return;
     }
+
+    setLoading(true);
+    setError('');
 
     try {
       const { error } = await signIn(formData.email, formData.password);
       if (!error) {
         navigate('/dashboard');
       } else {
-        setError('Credenziali non valide. Controlla email e password.');
+        setError(t('login.invalid_credentials'));
       }
     } catch (err) {
-      setError('Si è verificato un errore durante l\'accesso. Riprova.');
+      setError(t('login.error_generic'));
     } finally {
       setLoading(false);
     }
@@ -59,42 +59,42 @@ const LoginPage = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-green-50 flex items-center justify-center py-12 px-4">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4">
         <div className="max-w-md w-full">
           {/* Header */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-8 animate-fade-in">
             <div className="mb-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-600 to-blue-600 rounded-full mx-auto flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-2xl">GC</span>
+              <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-full mx-auto flex items-center justify-center shadow-lg border-2 border-white">
+                <span className="text-white font-bold text-2xl tracking-wider">{brandInitials}</span>
               </div>
             </div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-2">
-              GymConnect AI
+            <h2 className="text-2xl font-black bg-gradient-to-r from-indigo-600 to-indigo-800 bg-clip-text text-transparent mb-1">
+              {brandNameFull}
             </h2>
-            <h1 className="text-xl font-semibold text-slate-700 mb-2">
-              Bentornato!
+            <h1 className="text-xl font-bold text-slate-800 mb-1">
+              {t('login.welcome_back')}
             </h1>
-            <p className="text-slate-600">
-              Accedi al tuo account GymConnect AI
+            <p className="text-slate-500 text-sm">
+              {t('login.subtitle').replace('{brandName}', brandNameFull)}
             </p>
           </div>
 
           {/* Login Form */}
-          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+          <Card className="shadow-xl border-slate-200/80 bg-white/90 backdrop-blur-sm">
             <CardHeader className="pb-4">
-              <CardTitle className="text-2xl text-center text-slate-900">Accedi</CardTitle>
+              <CardTitle className="text-2xl text-center font-bold text-slate-800">{t('login.title')}</CardTitle>
             </CardHeader>
 
             <CardContent className="space-y-6">
               {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
+                <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-800">
+                  <AlertDescription className="font-semibold text-xs">{error}</AlertDescription>
                 </Alert>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-slate-700 font-medium">
+                  <Label htmlFor="email" className="text-slate-700 font-semibold text-sm">
                     Email
                   </Label>
                   <Input
@@ -102,15 +102,15 @@ const LoginPage = () => {
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    placeholder="inserisci la tua email"
+                    placeholder={t('login.email_placeholder')}
                     required
                     disabled={loading}
-                    className="h-12 border-slate-200 focus:border-green-500 focus:ring-green-500"
+                    className="h-12 border-slate-200 focus:border-indigo-500 focus:ring-indigo-500"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-slate-700 font-medium">
+                  <Label htmlFor="password" className="text-slate-700 font-semibold text-sm">
                     Password
                   </Label>
                   <div className="relative">
@@ -119,15 +119,15 @@ const LoginPage = () => {
                       type={showPassword ? "text" : "password"}
                       value={formData.password}
                       onChange={(e) => handleInputChange('password', e.target.value)}
-                      placeholder="inserisci la tua password"
+                      placeholder={t('login.password_placeholder')}
                       required
                       disabled={loading}
-                      className="h-12 border-slate-200 focus:border-green-500 focus:ring-green-500 pr-12"
+                      className="h-12 border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 pr-12"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-650"
                       disabled={loading}
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -137,16 +137,16 @@ const LoginPage = () => {
 
                 <Button
                   type="submit"
-                  className="w-full h-12 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-lg transition-all active:scale-95 shadow-md shadow-indigo-100 border-0"
                   disabled={loading}
                 >
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Accesso in corso...
+                      {t('login.loading')}
                     </>
                   ) : (
-                    'Accedi'
+                    t('login.title')
                   )}
                 </Button>
               </form>
@@ -157,31 +157,31 @@ const LoginPage = () => {
                   <span className="w-full border-t border-slate-200" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-slate-500">oppure</span>
+                  <span className="bg-white px-3 text-slate-400 font-semibold">{t('login.or')}</span>
                 </div>
               </div>
 
               {/* Register Link */}
               <div className="text-center space-y-3">
-                <p className="text-slate-600">
-                  Non hai ancora un account?{' '}
+                <p className="text-slate-500 text-sm">
+                  {t('login.no_account')}
                   <button
-                    onClick={() => navigate('/auth')}
-                    className="text-green-600 hover:text-green-700 font-semibold hover:underline transition-colors"
+                    onClick={() => navigate('/register')}
+                    className="text-indigo-600 hover:text-indigo-75px font-bold hover:underline transition-colors"
                     disabled={loading}
                   >
-                    Registrati qui
+                    {t('login.register_here')}
                   </button>
                 </p>
                 <div className="pt-2 border-t border-slate-100">
                   <p className="text-slate-500 text-sm">
-                    Gestisci una palestra?{' '}
+                    {t('login.manage_gym')}
                     <button
-                      onClick={() => navigate('/auth?role=gym')}
-                      className="text-orange-600 hover:text-orange-700 font-bold hover:underline transition-colors"
+                      onClick={() => navigate('/register?role=gym')}
+                      className="text-indigo-650 hover:text-indigo-800 font-bold hover:underline transition-colors"
                       disabled={loading}
                     >
-                      Registra la tua struttura
+                      {t('login.register_gym')}
                     </button>
                   </p>
                 </div>
@@ -191,18 +191,18 @@ const LoginPage = () => {
               <div className="text-center pt-4 border-t border-slate-100">
                 <button
                   onClick={() => navigate('/')}
-                  className="text-slate-500 hover:text-slate-700 text-sm transition-colors"
+                  className="text-slate-400 hover:text-slate-600 text-sm font-semibold transition-colors"
                   disabled={loading}
                 >
-                  ← Torna alla homepage
+                  {t('login.back_home')}
                 </button>
               </div>
             </CardContent>
           </Card>
 
           {/* Footer */}
-          <div className="text-center mt-8 text-sm text-slate-500">
-            <p>© 2024 GymConnect AI. Tutti i diritti riservati.</p>
+          <div className="text-center mt-8 text-xs text-slate-400 font-medium">
+            <p>{t('login.footer').replace('{brandName}', brandNameFull)}</p>
           </div>
         </div>
       </div>
