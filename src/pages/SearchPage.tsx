@@ -139,6 +139,8 @@ const SearchPage = () => {
                       results={matches.filter(m => m.type === type)}
                       loading={matchingLoading}
                       type={type as any}
+                      currentUserProfile={profile}
+                      currentUserPreferences={preferences}
                     />
                   </TabsContent>
                 ))}
