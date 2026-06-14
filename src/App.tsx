@@ -72,11 +72,7 @@ function App() {
                     </ProtectedRoute>
                   } />
                   <Route path="/investors" element={<InvestorPage />} />
-                  <Route path="/search" element={
-                    <ProtectedRoute>
-                      <SearchPage />
-                    </ProtectedRoute>
-                  } />
+                  <Route path="/search" element={<SearchPage />} />
                   <Route path="/bookings" element={
                     <ProtectedRoute>
                       <BookingsPage />

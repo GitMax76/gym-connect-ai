@@ -107,6 +107,13 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
               )}
 
               <div className="hidden md:flex items-center space-x-4">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => navigate('/search')}
+                  className={`text-indigo-650 font-bold ${location.pathname === '/search' ? 'bg-indigo-50/50' : ''}`}
+                >
+                  Matchmaking AI
+                </Button>
                 {location.pathname === '/' ? (
                   <>
                     <Button variant="outline" className="border-green-600 text-green-700 hover:bg-green-50" onClick={() => navigate('/login')}>
@@ -184,6 +191,9 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                         </>
                       ) : (
                         <>
+                          <Button variant="ghost" className="w-full justify-start text-indigo-650 font-bold" onClick={() => navigate('/search')}>
+                            Matchmaking AI
+                          </Button>
                           <Button variant="outline" className="w-full justify-start border-green-600 text-green-700" onClick={() => navigate('/login')}>
                             {t('nav.login') || "ACCEDI"}
                           </Button>

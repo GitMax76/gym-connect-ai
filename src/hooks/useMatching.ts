@@ -98,15 +98,13 @@ export const useMatching = () => {
   };
 
   const findMatches = async (type: 'trainer' | 'gym' | 'user' = 'trainer', filters: any = {}) => {
-    if (!user) return;
-
     setLoading(true);
     try {
       let query;
 
       // Retrieve user's city from profile or preferences to filter matches
-      // Default to 'Roma' only if no city is found in profile
-      const targetCity = profile?.city || 'Roma';
+      // Default to filters.city, then profile.city, then 'Roma'
+      const targetCity = filters.city || profile?.city || 'Roma';
       console.log('Searching matches for city:', targetCity);
 
       if (type === 'trainer') {
@@ -216,7 +214,7 @@ export const useMatching = () => {
       // Calculate match scores for each result in parallel
       const matchResults: MatchResult[] = await Promise.all((data || []).map(async (item) => {
         const score = await calculateMatchScore(
-          user.id,
+          user?.id || 'guest-user',
           type === 'trainer' ? item.id : null,
           type === 'gym' ? item.id : null
         );
