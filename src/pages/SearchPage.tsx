@@ -70,7 +70,7 @@ const SearchPage = () => {
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-r from-indigo-600 to-lime-500 rounded-lg flex items-center justify-center">
                 <Search className="h-5 w-5 text-white" />
               </div>
               <h1 className="text-3xl font-bold text-slate-900">
@@ -84,10 +84,10 @@ const SearchPage = () => {
           </div>
 
           {/* Smart Matching Banner */}
-          <Card className="mb-6 bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
+          <Card className="mb-6 bg-gradient-to-r from-indigo-50/50 to-lime-50/20 border-indigo-100">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-green-600 to-blue-600 rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-lime-500 rounded-full flex items-center justify-center">
                   <Zap className="h-6 w-6 text-white" />
                 </div>
                 <div>

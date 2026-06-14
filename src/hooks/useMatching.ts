@@ -157,7 +157,56 @@ export const useMatching = () => {
         query = q.limit(20);
       }
 
-      const { data, error } = await query;
+      let { data, error } = await query;
+
+      // UX Fallback: If no matches are found in the user's city, query all cities (ignoring the city filter)
+      // to make sure they always have matching profiles to test the algorithm.
+      if ((!data || data.length === 0) && !error) {
+        console.log(`No local matches in ${targetCity}, performing global matching fallback.`);
+        if (type === 'trainer') {
+          let q = supabase
+            .from('trainer_profiles')
+            .select(`
+              *,
+              profiles!inner(first_name, last_name, city, avatar_url)
+            `);
+          if (filters.specializations && filters.specializations.length > 0) {
+            q = q.contains('specializations', filters.specializations);
+          }
+          if (filters.budget_max) {
+            q = q.lte('personal_rate_per_hour', filters.budget_max);
+          }
+          const res = await q.limit(20);
+          data = res.data;
+          error = res.error;
+        } else if (type === 'gym') {
+          let q = supabase
+            .from('gym_profiles')
+            .select(`
+              *,
+              profiles!inner(city, first_name, avatar_url)
+            `);
+          if (filters.facilities && filters.facilities.length > 0) {
+            q = q.contains('facilities', filters.facilities);
+          }
+          if (filters.budget_max) {
+            q = q.lte('monthly_fee', filters.budget_max);
+          }
+          const res = await q.limit(20);
+          data = res.data;
+          error = res.error;
+        } else if (type === 'user') {
+          const res = await supabase
+            .from('user_profiles')
+            .select(`
+              *,
+              profiles!inner(first_name, last_name, city, avatar_url)
+            `)
+            .limit(20);
+          data = res.data;
+          error = res.error;
+        }
+      }
 
       if (error) {
         console.error('Error fetching matches:', error);
