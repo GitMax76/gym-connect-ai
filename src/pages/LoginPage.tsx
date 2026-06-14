@@ -197,6 +197,42 @@ const LoginPage = () => {
                   {t('login.back_home')}
                 </button>
               </div>
+
+              {/* Demo Accounts Quick-Select */}
+              <div className="pt-4 border-t border-slate-150 bg-slate-50/60 p-3.5 rounded-xl mt-4 border border-dashed border-slate-200">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider text-center mb-2.5">
+                  ⚡ ACCESSO RAPIDO DEMO (TESTER)
+                </p>
+                <div className="flex flex-col gap-2">
+                  <button
+                    type="button"
+                    className="w-full text-xs font-bold py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-lime-50 hover:text-lime-700 transition-all text-left flex items-center gap-2"
+                    onClick={() => {
+                      setFormData({ email: 'rome_user_1@test.com', password: 'password123' });
+                    }}
+                  >
+                    🏃‍♂️ <span className="flex-1">Accedi come Atleta (Roma)</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="w-full text-xs font-bold py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-indigo-50 hover:text-indigo-750 transition-all text-left flex items-center gap-2"
+                    onClick={() => {
+                      setFormData({ email: 'marco.bianchi@test.com', password: 'password123' });
+                    }}
+                  >
+                    💪 <span className="flex-1">Accedi come Trainer (Roma)</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="w-full text-xs font-bold py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-violet-50 hover:text-violet-750 transition-all text-left flex items-center gap-2"
+                    onClick={() => {
+                      setFormData({ email: 'info@powergymroma.com', password: 'password123' });
+                    }}
+                  >
+                    🏢 <span className="flex-1">Accedi come Palestra (Roma)</span>
+                  </button>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
