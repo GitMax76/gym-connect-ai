@@ -64,11 +64,11 @@ const LoginPage = () => {
           {/* Header */}
           <div className="text-center mb-8 animate-fade-in">
             <div className="mb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-full mx-auto flex items-center justify-center shadow-lg border-2 border-white">
+              <div className="w-16 h-16 bg-gradient-to-br from-emerald-600 to-indigo-700 rounded-full mx-auto flex items-center justify-center shadow-lg border-2 border-white">
                 <span className="text-white font-bold text-2xl tracking-wider">{brandInitials}</span>
               </div>
             </div>
-            <h2 className="text-2xl font-black bg-gradient-to-r from-indigo-600 to-indigo-800 bg-clip-text text-transparent mb-1">
+            <h2 className="text-2xl font-black bg-gradient-to-r from-emerald-600 to-indigo-700 bg-clip-text text-transparent mb-1">
               {brandNameFull}
             </h2>
             <h1 className="text-xl font-bold text-slate-800 mb-1">
@@ -105,7 +105,7 @@ const LoginPage = () => {
                     placeholder={t('login.email_placeholder')}
                     required
                     disabled={loading}
-                    className="h-12 border-slate-200 focus:border-indigo-500 focus:ring-indigo-500"
+                    className="h-12 border-slate-200 focus:border-primary focus:ring-primary rounded-xl"
                   />
                 </div>
 
@@ -122,7 +122,7 @@ const LoginPage = () => {
                       placeholder={t('login.password_placeholder')}
                       required
                       disabled={loading}
-                      className="h-12 border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 pr-12"
+                      className="h-12 border-slate-200 focus:border-primary focus:ring-primary pr-12 rounded-xl"
                     />
                     <button
                       type="button"
@@ -137,7 +137,7 @@ const LoginPage = () => {
 
                 <Button
                   type="submit"
-                  className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-lg transition-all active:scale-95 shadow-md shadow-indigo-100 border-0"
+                  className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-semibold text-lg transition-all active:scale-95 shadow-md shadow-emerald-500/10 border-0 rounded-xl"
                   disabled={loading}
                 >
                   {loading ? (
@@ -167,7 +167,7 @@ const LoginPage = () => {
                   {t('login.no_account')}
                   <button
                     onClick={() => navigate('/register')}
-                    className="text-indigo-600 hover:text-indigo-75px font-bold hover:underline transition-colors"
+                    className="text-primary hover:text-primary/80 font-bold hover:underline transition-colors ml-1"
                     disabled={loading}
                   >
                     {t('login.register_here')}
@@ -178,7 +178,7 @@ const LoginPage = () => {
                     {t('login.manage_gym')}
                     <button
                       onClick={() => navigate('/register?role=gym')}
-                      className="text-indigo-650 hover:text-indigo-800 font-bold hover:underline transition-colors"
+                      className="text-primary hover:text-primary/80 font-bold hover:underline transition-colors ml-1"
                       disabled={loading}
                     >
                       {t('login.register_gym')}
@@ -206,7 +206,7 @@ const LoginPage = () => {
                 <div className="flex flex-col gap-2">
                   <button
                     type="button"
-                    className="w-full text-xs font-bold py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-lime-50 hover:text-lime-700 transition-all text-left flex items-center gap-2"
+                    className="w-full text-xs font-bold py-2.5 px-3.5 rounded-xl border border-slate-200 bg-white hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-250 transition-all text-left flex items-center gap-2"
                     onClick={() => {
                       setFormData({ email: 'rome_user_1@test.com', password: 'password123' });
                     }}
@@ -215,7 +215,7 @@ const LoginPage = () => {
                   </button>
                   <button
                     type="button"
-                    className="w-full text-xs font-bold py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-indigo-50 hover:text-indigo-750 transition-all text-left flex items-center gap-2"
+                    className="w-full text-xs font-bold py-2.5 px-3.5 rounded-xl border border-slate-200 bg-white hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-250 transition-all text-left flex items-center gap-2"
                     onClick={() => {
                       setFormData({ email: 'marco.bianchi@test.com', password: 'password123' });
                     }}
@@ -224,7 +224,7 @@ const LoginPage = () => {
                   </button>
                   <button
                     type="button"
-                    className="w-full text-xs font-bold py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-violet-50 hover:text-violet-750 transition-all text-left flex items-center gap-2"
+                    className="w-full text-xs font-bold py-2.5 px-3.5 rounded-xl border border-slate-200 bg-white hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-250 transition-all text-left flex items-center gap-2"
                     onClick={() => {
                       setFormData({ email: 'info@powergymroma.com', password: 'password123' });
                     }}

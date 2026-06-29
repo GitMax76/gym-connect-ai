@@ -276,7 +276,7 @@ const SearchResults = ({
           <h2 className="text-xl font-bold text-slate-800">
             {results.length} {type === 'trainer' ? 'Trainer' : type === 'gym' ? 'Palestre' : 'Atleti'} {isEn ? 'found' : 'trovati'}
           </h2>
-          <div className="text-xs font-semibold text-indigo-600/80 uppercase tracking-wide bg-indigo-50 px-3 py-1 rounded-full flex items-center gap-1.5">
+          <div className="text-xs font-semibold text-primary/95 uppercase tracking-wide bg-primary/10 px-3 py-1 rounded-full flex items-center gap-1.5">
             <TrendingUp className="h-3.5 w-3.5" />
             {isEn ? 'Sorted by compatibility' : 'Ordinati per compatibilità'}
           </div>
@@ -299,7 +299,7 @@ const SearchResults = ({
           return (
             <Card 
               key={result.id} 
-              className="group overflow-hidden rounded-2xl border border-slate-100 bg-white/80 backdrop-blur-md shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-500/20"
+              className="group overflow-hidden rounded-2xl border border-slate-100 bg-white/80 backdrop-blur-md shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/5 hover:border-primary/20"
             >
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
@@ -308,9 +308,9 @@ const SearchResults = ({
                   <div className="flex-1 flex items-start gap-4">
                     {(type === 'trainer' || type === 'user') && (
                       <div className="relative">
-                        <Avatar className="w-16 h-16 border-2 border-indigo-100 group-hover:border-indigo-500/30 transition-colors duration-300">
+                        <Avatar className="w-16 h-16 border-2 border-emerald-100 group-hover:border-primary/30 transition-colors duration-300">
                           <AvatarImage src={result.profile.profiles?.avatar_url} />
-                          <AvatarFallback className="bg-indigo-50 text-indigo-700 font-bold text-lg">
+                          <AvatarFallback className="bg-primary/10 text-primary font-bold text-lg">
                             {result.profile.profiles?.first_name?.[0]}
                             {result.profile.profiles?.last_name?.[0]}
                           </AvatarFallback>
@@ -325,7 +325,7 @@ const SearchResults = ({
 
                     {type === 'gym' && (
                       <div className="relative">
-                        <div className="w-16 h-16 bg-gradient-to-br from-indigo-50 to-indigo-100/50 rounded-2xl border-2 border-indigo-100 flex items-center justify-center text-indigo-600 font-bold group-hover:border-indigo-500/30 transition-colors duration-300">
+                        <div className="w-16 h-16 bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-2xl border-2 border-emerald-100 flex items-center justify-center text-primary font-bold group-hover:border-primary/30 transition-colors duration-300">
                           <Users className="w-8 h-8" />
                         </div>
                         {isVerified && (
@@ -338,14 +338,14 @@ const SearchResults = ({
 
                     <div className="space-y-1 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-lg font-bold text-slate-800 tracking-tight group-hover:text-indigo-600 transition-colors duration-300">
+                        <h3 className="text-lg font-bold text-slate-800 tracking-tight group-hover:text-primary transition-colors duration-300">
                           {(type === 'trainer' || type === 'user')
                             ? `${result.profile.profiles?.first_name || ''} ${result.profile.profiles?.last_name || ''}`
                             : result.profile.gym_name
                           }
                         </h3>
                         {type === 'trainer' && (
-                          <Badge variant="outline" className="bg-indigo-50/50 border-indigo-100 text-indigo-700 text-[10px] font-bold py-0.5 px-2">
+                          <Badge variant="outline" className="bg-primary/5 border-primary/20 text-primary text-[10px] font-bold py-0.5 px-2">
                             Trainer Pro
                           </Badge>
                         )}
@@ -448,9 +448,9 @@ const SearchResults = ({
                     {/* Show Breakdown toggle button */}
                     <button 
                       onClick={() => toggleExpand(result.id)}
-                      className="text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50/50 hover:bg-indigo-50 hover-lift flex items-center gap-1 py-1.5 px-3 rounded-full transition-all duration-300"
+                      className="text-xs font-bold text-primary hover:text-primary/80 bg-primary/10 hover:bg-primary/20 hover-lift flex items-center gap-1 py-1.5 px-3 rounded-full transition-all duration-300"
                     >
-                      <Sparkles className="w-3 h-3 text-indigo-500 fill-indigo-100" />
+                      <Sparkles className="w-3 h-3 text-primary fill-primary/10" />
                       <span>{isExpanded ? (isEn ? 'Hide Details' : 'Chiudi Analisi') : (isEn ? 'AI Analysis' : 'Analisi AI')}</span>
                       {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                     </button>
@@ -468,7 +468,7 @@ const SearchResults = ({
                 {/* Tags / Skills list */}
                 <div className="flex flex-wrap gap-1.5 mt-4">
                   {type === 'trainer' && result.profile.specializations?.map((spec: string) => (
-                    <Badge key={spec} variant="secondary" className="bg-slate-100 text-slate-700 text-[10px] hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-100 transition-colors duration-200 py-0.5 px-2">
+                    <Badge key={spec} variant="secondary" className="bg-slate-100 text-slate-700 text-[10px] hover:bg-primary/5 hover:text-primary hover:border-primary/20 transition-colors duration-200 py-0.5 px-2">
                       {spec}
                     </Badge>
                   ))}
@@ -481,9 +481,9 @@ const SearchResults = ({
 
                 {/* Score Breakdown Expanded Panel */}
                 {isExpanded && (
-                  <div className="mt-5 pt-4 border-t border-dashed border-slate-100 bg-indigo-50/20 rounded-xl p-4 transition-all duration-500 ease-in-out">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-900 mb-3 uppercase tracking-wider">
-                      <Sparkles className="w-4 h-4 text-indigo-500 fill-indigo-100" />
+                  <div className="mt-5 pt-4 border-t border-dashed border-slate-100 bg-primary/5 rounded-xl p-4 transition-all duration-500 ease-in-out">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 mb-3 uppercase tracking-wider">
+                      <Sparkles className="w-4 h-4 text-primary fill-primary/10" />
                       <span>{isEn ? 'AI Compatibility Report' : 'Dettaglio Analisi di Compatibilità AI'}</span>
                     </div>
                     
@@ -496,7 +496,7 @@ const SearchResults = ({
                         </div>
                         <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full transition-all duration-1000"
+                            className="h-full bg-gradient-to-r from-emerald-550 to-emerald-600 rounded-full transition-all duration-1000"
                             style={{ width: `${breakdown.goals}%` }}
                           />
                         </div>
@@ -510,7 +510,7 @@ const SearchResults = ({
                         </div>
                         <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full transition-all duration-1000"
+                            className="h-full bg-gradient-to-r from-emerald-550 to-emerald-600 rounded-full transition-all duration-1000"
                             style={{ width: `${breakdown.budget}%` }}
                           />
                         </div>
@@ -524,7 +524,7 @@ const SearchResults = ({
                         </div>
                         <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full transition-all duration-1000"
+                            className="h-full bg-gradient-to-r from-emerald-550 to-emerald-600 rounded-full transition-all duration-1000"
                             style={{ width: `${breakdown.schedule}%` }}
                           />
                         </div>
@@ -538,7 +538,7 @@ const SearchResults = ({
                         </div>
                         <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full transition-all duration-1000"
+                            className="h-full bg-gradient-to-r from-emerald-550 to-emerald-600 rounded-full transition-all duration-1000"
                             style={{ width: `${breakdown.location}%` }}
                           />
                         </div>
@@ -634,7 +634,7 @@ const SearchResults = ({
                     <Button 
                       size="sm" 
                       onClick={() => handleBooking(result)}
-                      className="text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all duration-200 px-4 rounded-xl active:scale-[0.98]"
+                      className="text-xs font-bold bg-primary hover:bg-primary/90 text-white shadow-sm transition-all duration-200 px-4 rounded-xl active:scale-[0.98]"
                     >
                       {type === 'trainer' 
                         ? (isEn ? 'Book Session' : 'Prenota Trainer') 

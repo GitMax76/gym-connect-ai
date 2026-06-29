@@ -50,7 +50,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center group">
                 <div 
-                  className="w-8 h-8 bg-gradient-to-r from-indigo-600 to-lime-500 rounded-lg mr-3 flex items-center justify-center cursor-pointer hover:opacity-85 transition-opacity"
+                  className="w-8 h-8 bg-gradient-to-r from-emerald-600 to-indigo-700 rounded-lg mr-3 flex items-center justify-center cursor-pointer hover:opacity-85 transition-opacity"
                   onClick={() => navigate('/')}
                 >
                   <span className="text-white font-bold text-sm">{brandInitials}</span>
@@ -61,7 +61,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                       e.stopPropagation();
                       toggleBrandName();
                     }}
-                    className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-lime-500 bg-clip-text text-transparent select-none cursor-pointer hover:opacity-80 transition-opacity flex items-center"
+                    className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-indigo-700 bg-clip-text text-transparent select-none cursor-pointer hover:opacity-80 transition-opacity flex items-center"
                     title="Clicca per cambiare brand name (Demo)"
                   >
                     {brandNameFull}
@@ -71,7 +71,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                       e.stopPropagation();
                       toggleBrandName();
                     }}
-                    className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-lime-100 text-lime-800 animate-pulse cursor-pointer select-none"
+                    className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 animate-pulse cursor-pointer select-none"
                   >
                     Demo Switch
                   </span>
@@ -110,7 +110,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                 <Button 
                   variant="ghost" 
                   onClick={() => navigate('/search')}
-                  className={`text-indigo-650 font-bold ${location.pathname === '/search' ? 'bg-indigo-50/50' : ''}`}
+                  className={`text-primary font-bold ${location.pathname === '/search' ? 'bg-primary/10' : ''}`}
                 >
                   Matchmaking AI
                 </Button>
@@ -191,7 +191,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
                         </>
                       ) : (
                         <>
-                          <Button variant="ghost" className="w-full justify-start text-indigo-650 font-bold" onClick={() => navigate('/search')}>
+                          <Button variant="ghost" className="w-full justify-start text-primary font-bold" onClick={() => navigate('/search')}>
                             Matchmaking AI
                           </Button>
                           <Button variant="outline" className="w-full justify-start border-green-600 text-green-700" onClick={() => navigate('/login')}>
@@ -225,9 +225,9 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
               &copy; {new Date().getFullYear()} {brandNameFull}. <span className="mx-2">|</span>
               <div className="flex items-center group cursor-pointer">
                 <span className="mr-1">{t('footer.created_by')}</span>
-                <Link to="/credits" className="flex items-center font-extrabold text-base bg-gradient-to-r from-indigo-600 to-lime-500 bg-clip-text text-transparent hover:opacity-80 transition-opacity ml-1">
+                <Link to="/credits" className="flex items-center font-extrabold text-base bg-gradient-to-r from-emerald-600 to-indigo-700 bg-clip-text text-transparent hover:opacity-80 transition-opacity ml-1">
                   Massimiliano Sabato
-                  <Dumbbell className="ml-2 w-5 h-5 text-indigo-500 animate-bounce" style={{ animationDuration: '2s' }} />
+                  <Dumbbell className="ml-2 w-5 h-5 text-emerald-600 animate-bounce" style={{ animationDuration: '2s' }} />
                 </Link>
               </div>
             </div>
@@ -243,7 +243,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
               </a>
               <Link to="/privacy" className="hover:text-primary transition-colors text-sm">{t('nav.privacy')}</Link>
               <Link to="/terms" className="hover:text-primary transition-colors text-sm">{t('nav.terms')}</Link>
-              <Link to="/investors" className="hover:text-primary transition-colors text-sm font-semibold text-indigo-600">{t('nav.investors')}</Link>
+              <Link to="/investors" className="hover:text-primary transition-colors text-sm font-semibold text-primary">{t('nav.investors')}</Link>
             </div>
           </div>
         </footer>
@@ -254,7 +254,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
           <button
             onClick={() => navigate('/dashboard')}
             className={`flex flex-col items-center gap-1 flex-1 text-slate-500 transition-colors ${
-              location.pathname === '/dashboard' ? 'text-indigo-650 font-bold' : ''
+              location.pathname === '/dashboard' ? 'text-primary font-bold' : ''
             }`}
           >
             <LayoutDashboard className="h-5 w-5" />
@@ -263,7 +263,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
           <button
             onClick={() => navigate('/search')}
             className={`flex flex-col items-center gap-1 flex-1 text-slate-500 transition-colors ${
-              location.pathname === '/search' ? 'text-indigo-650 font-bold' : ''
+              location.pathname === '/search' ? 'text-primary font-bold' : ''
             }`}
           >
             <Search className="h-5 w-5" />
@@ -272,7 +272,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
           <button
             onClick={() => navigate('/bookings')}
             className={`flex flex-col items-center gap-1 flex-1 text-slate-500 transition-colors ${
-              location.pathname === '/bookings' ? 'text-indigo-650 font-bold' : ''
+              location.pathname === '/bookings' ? 'text-primary font-bold' : ''
             }`}
           >
             <Calendar className="h-5 w-5" />
@@ -281,7 +281,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
           <button
             onClick={() => navigate('/wallet')}
             className={`flex flex-col items-center gap-1 flex-1 text-slate-500 transition-colors ${
-              location.pathname === '/wallet' ? 'text-indigo-650 font-bold' : ''
+              location.pathname === '/wallet' ? 'text-primary font-bold' : ''
             }`}
           >
             <Wallet className="h-5 w-5" />
@@ -290,7 +290,7 @@ const Layout = ({ children, showNavigation = true }: LayoutProps) => {
           <button
             onClick={() => navigate(`/profile/${user.id}`)}
             className={`flex flex-col items-center gap-1 flex-1 text-slate-500 transition-colors ${
-              location.pathname.startsWith('/profile') ? 'text-indigo-650 font-bold' : ''
+              location.pathname.startsWith('/profile') ? 'text-primary font-bold' : ''
             }`}
           >
             <User className="h-5 w-5" />
