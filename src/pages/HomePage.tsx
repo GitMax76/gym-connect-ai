@@ -18,7 +18,7 @@ import "driver.js/dist/driver.css";
 const HomePage = () => {
   const navigate = useNavigate();
   const { t, language } = useLanguage();
-  const { brandNameFull } = useBranding();
+  const { brandNameFull, brandInitials } = useBranding();
   const isEn = language === 'EN';
 
   // State to manage active Tab
@@ -40,7 +40,7 @@ const HomePage = () => {
     const driverObj = driver({
       showProgress: true,
       steps: [
-        { popover: { title: `Benvenuto in ${brandNameFull}`, description: 'Esplora le sezioni interattive per comprendere il valore di Gym-Connect.ai.' } },
+        { popover: { title: `Benvenuto in ${brandNameFull}`, description: `Esplora le sezioni interattive per comprendere il valore di ${brandNameFull}.` } },
         { element: '#tab-btn-home', popover: { title: 'Home', description: 'La nostra proposta di valore in meno di 10 secondi.' } },
         { element: '#tab-btn-ai-coach', popover: { title: 'AI Matchmaker', description: 'Prova il simulatore di accoppiamento intelligente in tempo reale.' } },
         { element: '#tab-btn-dashboard', popover: { title: 'Anteprima Dashboard', description: 'Osserva come si presenta il cruscotto di controllo per gli utenti attivi.' } }
@@ -101,7 +101,7 @@ const HomePage = () => {
     }
   ];
 
-  // Filtered preview match list based on simulator selettors
+  // Filtered preview match list based on simulator selectors
   const filteredMatches = fakeResults.filter(
     (item) => item.city === simCity || item.goal === simGoal
   ).sort((a, b) => b.score - a.score);
@@ -123,112 +123,64 @@ const HomePage = () => {
     <Layout>
       <div className="min-h-screen bg-[#050505] text-white font-sans overflow-x-hidden antialiased">
         
-        {/* Main Application Frame Grid */}
-        <div className="max-w-[1600px] mx-auto px-4 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Horizontal Sticky Sub-Navigation Tabs Bar (Immediately below the navbar at top-16) */}
+        <div className="sticky top-16 z-40 bg-[#050505]/95 backdrop-blur-md border-b border-slate-900 shadow-lg select-none py-3.5">
+          <div className="max-w-7xl mx-auto px-4 flex items-center justify-start md:justify-center overflow-x-auto scrollbar-none gap-2.5">
+            {tabs.map((tab) => {
+              const TabIcon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  id={`tab-btn-${tab.id}`}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className={`flex items-center gap-2.5 px-4.5 py-2.5 rounded-2xl text-xs md:text-sm font-bold tracking-tight transition-all duration-200 whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/10'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
+                  }`}
+                >
+                  <TabIcon className="w-4.5 h-4.5 flex-shrink-0" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Main Full-Width Content Container */}
+        <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
           
-          {/* Desktop Left Sidebar (Sticky Layout) */}
-          <aside className="lg:col-span-3 lg:h-[80vh] lg:sticky lg:top-24 flex flex-col justify-between">
-            <div className="bg-[#0A0A0A] border border-slate-900 rounded-3xl p-6 space-y-8 shadow-2xl">
-              <div>
-                <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest bg-emerald-950/40 border border-emerald-900 px-3 py-1.5 rounded-lg">
-                  WORKSPACE PLATFORM
-                </span>
-                <h2 className="text-xl font-extrabold text-white mt-4 tracking-tight">
-                  Gym-Connect.ai
-                </h2>
-                <p className="text-xs text-slate-500 font-medium mt-1">
-                  L'ecosistema del fitness intelligente.
-                </p>
-              </div>
-
-              {/* Navigation Tabs List */}
-              <nav className="flex flex-col gap-2">
-                {tabs.map((tab) => {
-                  const TabIcon = tab.icon;
-                  return (
-                    <button
-                      key={tab.id}
-                      id={`tab-btn-${tab.id}`}
-                      onClick={() => {
-                        setActiveTab(tab.id);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className={`flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-bold tracking-tight transition-all duration-200 text-left ${
-                        activeTab === tab.id
-                          ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/10'
-                          : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
-                      }`}
-                    >
-                      <TabIcon className="w-5 h-5 flex-shrink-0" />
-                      <span>{tab.label}</span>
-                    </button>
-                  );
-                })}
-              </nav>
-            </div>
-
-            {/* Quick Demo Footer Action in Sidebar */}
-            <div className="hidden lg:block bg-gradient-to-br from-emerald-950/20 to-slate-950 border border-emerald-900/40 rounded-3xl p-5 mt-6 text-center space-y-4">
-              <Sparkles className="w-8 h-8 text-emerald-400 mx-auto animate-pulse" />
-              <div className="space-y-1">
-                <h4 className="text-sm font-bold text-white">Pronto per gli investitori?</h4>
-                <p className="text-[10.5px] text-slate-500 font-medium">Avvia il tour guidato interattivo del prototipo.</p>
-              </div>
-              <Button 
-                onClick={startTour}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl py-2.5 shadow-md active:scale-95 transition-all"
-              >
-                Avvia il Tour
-              </Button>
-            </div>
-          </aside>
-
-          {/* Mobile Top Tabs Scroller Navigation (Visible only on mobile/tablet when NOT on home tab) */}
-          {activeTab !== 'home' && (
-            <div className="lg:hidden col-span-1 border-b border-slate-900 pb-2 select-none overflow-x-auto scrollbar-none flex gap-3.5">
-              {tabs.map((tab) => {
-                const TabIcon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => {
-                      setActiveTab(tab.id);
-                    }}
-                    className={`flex items-center gap-2.5 px-4 py-3 rounded-full text-xs font-extrabold whitespace-nowrap tracking-wider uppercase transition-all duration-200 border ${
-                      activeTab === tab.id
-                        ? 'bg-emerald-600 text-white border-emerald-500 shadow-md shadow-emerald-600/10'
-                        : 'bg-[#0A0A0A] border-slate-900 text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <TabIcon className="w-4 h-4 flex-shrink-0" />
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Right Workspace Main Content Area */}
-          <main className="lg:col-span-9 space-y-8 animate-fade-in">
+          <main className="space-y-12 animate-fade-in">
             
             {/* 1. HOME TAB */}
             {activeTab === 'home' && (
-              <div className="space-y-12">
+              <div className="space-y-16">
                 
                 {/* 10-Second Premium Hero Header */}
-                <div className="bg-gradient-to-br from-[#0A0A0A] via-slate-950 to-[#0A0A0A] border border-slate-900 rounded-3xl p-8 md:p-14 text-center space-y-8 relative overflow-hidden shadow-2xl">
-                  <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
+                <div className="bg-gradient-to-br from-[#0A0A0A] via-slate-950 to-[#0A0A0A] border border-slate-900 rounded-3xl p-8 md:p-16 text-center space-y-8 relative overflow-hidden shadow-2xl">
+                  <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none" />
                   
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-950/60 border border-emerald-900/60 text-emerald-400 text-xs font-black tracking-widest uppercase mb-4 shadow-inner">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-950/60 border border-emerald-900/60 text-emerald-450 text-xs font-black tracking-widest uppercase mb-4 shadow-inner">
                     <Sparkles className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '6s' }} />
                     <span>L'ecosistema del fitness on-demand</span>
                   </div>
 
-                  <h1 className="text-4xl md:text-7xl font-black text-white leading-none tracking-tight">
-                    Gym-Connect<span className="text-emerald-500">.ai</span>
+                  <h1 className="text-4xl md:text-8xl font-black text-white leading-none tracking-tight">
+                    {brandNameFull.includes(' ') ? (
+                      <>
+                        {brandNameFull.split(' ')[0]}<span className="text-emerald-500"> {brandNameFull.split(' ')[1]}</span>
+                      </>
+                    ) : (
+                      <>
+                        {brandNameFull}<span className="text-emerald-500">.ai</span>
+                      </>
+                    )}
                   </h1>
 
-                  <p className="text-lg md:text-2xl text-slate-350 max-w-3xl mx-auto font-medium leading-relaxed">
+                  <p className="text-lg md:text-2xl text-slate-350 max-w-4xl mx-auto font-medium leading-relaxed">
                     Il punto d'incontro intelligente per <span className="text-white font-bold">Atleti</span>, <span className="text-white font-bold">Personal Trainer</span> e <span className="text-white font-bold">Centri Fitness</span>. 
                     Prenota allenamenti on-demand, gestisci clienti da un CRM avanzato e monetizza gli spazi vuoti delle palestre.
                   </p>
@@ -246,7 +198,7 @@ const HomePage = () => {
                       size="lg" 
                       variant="ghost"
                       onClick={startTour}
-                      className="border border-slate-800 text-white bg-slate-950/45 hover:bg-slate-900 rounded-2xl px-8 py-7 text-base font-extrabold transition-all"
+                      className="border border-slate-800 text-white bg-slate-900/80 hover:bg-slate-850 rounded-2xl px-8 py-7 text-base font-extrabold transition-all shadow-lg"
                     >
                       <Play className="w-4 h-4 fill-white mr-2" />
                       <span>Guarda come funziona</span>
@@ -254,31 +206,8 @@ const HomePage = () => {
                   </div>
                 </div>
 
-                {/* Mobile Tabs Scroller (rendered right below the Hero on the home tab on mobile) */}
-                <div className="lg:hidden border-b border-slate-900 pb-2 select-none overflow-x-auto scrollbar-none flex gap-3.5">
-                  {tabs.map((tab) => {
-                    const TabIcon = tab.icon;
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => {
-                          setActiveTab(tab.id);
-                        }}
-                        className={`flex items-center gap-2.5 px-4 py-3 rounded-full text-xs font-extrabold whitespace-nowrap tracking-wider uppercase transition-all duration-200 border ${
-                          activeTab === tab.id
-                            ? 'bg-emerald-600 text-white border-emerald-500 shadow-md shadow-emerald-600/10'
-                            : 'bg-[#0A0A0A] border-slate-900 text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        <TabIcon className="w-4 h-4 flex-shrink-0" />
-                        <span>{tab.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-
                 {/* 3-Pillar Value Matrix Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   
                   {/* Athletes Card */}
                   <Card className="bg-[#0A0A0A] border-slate-900 rounded-3xl hover:border-emerald-500/30 transition-all duration-300 p-8 flex flex-col justify-between group shadow-xl">
@@ -492,7 +421,7 @@ const HomePage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4 font-semibold text-slate-300 text-sm">
                     <p className="leading-relaxed">
-                      Con Gym-Connect.ai dimentichi abbonamenti bloccanti, contratti lunghi e palestre affollate. Hai a disposizione un intero network di trainer qualificati e strutture in base alle tue esigenze orarie e geografiche.
+                      Con {brandNameFull} dimentichi abbonamenti bloccanti, contratti lunghi e palestre affollate. Hai a disposizione un intero network di trainer qualificati e strutture in base alle tue esigenze orarie e geografiche.
                     </p>
                     <div className="flex items-start gap-3 pt-2">
                       <div className="p-1 bg-emerald-950/60 rounded-full border border-emerald-900 text-emerald-400 mt-0.5">
@@ -618,7 +547,7 @@ const HomePage = () => {
                     <div className="space-y-3 text-xs font-bold">
                       <div className="space-y-1">
                         <div className="flex justify-between text-slate-400">
-                          <span>Senza Gym-Connect (Prima)</span>
+                          <span>Senza {brandNameFull} (Prima)</span>
                           <span>35%</span>
                         </div>
                         <div className="h-3 w-full bg-[#0A0A0A] rounded-lg overflow-hidden border border-slate-900">
@@ -628,7 +557,7 @@ const HomePage = () => {
 
                       <div className="space-y-1">
                         <div className="flex justify-between text-white">
-                          <span>Con Gym-Connect.ai</span>
+                          <span>Con {brandNameFull}</span>
                           <span className="text-emerald-400">85%</span>
                         </div>
                         <div className="h-3 w-full bg-[#0A0A0A] rounded-lg overflow-hidden border border-slate-900">
@@ -800,7 +729,7 @@ const HomePage = () => {
                 <div className="space-y-4">
                   {[
                     {
-                      q: "Come funziona il sistema di Matchmaking AI?",
+                      q: `Come funziona il sistema di Matchmaking AI di ${brandNameFull}?`,
                       a: "Il nostro algoritmo incrocia la tua posizione geografica con le tue preferenze orarie, gli obiettivi fisici e la tariffa oraria desiderata, fornendoti una percentuale di compatibilità dettagliata."
                     },
                     {
@@ -808,8 +737,8 @@ const HomePage = () => {
                       a: "I FitTokens sono la moneta virtuale della piattaforma. Consentono di pagare gli allenamenti a consumo senza dover sottoscrivere abbonamenti o contratti fisici con le singole palestre."
                     },
                     {
-                      q: "Sono un gestore di una palestra, quanto mi costa aderire?",
-                      a: "L'adesione a Gym-Connect.ai è totalmente gratuita. Guadagni una percentuale su ogni ora di utilizzo delle sale o attrezzature da parte di atleti esterni convenzionati."
+                      q: `Sono un gestore di una palestra, quanto mi costa aderire a ${brandNameFull}?`,
+                      a: `L'adesione a ${brandNameFull} è totalmente gratuita. Guadagni una percentuale su ogni ora di utilizzo delle sale o attrezzature da parte di atleti esterni convenzionati.`
                     }
                   ].map((faq, index) => (
                     <div 
