@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import UniversalHero from '@/components/UniversalHero';
-import ScrollReveal from '@/components/ScrollReveal';
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Play, CheckCircle, Sparkles, TrendingUp, Calendar, DollarSign, Award, Target, LayoutDashboard } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { 
+  Dumbbell, Users, Building2, Check, ArrowRight, Sparkles, TrendingUp, Calendar, 
+  DollarSign, Award, Target, LayoutDashboard, HelpCircle, Phone, Play, Star, Clock, 
+  Zap, ChevronDown, ChevronUp, ShieldCheck, Mail, MessageSquare, ArrowUpRight
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
-import { driver } from "driver.js";
-import "driver.js/dist/driver.css";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBranding } from '@/contexts/BrandingContext';
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -16,411 +21,852 @@ const HomePage = () => {
   const { brandNameFull } = useBranding();
   const isEn = language === 'EN';
 
-  // State to manage active section for sticky sub-nav highlight
-  const [activeSection, setActiveSection] = useState('athletes');
+  // State to manage active Tab
+  const [activeTab, setActiveTab] = useState('home');
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const sections = ['athletes', 'trainers', 'gyms', 'sponsors'];
-      const scrollPosition = window.scrollY + 200;
+  // FAQ Accordion State
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-      for (const section of sections) {
-        const el = document.getElementById(section);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            setActiveSection(section);
-            break;
-          }
-        }
-      }
-    };
+  // CRM simulation states
+  const [revenue, setRevenue] = useState(2840);
+  const [sessions, setSessions] = useState(38);
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // Matchmaking simulation states
+  const [simGoal, setSimGoal] = useState('strength');
+  const [simCity, setSimCity] = useState('Roma');
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const yOffset = -120; // Navbar + Sticky Subnav offset
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    }
-  };
-
+  // Interactive Tour Launcher
   const startTour = () => {
     const driverObj = driver({
       showProgress: true,
       steps: [
-        { popover: { title: `${t('tour.welcome.title')} (${brandNameFull})`, description: t('tour.welcome.desc') } },
-        { element: '#tour-athlete', popover: { title: t('tour.athlete.title'), description: t('tour.athlete.desc') } },
-        { element: '#tour-trainer', popover: { title: t('tour.trainer.title'), description: t('tour.trainer.desc') } },
-        { element: '#tour-gym', popover: { title: t('tour.gym.title'), description: t('tour.gym.desc') } },
-        { element: '#tour-sponsor', popover: { title: t('tour.sponsor.title'), description: t('tour.sponsor.desc') } },
-        { popover: { title: t('tour.start.title'), description: t('tour.start.desc') } }
+        { popover: { title: `Benvenuto in ${brandNameFull}`, description: 'Esplora le sezioni interattive per comprendere il valore di Gym-Connect.ai.' } },
+        { element: '#tab-btn-home', popover: { title: 'Home', description: 'La nostra proposta di valore in meno di 10 secondi.' } },
+        { element: '#tab-btn-ai-coach', popover: { title: 'AI Matchmaker', description: 'Prova il simulatore di accoppiamento intelligente in tempo reale.' } },
+        { element: '#tab-btn-dashboard', popover: { title: 'Anteprima Dashboard', description: 'Osserva come si presenta il cruscotto di controllo per gli utenti attivi.' } }
       ]
     });
-
     driverObj.drive();
   };
 
+  // Fake database for matchmaking preview
+  const fakeResults = [
+    {
+      id: 'trainer-1',
+      name: 'Marco Bianchi',
+      role: 'Trainer Pro',
+      city: 'Roma',
+      goal: 'strength',
+      score: 98,
+      rate: 35,
+      exp: 6,
+      avatar: 'MB',
+      spec: ['Powerlifting', 'Massa Muscolare', 'Forza Max']
+    },
+    {
+      id: 'trainer-2',
+      name: 'Chiara Rossi',
+      role: 'Trainer Pro',
+      city: 'Milano',
+      goal: 'weightloss',
+      score: 94,
+      rate: 40,
+      exp: 4,
+      avatar: 'CR',
+      spec: ['Perdita Peso', 'Cardio Fitness', 'Tono Muscolare']
+    },
+    {
+      id: 'gym-1',
+      name: 'Olympus Gym',
+      role: 'Centro Convenzionato',
+      city: 'Roma',
+      goal: 'strength',
+      score: 92,
+      rate: 65,
+      exp: 10,
+      avatar: 'OG',
+      spec: ['Sale Attrezzate', 'Crossfit Area', 'Sauna']
+    },
+    {
+      id: 'gym-2',
+      name: 'FitLife Center',
+      role: 'Centro Convenzionato',
+      city: 'Salerno',
+      goal: 'flexibility',
+      score: 95,
+      rate: 50,
+      exp: 8,
+      avatar: 'FL',
+      spec: ['Yoga Room', 'Calisthenics', 'Piscina']
+    }
+  ];
+
+  // Filtered preview match list based on simulator selettors
+  const filteredMatches = fakeResults.filter(
+    (item) => item.city === simCity || item.goal === simGoal
+  ).sort((a, b) => b.score - a.score);
+
+  // Tab definitions
+  const tabs = [
+    { id: 'home', label: 'Home', icon: Dumbbell },
+    { id: 'ai-coach', label: 'AI Coach', icon: Target },
+    { id: 'athletes', label: 'Atleti', icon: Award },
+    { id: 'trainers', label: 'Personal Trainer', icon: Users },
+    { id: 'gyms', label: 'Centri Fitness', icon: Building2 },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'pricing', label: 'Pricing', icon: DollarSign },
+    { id: 'faq', label: 'FAQ', icon: HelpCircle },
+    { id: 'contact', label: 'Contatti', icon: Phone }
+  ];
+
   return (
     <Layout>
-      <div className="bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
-        <UniversalHero />
+      <div className="min-h-screen bg-[#050505] text-white font-sans overflow-x-hidden antialiased">
+        
+        {/* Main Application Frame Grid */}
+        <div className="max-w-[1600px] mx-auto px-4 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* Desktop Left Sidebar (Sticky Layout) */}
+          <aside className="lg:col-span-3 lg:h-[80vh] lg:sticky lg:top-24 flex flex-col justify-between">
+            <div className="bg-[#0A0A0A] border border-slate-900 rounded-3xl p-6 space-y-8 shadow-2xl">
+              <div>
+                <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest bg-emerald-950/40 border border-emerald-900 px-3 py-1.5 rounded-lg">
+                  WORKSPACE PLATFORM
+                </span>
+                <h2 className="text-xl font-extrabold text-white mt-4 tracking-tight">
+                  Gym-Connect.ai
+                </h2>
+                <p className="text-xs text-slate-500 font-medium mt-1">
+                  L'ecosistema del fitness intelligente.
+                </p>
+              </div>
 
-        {/* Sticky Sub-Navigation Anchor Bar */}
-        <div className="sticky top-16 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm py-4 hidden md:block select-none">
-          <div className="container mx-auto px-4 flex justify-center gap-10 font-bold text-xs md:text-sm tracking-wider uppercase">
-            <button
-              onClick={() => scrollToSection('athletes')}
-              className={`pb-1 transition-all border-b-2 hover:text-emerald-600 ${
-                activeSection === 'athletes' ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-slate-500'
-              }`}
-            >
-              {isEn ? "Athletes" : "Atleti / Utenti"}
-            </button>
-            <button
-              onClick={() => scrollToSection('trainers')}
-              className={`pb-1 transition-all border-b-2 hover:text-emerald-600 ${
-                activeSection === 'trainers' ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-slate-500'
-              }`}
-            >
-              {isEn ? "Personal Trainers" : "Personal Trainers"}
-            </button>
-            <button
-              onClick={() => scrollToSection('gyms')}
-              className={`pb-1 transition-all border-b-2 hover:text-emerald-600 ${
-                activeSection === 'gyms' ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-slate-500'
-              }`}
-            >
-              {isEn ? "Fitness Centers" : "Centri Fitness"}
-            </button>
-            <button
-              onClick={() => scrollToSection('sponsors')}
-              className={`pb-1 transition-all border-b-2 hover:text-emerald-600 ${
-                activeSection === 'sponsors' ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-slate-500'
-              }`}
-            >
-              {isEn ? "Sponsors" : "Sponsor & Brand"}
-            </button>
+              {/* Navigation Tabs List */}
+              <nav className="flex flex-col gap-2">
+                {tabs.map((tab) => {
+                  const TabIcon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      id={`tab-btn-${tab.id}`}
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className={`flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-bold tracking-tight transition-all duration-200 text-left ${
+                        activeTab === tab.id
+                          ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/10'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
+                      }`}
+                    >
+                      <TabIcon className="w-5 h-5 flex-shrink-0" />
+                      <span>{tab.label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+
+            {/* Quick Demo Footer Action in Sidebar */}
+            <div className="hidden lg:block bg-gradient-to-br from-emerald-950/20 to-slate-950 border border-emerald-900/40 rounded-3xl p-5 mt-6 text-center space-y-4">
+              <Sparkles className="w-8 h-8 text-emerald-400 mx-auto animate-pulse" />
+              <div className="space-y-1">
+                <h4 className="text-sm font-bold text-white">Pronto per gli investitori?</h4>
+                <p className="text-[10.5px] text-slate-500 font-medium">Avvia il tour guidato interattivo del prototipo.</p>
+              </div>
+              <Button 
+                onClick={startTour}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl py-2.5 shadow-md active:scale-95 transition-all"
+              >
+                Avvia il Tour
+              </Button>
+            </div>
+          </aside>
+
+          {/* Mobile Top Tabs Scroller Navigation (Visible only on mobile/tablet) */}
+          <div className="lg:hidden col-span-1 border-b border-slate-900 pb-2 select-none overflow-x-auto scrollbar-none flex gap-3.5">
+            {tabs.map((tab) => {
+              const TabIcon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                  }}
+                  className={`flex items-center gap-2.5 px-4 py-3 rounded-full text-xs font-extrabold whitespace-nowrap tracking-wider uppercase transition-all duration-200 border ${
+                    activeTab === tab.id
+                      ? 'bg-emerald-600 text-white border-emerald-500 shadow-md shadow-emerald-600/10'
+                      : 'bg-[#0A0A0A] border-slate-900 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <TabIcon className="w-4 h-4 flex-shrink-0" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
-        </div>
 
-        {/* SECTIONS */}
-        <div className="relative z-10">
+          {/* Right Workspace Main Content Area */}
+          <main className="lg:col-span-9 space-y-8 animate-fade-in">
+            
+            {/* 1. HOME TAB */}
+            {activeTab === 'home' && (
+              <div className="space-y-12">
+                
+                {/* 10-Second Premium Hero Header */}
+                <div className="bg-gradient-to-br from-[#0A0A0A] via-slate-950 to-[#0A0A0A] border border-slate-900 rounded-3xl p-8 md:p-14 text-center space-y-8 relative overflow-hidden shadow-2xl">
+                  <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
+                  
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-950/60 border border-emerald-900/60 text-emerald-400 text-xs font-black tracking-widest uppercase mb-4 shadow-inner">
+                    <Sparkles className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '6s' }} />
+                    <span>L'ecosistema del fitness on-demand</span>
+                  </div>
 
-          {/* 1. ATHLETE SECTION */}
-          <section id="athletes" className="py-24 bg-white border-b border-slate-100">
-            <div className="container mx-auto px-4 grid md:grid-cols-2 gap-16 items-center">
-              <ScrollReveal animation="fade-right">
-                <div className="relative">
-                  <div className="absolute -inset-4 bg-emerald-100 rounded-full blur-3xl opacity-40"></div>
-                  {/* High Fidelity Mock UI for Athlete Matching */}
-                  <div className="relative bg-white p-8 rounded-3xl border border-slate-200 shadow-2xl space-y-6">
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
-                          <Target className="w-4.5 h-4.5" />
+                  <h1 className="text-4xl md:text-7xl font-black text-white leading-none tracking-tight">
+                    Gym-Connect<span className="text-emerald-500">.ai</span>
+                  </h1>
+
+                  <p className="text-lg md:text-2xl text-slate-350 max-w-3xl mx-auto font-medium leading-relaxed">
+                    Il punto d'incontro intelligente per <span className="text-white font-bold">Atleti</span>, <span className="text-white font-bold">Personal Trainer</span> e <span className="text-white font-bold">Centri Fitness</span>. 
+                    Prenota allenamenti on-demand, gestisci clienti da un CRM avanzato e monetizza gli spazi vuoti delle palestre.
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                    <Button 
+                      size="lg" 
+                      onClick={() => setActiveTab('ai-coach')}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base rounded-2xl px-8 py-7 shadow-lg shadow-emerald-600/10 hover:shadow-emerald-600/20 active:scale-[0.98] transition-all flex items-center gap-2"
+                    >
+                      <span>Prova l'AI Matchmaker</span>
+                      <ArrowRight className="w-5 h-5" />
+                    </Button>
+                    <Button 
+                      size="lg" 
+                      variant="outline"
+                      onClick={startTour}
+                      className="border-slate-800 text-white hover:bg-slate-900 rounded-2xl px-8 py-7 text-base font-extrabold transition-all"
+                    >
+                      <Play className="w-4 h-4 fill-white mr-2" />
+                      <span>Guarda come funziona</span>
+                    </Button>
+                  </div>
+                </div>
+
+                {/* 3-Pillar Value Matrix Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  
+                  {/* Athletes Card */}
+                  <Card className="bg-[#0A0A0A] border-slate-900 rounded-3xl hover:border-emerald-500/30 transition-all duration-300 p-8 flex flex-col justify-between group shadow-xl">
+                    <div className="space-y-6">
+                      <div className="w-12 h-12 bg-emerald-950/60 border border-emerald-900/60 rounded-2xl flex items-center justify-center text-emerald-450 group-hover:scale-105 transition-transform">
+                        <Award className="w-6 h-6" />
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-extrabold text-white tracking-tight">Atleti / Utenti</h3>
+                        <p className="text-slate-400 text-xs font-semibold leading-relaxed">
+                          La massima libertà di allenarsi dove e quando vuoi, senza vincoli.
+                        </p>
+                      </div>
+                      <ul className="space-y-3 font-semibold text-xs text-slate-300">
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Match istantaneo con il coach ideale</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Prenotazione a consumo</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Accesso a strutture convenzionate</li>
+                      </ul>
+                    </div>
+                    <Button 
+                      onClick={() => setActiveTab('athletes')}
+                      className="w-full bg-slate-900 hover:bg-slate-850 text-white font-extrabold text-xs rounded-xl py-3 mt-8 active:scale-98 transition-all"
+                    >
+                      Maggiori Info
+                    </Button>
+                  </Card>
+
+                  {/* Trainer Card */}
+                  <Card className="bg-[#0A0A0A] border-slate-900 rounded-3xl hover:border-emerald-500/30 transition-all duration-300 p-8 flex flex-col justify-between group shadow-xl">
+                    <div className="space-y-6">
+                      <div className="w-12 h-12 bg-emerald-950/60 border border-emerald-900/60 rounded-2xl flex items-center justify-center text-emerald-450 group-hover:scale-105 transition-transform">
+                        <Users className="w-6 h-6" />
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-extrabold text-white tracking-tight">Personal Trainer</h3>
+                        <p className="text-slate-400 text-xs font-semibold leading-relaxed">
+                          Acquisisci clienti in target e ottimizza l'agenda oraria.
+                        </p>
+                      </div>
+                      <ul className="space-y-3 font-semibold text-xs text-slate-300">
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Ricevi prenotazioni in zona</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Riempi le ore vuote</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> CRM integrato per allenamenti</li>
+                      </ul>
+                    </div>
+                    <Button 
+                      onClick={() => setActiveTab('trainers')}
+                      className="w-full bg-slate-900 hover:bg-slate-850 text-white font-extrabold text-xs rounded-xl py-3 mt-8 active:scale-98 transition-all"
+                    >
+                      Maggiori Info
+                    </Button>
+                  </Card>
+
+                  {/* Gyms Card */}
+                  <Card className="bg-[#0A0A0A] border-slate-900 rounded-3xl hover:border-emerald-500/30 transition-all duration-300 p-8 flex flex-col justify-between group shadow-xl">
+                    <div className="space-y-6">
+                      <div className="w-12 h-12 bg-emerald-950/60 border border-emerald-900/60 rounded-2xl flex items-center justify-center text-emerald-450 group-hover:scale-105 transition-transform">
+                        <Building2 className="w-6 h-6" />
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-extrabold text-white tracking-tight">Centri Fitness</h3>
+                        <p className="text-slate-400 text-xs font-semibold leading-relaxed">
+                          Monetizza ingressi e attrezzature inutilizzate nelle ore morte.
+                        </p>
+                      </div>
+                      <ul className="space-y-3 font-semibold text-xs text-slate-300">
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Monetizza ore a bassa affluenza</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Ingressi extra certificati</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Zero costi fissi di gestione</li>
+                      </ul>
+                    </div>
+                    <Button 
+                      onClick={() => setActiveTab('gyms')}
+                      className="w-full bg-slate-900 hover:bg-slate-850 text-white font-extrabold text-xs rounded-xl py-3 mt-8 active:scale-98 transition-all"
+                    >
+                      Maggiori Info
+                    </Button>
+                  </Card>
+
+                </div>
+              </div>
+            )}
+
+            {/* 2. AI COACH TAB (Matchmaking Interactive Preview) */}
+            {activeTab === 'ai-coach' && (
+              <div className="space-y-8">
+                <div className="bg-[#0A0A0A] border border-slate-900 rounded-3xl p-8 space-y-6">
+                  <div>
+                    <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">
+                      PREVIEW LIVE INTERATTIVA
+                    </span>
+                    <h2 className="text-3xl font-extrabold text-white tracking-tight mt-2">
+                      AI Matchmaking Engine
+                    </h2>
+                    <p className="text-sm text-slate-500 font-medium">
+                      Simula le preferenze dell'atleta e osserva l'ordinamento dinamico basato sul punteggio di compatibilità.
+                    </p>
+                  </div>
+
+                  {/* Simulator Controls */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-950 p-6 rounded-2xl border border-slate-900">
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Obiettivo Fitness</Label>
+                      <select 
+                        value={simGoal} 
+                        onChange={(e) => setSimGoal(e.target.value)}
+                        className="w-full bg-[#0A0A0A] border border-slate-900 rounded-xl py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 font-bold"
+                      >
+                        <option value="strength">Aumento Forza / Massa</option>
+                        <option value="weightloss">Perdita Peso / Cardio</option>
+                        <option value="flexibility">Yoga / Flessibilità</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Posizione / Città</Label>
+                      <select 
+                        value={simCity} 
+                        onChange={(e) => setSimCity(e.target.value)}
+                        className="w-full bg-[#0A0A0A] border border-slate-900 rounded-xl py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 font-bold"
+                      >
+                        <option value="Roma">Roma</option>
+                        <option value="Milano">Milano</option>
+                        <option value="Salerno">Salerno</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Live Simulated Result Cards */}
+                  <div className="space-y-4">
+                    {filteredMatches.map((item) => {
+                      const radius = 20;
+                      const strokeDash = 2 * Math.PI * radius;
+                      const offset = strokeDash - (item.score / 100) * strokeDash;
+                      return (
+                        <div 
+                          key={item.id} 
+                          className="bg-slate-950 border border-slate-900 rounded-2xl p-5 hover:border-emerald-500/30 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-emerald-950/60 border border-emerald-900 text-emerald-450 font-black rounded-xl flex items-center justify-center text-sm">
+                              {item.avatar}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-extrabold text-white text-base">{item.name}</h4>
+                                <span className="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-900/60 px-2 py-0.5 rounded font-black tracking-wide uppercase">
+                                  {item.role}
+                                </span>
+                              </div>
+                              <p className="text-xs text-slate-500 font-semibold mt-1">
+                                {item.spec.join(' • ')} • {item.city}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-6">
+                            <div className="text-right">
+                              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tariffa</div>
+                              <div className="text-sm font-extrabold text-white">€{item.rate}/{item.id.includes('gym') ? 'mese' : 'ora'}</div>
+                            </div>
+
+                            {/* Circular gauge */}
+                            <div className="flex items-center gap-2.5">
+                              <div className="relative w-12 h-12">
+                                <svg className="w-full h-full transform -rotate-90">
+                                  <circle cx="24" cy="24" r={radius} stroke="#18181b" strokeWidth="3" fill="transparent" />
+                                  <circle 
+                                    cx="24" cy="24" r={radius} stroke="#10b981" strokeWidth="3.5" fill="transparent" 
+                                    strokeDasharray={strokeDash}
+                                    strokeDashoffset={offset}
+                                    strokeLinecap="round"
+                                  />
+                                </svg>
+                                <div className="absolute inset-0 flex items-center justify-center text-[10.5px] font-black text-emerald-400">
+                                  {item.score}%
+                                </div>
+                              </div>
+                              <span className="text-xs font-bold text-slate-400">{isEn ? 'Match' : 'Compatibilità'}</span>
+                            </div>
+                          </div>
                         </div>
-                        <span className="font-extrabold text-sm text-slate-800 uppercase tracking-wide">
-                          {isEn ? "Smart Match Calculator" : "Calcolatore Compatibilità"}
+                      );
+                    })}
+                  </div>
+
+                  <div className="text-center pt-4 border-t border-slate-900">
+                    <Button 
+                      onClick={() => navigate('/search')}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl px-6 py-2 shadow active:scale-95 transition-all text-xs"
+                    >
+                      Apri Ricerca Completa
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 3. ATHLETES TAB */}
+            {activeTab === 'athletes' && (
+              <div className="space-y-8 bg-[#0A0A0A] border border-slate-900 rounded-3xl p-8">
+                <div>
+                  <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">
+                    ATLETI & SPORTIVI
+                  </span>
+                  <h2 className="text-3xl font-extrabold text-white tracking-tight mt-2">
+                    L'esperienza fitness su misura per te
+                  </h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4 font-semibold text-slate-300 text-sm">
+                    <p className="leading-relaxed">
+                      Con Gym-Connect.ai dimentichi abbonamenti bloccanti, contratti lunghi e palestre affollate. Hai a disposizione un intero network di trainer qualificati e strutture in base alle tue esigenze orarie e geografiche.
+                    </p>
+                    <div className="flex items-start gap-3 pt-2">
+                      <div className="p-1 bg-emerald-950/60 rounded-full border border-emerald-900 text-emerald-400 mt-0.5">
+                        <Check className="w-4 h-4 stroke-[3]" />
+                      </div>
+                      <div>
+                        <h4 className="text-white font-bold">Filtri Intelligenti</h4>
+                        <p className="text-xs text-slate-500">Cerca per area, fascia prezzo, disponibilità e recensioni certificate.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="p-1 bg-emerald-950/60 rounded-full border border-emerald-900 text-emerald-400 mt-0.5">
+                        <Check className="w-4 h-4 stroke-[3]" />
+                      </div>
+                      <div>
+                        <h4 className="text-white font-bold">Portafoglio Digitale Unico</h4>
+                        <p className="text-xs text-slate-500">Paga a consumo tramite i crediti digitali della piattaforma (Tokens).</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-950 p-6 rounded-2xl border border-slate-900 flex flex-col justify-center space-y-4">
+                    <h3 className="text-lg font-bold text-white text-center">Registrati subito e inizia ad allenarti</h3>
+                    <Button 
+                      onClick={() => navigate('/register?role=user')}
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl py-3.5 shadow active:scale-95 transition-all text-sm"
+                    >
+                      Crea Account Atleta
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 4. TRAINERS TAB */}
+            {activeTab === 'trainers' && (
+              <div className="space-y-8">
+                <div className="bg-[#0A0A0A] border border-slate-900 rounded-3xl p-8 space-y-6">
+                  <div>
+                    <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">
+                      PERSONAL TRAINER & COACHES
+                    </span>
+                    <h2 className="text-3xl font-extrabold text-white tracking-tight mt-2">
+                      Fai decollare la tua attività di coaching
+                    </h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                    <div className="md:col-span-7 space-y-4 text-slate-355 text-sm font-semibold">
+                      <p className="leading-relaxed">
+                        Trova nuovi atleti in target, gestisci gli appuntamenti e monitora i pagamenti da un cruscotto CRM avanzato e integrato. Non avrai più ore vuote nella tua agenda quotidiana.
+                      </p>
+                      <ul className="space-y-3 text-slate-300">
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Match automatico con clienti vicini a te</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Gestione schede e cronologia allenamenti</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Pagamenti istantanei protetti</li>
+                      </ul>
+                      <div className="pt-4">
+                        <Button 
+                          onClick={() => navigate('/register?role=instructor')}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl px-6 py-3 shadow active:scale-95 transition-all text-xs"
+                        >
+                          Registrati come Personal Trainer
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* CRM Dashboard Preview Widget */}
+                    <div className="md:col-span-5 bg-slate-950 p-6 rounded-2xl border border-slate-900 space-y-6 shadow-xl relative overflow-hidden">
+                      <div className="flex justify-between items-center border-b border-slate-900 pb-3">
+                        <div className="flex items-center gap-2">
+                          <LayoutDashboard className="w-4.5 h-4.5 text-emerald-400" />
+                          <span className="font-extrabold text-xs text-white uppercase tracking-wider">CRM Coach Preview</span>
+                        </div>
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 text-xs">
+                        <div className="bg-[#0A0A0A] p-3 rounded-xl border border-slate-900">
+                          <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Entrate (Mese)</div>
+                          <div className="font-extrabold text-white text-base mt-1">€{revenue}</div>
+                        </div>
+                        <div className="bg-[#0A0A0A] p-3 rounded-xl border border-slate-900">
+                          <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Sessioni</div>
+                          <div className="font-extrabold text-white text-base mt-1">{sessions} fatte</div>
+                        </div>
+                      </div>
+
+                      <div className="bg-[#0A0A0A] p-3.5 rounded-xl border border-slate-900 flex justify-between items-center text-xs">
+                        <div>
+                          <div className="font-extrabold text-white">Chiara M.</div>
+                          <div className="text-[10px] text-slate-500 font-semibold">Oggi alle 18:30</div>
+                        </div>
+                        <span className="bg-emerald-950 text-emerald-400 border border-emerald-900/60 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider">
+                          Pronto
                         </span>
                       </div>
-                      <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold py-1 px-2.5 rounded-full uppercase tracking-wider">
-                        Active AI
-                      </span>
                     </div>
-                    
-                    {/* Simulated Results Card */}
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center bg-slate-55 p-4 rounded-2xl border border-slate-100">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center font-bold text-indigo-700 text-sm">
-                            MS
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-slate-800 text-sm">Marco S.</h4>
-                            <p className="text-xs text-slate-500 font-semibold">{isEn ? "Powerlifting Coach" : "Coach di Powerlifting"}</p>
-                          </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 5. FITNESS CENTERS TAB */}
+            {activeTab === 'gyms' && (
+              <div className="space-y-8 bg-[#0A0A0A] border border-slate-900 rounded-3xl p-8">
+                <div>
+                  <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">
+                    CENTRI FITNESS & PALESTRE
+                  </span>
+                  <h2 className="text-3xl font-extrabold text-white tracking-tight mt-2">
+                    Monetizza le tue ore morte
+                  </h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                  <div className="bg-slate-950 p-6 rounded-2xl border border-slate-900 space-y-6">
+                    <div className="flex justify-between items-center border-b border-slate-900 pb-3 text-xs">
+                      <span className="font-extrabold text-white uppercase tracking-wider">Tasso Occupazione Spazi</span>
+                      <span className="text-emerald-400 bg-emerald-950/60 border border-emerald-900/60 px-2 py-0.5 rounded font-black">+145% Entrate</span>
+                    </div>
+
+                    <div className="space-y-3 text-xs font-bold">
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-slate-400">
+                          <span>Senza Gym-Connect (Prima)</span>
+                          <span>35%</span>
                         </div>
-                        <div className="text-right">
-                          <div className="text-emerald-650 text-sm font-extrabold">98% Match</div>
-                          <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">2.4 km {isEn ? "away" : "da te"}</div>
+                        <div className="h-3 w-full bg-[#0A0A0A] rounded-lg overflow-hidden border border-slate-900">
+                          <div className="h-full bg-slate-650 rounded-lg" style={{ width: '35%' }} />
                         </div>
                       </div>
-                      
-                      <p className="text-slate-600 text-sm italic font-medium leading-relaxed bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100/50">
-                        {isEn 
-                          ? '"I found the perfect Powerlifting coach 2km from home, with direct access to local partner gyms without subscriptions!"'
-                          : '"Ho trovato il coach di Powerlifting perfetto a 2km da casa, con accesso diretto alle palestre partner senza abbonamenti!"'
-                        }
-                      </p>
+
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-white">
+                          <span>Con Gym-Connect.ai</span>
+                          <span className="text-emerald-400">85%</span>
+                        </div>
+                        <div className="h-3 w-full bg-[#0A0A0A] rounded-lg overflow-hidden border border-slate-900">
+                          <div className="h-full bg-emerald-500 rounded-lg" style={{ width: '85%' }} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 text-slate-300 text-sm font-semibold">
+                    <p className="leading-relaxed">
+                      Ospita sessioni esterne di personal trainer accreditati e dei loro atleti nei momenti di bassa affluenza. Sei tu a stabilire tariffe, disponibilità oraria ed accessi tramite il tuo portale dedicato.
+                    </p>
+                    <ul className="space-y-2 text-xs text-slate-450">
+                      <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Monetizzazione di macchinari fermi</li>
+                      <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Afflusso di potenziali nuovi iscritti</li>
+                      <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Gestione ingressi automatica via QR Code</li>
+                    </ul>
+                    <div className="pt-2">
+                      <Button 
+                        onClick={() => navigate('/register?role=gym')}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl px-6 py-3 shadow active:scale-95 transition-all text-xs"
+                      >
+                        Registra la tua Palestra
+                      </Button>
                     </div>
                   </div>
                 </div>
-              </ScrollReveal>
-              
-              <ScrollReveal animation="fade-left">
-                <span className="text-emerald-600 font-extrabold tracking-widest text-xs uppercase bg-emerald-50 px-3 py-1.5 rounded-md border border-emerald-100">
-                  {t('section.athlete.title')}
-                </span>
-                <h2 className="text-4xl md:text-5xl font-black text-slate-900 mt-5 mb-6 tracking-tight leading-tight">
-                  {t('section.athlete.heading')}
-                </h2>
-                <p className="text-lg text-slate-600 mb-8 leading-relaxed font-medium">
-                  {t('section.athlete.desc')}
-                </p>
-                <ul className="space-y-4 mb-10">
-                  <li className="flex items-start gap-3 text-slate-800 font-semibold">
-                    <CheckCircle className="text-emerald-600 w-5.5 h-5.5 mt-0.5 flex-shrink-0 stroke-[2.5]" /> 
-                    <span>{t('section.athlete.feat1')}</span>
-                  </li>
-                  <li className="flex items-start gap-3 text-slate-800 font-semibold">
-                    <CheckCircle className="text-emerald-600 w-5.5 h-5.5 mt-0.5 flex-shrink-0 stroke-[2.5]" /> 
-                    <span>{t('section.athlete.feat2')}</span>
-                  </li>
-                  <li className="flex items-start gap-3 text-slate-800 font-semibold">
-                    <CheckCircle className="text-emerald-600 w-5.5 h-5.5 mt-0.5 flex-shrink-0 stroke-[2.5]" /> 
-                    <span>{t('section.athlete.feat3')}</span>
-                  </li>
-                </ul>
-                <Button
-                  size="lg"
-                  className="bg-emerald-650 hover:bg-emerald-700 text-white rounded-2xl px-8 py-6 font-bold shadow-xl shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all hover:-translate-y-0.5 active:scale-95 flex items-center gap-2"
-                  onClick={() => navigate('/register?role=user')}
-                >
-                  <span>{t('hero.cta.user')}</span>
-                  <ArrowRight className="w-5 h-5" />
-                </Button>
-              </ScrollReveal>
-            </div>
-          </section>
+              </div>
+            )}
 
-          {/* 2. TRAINER SECTION */}
-          <section id="trainers" className="py-24 bg-slate-50/70 border-b border-slate-200/60">
-            <div className="container mx-auto px-4 grid md:grid-cols-2 gap-16 items-center">
-              <ScrollReveal animation="fade-right" className="order-2 md:order-1">
-                <span className="text-emerald-600 font-extrabold tracking-widest text-xs uppercase bg-emerald-50 px-3 py-1.5 rounded-md border border-emerald-100">
-                  {t('section.trainer.title')}
-                </span>
-                <h2 className="text-4xl md:text-5xl font-black text-slate-900 mt-5 mb-6 tracking-tight leading-tight">
-                  {t('section.trainer.heading')}
-                </h2>
-                <p className="text-lg text-slate-600 mb-8 leading-relaxed font-medium">
-                  {t('section.trainer.desc')}
-                </p>
-                <div className="grid grid-cols-2 gap-6 mb-10">
-                  <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
-                    <div className="text-4xl font-extrabold text-slate-900 mb-1">{t('section.trainer.stat1.val')}</div>
-                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('section.trainer.stat1.label')}</div>
+            {/* 6. DASHBOARD PREVIEW TAB */}
+            {activeTab === 'dashboard' && (
+              <div className="space-y-8 bg-[#0A0A0A] border border-slate-900 rounded-3xl p-8">
+                <div>
+                  <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">
+                    DEMO LIVE DASHBOARD
+                  </span>
+                  <h2 className="text-3xl font-extrabold text-white tracking-tight mt-2">
+                    Il tuo centro operativo
+                  </h2>
+                  <p className="text-xs text-slate-500 font-semibold mt-1">
+                    Visualizza in tempo reale le statistiche degli allenamenti e l'attività economica.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-slate-950 p-5 rounded-2xl border border-slate-900 space-y-2">
+                    <div className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">Ore Allenate</div>
+                    <div className="text-3xl font-black text-white">124.5 h</div>
+                    <p className="text-[10px] text-emerald-400 font-semibold">+12% questo mese</p>
                   </div>
-                  <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
-                    <div className="text-4xl font-extrabold text-slate-900 mb-1">{t('section.trainer.stat2.val')}</div>
-                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('section.trainer.stat2.label')}</div>
+                  <div className="bg-slate-950 p-5 rounded-2xl border border-slate-900 space-y-2">
+                    <div className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">Punteggio Feedback</div>
+                    <div className="text-3xl font-black text-white">4.92 / 5</div>
+                    <p className="text-[10px] text-slate-500 font-semibold">18 recensioni verificate</p>
+                  </div>
+                  <div className="bg-slate-950 p-5 rounded-2xl border border-slate-900 space-y-2">
+                    <div className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">Tokens Guadagnati</div>
+                    <div className="text-3xl font-black text-white">480 FC</div>
+                    <p className="text-[10px] text-slate-500 font-semibold">Equivalgono a circa €480</p>
                   </div>
                 </div>
-                <Button
-                  size="lg"
-                  className="bg-emerald-650 hover:bg-emerald-700 text-white rounded-2xl px-8 py-6 font-bold shadow-xl shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all hover:-translate-y-0.5 active:scale-95 flex items-center gap-2"
-                  onClick={() => navigate('/register?role=instructor')}
-                >
-                  <span>{t('hero.cta.trainer')}</span>
-                  <ArrowRight className="w-5 h-5" />
-                </Button>
-              </ScrollReveal>
-              
-              <ScrollReveal animation="fade-left" className="order-1 md:order-2">
-                <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-2xl relative overflow-hidden space-y-6">
-                  {/* High Fidelity CRM Mock UI */}
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                    <div className="flex items-center gap-2">
-                      <LayoutDashboard className="w-5 h-5 text-emerald-600" />
-                      <span className="font-extrabold text-sm text-slate-800 uppercase tracking-wider">
-                        {isEn ? "Trainer CRM Dashboard" : "CRM Coach Dashboard"}
-                      </span>
-                    </div>
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-3">
-                      <DollarSign className="w-8 h-8 text-emerald-600 bg-emerald-50 p-1.5 rounded-lg" />
+                {/* Calendar simulation */}
+                <div className="bg-slate-950 p-6 rounded-2xl border border-slate-900 space-y-4">
+                  <h3 className="text-base font-extrabold text-white">Appuntamenti della settimana</h3>
+                  <div className="space-y-3 text-xs">
+                    <div className="flex justify-between items-center p-3 bg-[#0A0A0A] rounded-xl border border-slate-900">
                       <div>
-                        <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{isEn ? "Revenue (Mo)" : "Ricavi (Mese)"}</div>
-                        <div className="font-extrabold text-slate-800 text-base">€2.840</div>
+                        <div className="font-bold text-white">Lunedì - 09:00</div>
+                        <div className="text-slate-500">Giuseppe R. • Forza Max</div>
                       </div>
+                      <span className="bg-emerald-950 text-emerald-400 border border-emerald-900/60 px-2 py-1 rounded font-bold uppercase text-[9px]">Completato</span>
                     </div>
-                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-3">
-                      <Calendar className="w-8 h-8 text-emerald-600 bg-emerald-50 p-1.5 rounded-lg" />
+                    <div className="flex justify-between items-center p-3 bg-[#0A0A0A] rounded-xl border border-slate-900">
                       <div>
-                        <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{isEn ? "Sessions" : "Allenamenti"}</div>
-                        <div className="font-extrabold text-slate-800 text-base">38 {isEn ? "booked" : "avviati"}</div>
+                        <div className="font-bold text-white">Mercoledì - 18:30</div>
+                        <div className="text-slate-500">Chiara M. • Perdita Peso</div>
                       </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-emerald-50/40 p-4 rounded-2xl border border-emerald-100/60">
-                    <div className="text-[10px] text-emerald-800 font-extrabold uppercase tracking-widest mb-2 flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 fill-current" />
-                      <span>{isEn ? "Next Scheduled Match" : "Prossimo Match Confermato"}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-xs">
-                      <div>
-                        <div className="font-bold text-slate-800">Chiara M.</div>
-                        <div className="text-slate-500">{isEn ? "Weight Loss - 18:30 today" : "Perdita Peso - Oggi 18:30"}</div>
-                      </div>
-                      <span className="bg-emerald-100 text-emerald-850 font-extrabold px-2.5 py-1 rounded-md text-[10px] uppercase tracking-wide">
-                        {isEn ? "Ready" : "Pronto"}
-                      </span>
+                      <span className="bg-emerald-950 text-emerald-400 border border-emerald-900/60 px-2 py-1 rounded font-bold uppercase text-[9px]">Completato</span>
                     </div>
                   </div>
                 </div>
-              </ScrollReveal>
-            </div>
-          </section>
+              </div>
+            )}
 
-          {/* 3. GYM SECTION */}
-          <section id="gyms" className="py-24 bg-white border-b border-slate-100">
-            <div className="container mx-auto px-4 grid md:grid-cols-2 gap-16 items-center">
-              <ScrollReveal animation="fade-right">
-                <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200/80 shadow-2xl space-y-6">
-                  <div className="flex items-center justify-between border-b border-slate-200/60 pb-4">
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-emerald-600" />
-                      <span className="font-extrabold text-sm text-slate-800 uppercase tracking-wider">
-                        {isEn ? "Asset Occupancy Rate" : "Tasso di Utilizzo Spazi"}
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-100 font-extrabold px-2.5 py-1 rounded-md">
-                      +145% Revenue
-                    </span>
-                  </div>
+            {/* 7. PRICING TAB */}
+            {activeTab === 'pricing' && (
+              <div className="space-y-8 bg-[#0A0A0A] border border-slate-900 rounded-3xl p-8">
+                <div className="text-center max-w-xl mx-auto space-y-2">
+                  <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">
+                    LISTINO PREZZI
+                  </span>
+                  <h2 className="text-3xl font-extrabold text-white tracking-tight">
+                    Tariffe trasparenti a consumo
+                  </h2>
+                  <p className="text-xs text-slate-500 font-semibold">
+                    Acquista i pacchetti di crediti (FitFlow Tokens) per allenarti liberamente o ricevere compensi.
+                  </p>
+                </div>
 
-                  {/* Tailwind-based Bar Chart showing utility growth */}
-                  <div className="space-y-4 font-semibold text-xs">
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-slate-700">
-                        <span>{isEn ? "Standard Occupancy (Before)" : "Tasso di occupazione standard (Prima)"}</span>
-                        <span className="font-extrabold text-slate-500">35%</span>
-                      </div>
-                      <div className="h-4 w-full bg-slate-200 rounded-lg overflow-hidden">
-                        <div className="h-full bg-slate-400 rounded-lg transition-all" style={{ width: '35%' }} />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-slate-800">
-                        <span>{isEn ? "Occupancy with Gym-Connect AI" : "Tasso di occupazione con Gym-Connect AI"}</span>
-                        <span className="font-extrabold text-emerald-600">85%</span>
-                      </div>
-                      <div className="h-4 w-full bg-slate-200 rounded-lg overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg transition-all" style={{ width: '85%' }} />
-                      </div>
-                    </div>
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   
-                  <p className="text-[11px] text-slate-500 leading-relaxed font-medium text-center italic bg-white p-3 rounded-xl border border-slate-100">
-                    {isEn 
-                      ? "Monetize dead hours by letting external trainers run private sessions for their clients."
-                      : "Monetizza le ore morte consentendo a trainer esterni di condurre sessioni private per i loro atleti."
+                  {/* Basic Plan */}
+                  <Card className="bg-slate-950 border-slate-900 rounded-2xl p-6 space-y-6 flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Starter Pack</h4>
+                        <div className="text-3xl font-black text-white mt-1">€19.99</div>
+                      </div>
+                      <div className="text-emerald-400 font-extrabold text-sm">20 FitTokens</div>
+                      <p className="text-xs text-slate-500 font-medium">Ottimo per iniziare ed effettuare i primi due allenamenti.</p>
+                    </div>
+                    <Button className="w-full bg-[#0A0A0A] hover:bg-slate-900 text-white font-bold text-xs rounded-xl py-3 border border-slate-900">
+                      Acquista
+                    </Button>
+                  </Card>
+
+                  {/* Pro Plan */}
+                  <Card className="bg-slate-950 border-emerald-600/30 rounded-2xl p-6 space-y-6 flex flex-col justify-between relative">
+                    <div className="absolute top-0 right-6 transform -translate-y-1/2 bg-emerald-600 text-white text-[9px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full">
+                      POPOLARE
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Pro Pack</h4>
+                        <div className="text-3xl font-black text-white mt-1">€49.99</div>
+                      </div>
+                      <div className="text-emerald-400 font-extrabold text-sm">55 FitTokens</div>
+                      <p className="text-xs text-slate-500 font-medium">Ideale per atleti costanti. Include 5 crediti bonus in regalo.</p>
+                    </div>
+                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl py-3 shadow shadow-emerald-500/10">
+                      Acquista
+                    </Button>
+                  </Card>
+
+                  {/* Ultra Plan */}
+                  <Card className="bg-slate-950 border-slate-900 rounded-2xl p-6 space-y-6 flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Athlete Pack</h4>
+                        <div className="text-3xl font-black text-white mt-1">€99.99</div>
+                      </div>
+                      <div className="text-emerald-400 font-extrabold text-sm">115 FitTokens</div>
+                      <p className="text-xs text-slate-500 font-medium">Per chi si allena intensamente. Risparmio massimo con 15 crediti bonus.</p>
+                    </div>
+                    <Button className="w-full bg-[#0A0A0A] hover:bg-slate-900 text-white font-bold text-xs rounded-xl py-3 border border-slate-900">
+                      Acquista
+                    </Button>
+                  </Card>
+
+                </div>
+              </div>
+            )}
+
+            {/* 8. FAQ TAB */}
+            {activeTab === 'faq' && (
+              <div className="space-y-8 bg-[#0A0A0A] border border-slate-900 rounded-3xl p-8">
+                <div>
+                  <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">
+                    DOMANDE FREQUENTI
+                  </span>
+                  <h2 className="text-3xl font-extrabold text-white tracking-tight mt-2">
+                    Chiarisci ogni dubbio
+                  </h2>
+                </div>
+
+                <div className="space-y-4">
+                  {[
+                    {
+                      q: "Come funziona il sistema di Matchmaking AI?",
+                      a: "Il nostro algoritmo incrocia la tua posizione geografica con le tue preferenze orarie, gli obiettivi fisici e la tariffa oraria desiderata, fornendoti una percentuale di compatibilità dettagliata."
+                    },
+                    {
+                      q: "Cosa sono i FitTokens?",
+                      a: "I FitTokens sono la moneta virtuale della piattaforma. Consentono di pagare gli allenamenti a consumo senza dover sottoscrivere abbonamenti o contratti fisici con le singole palestre."
+                    },
+                    {
+                      q: "Sono un gestore di una palestra, quanto mi costa aderire?",
+                      a: "L'adesione a Gym-Connect.ai è totalmente gratuita. Guadagni una percentuale su ogni ora di utilizzo delle sale o attrezzature da parte di atleti esterni convenzionati."
                     }
+                  ].map((faq, index) => (
+                    <div 
+                      key={index} 
+                      className="bg-slate-950 border border-slate-900 rounded-2xl overflow-hidden transition-all"
+                    >
+                      <button
+                        onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                        className="w-full p-5 text-left font-bold text-sm text-white flex justify-between items-center"
+                      >
+                        <span>{faq.q}</span>
+                        {openFaq === index ? <ChevronUp className="w-4 h-4 text-emerald-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
+                      </button>
+                      {openFaq === index && (
+                        <div className="px-5 pb-5 text-xs text-slate-400 leading-relaxed font-semibold">
+                          {faq.a}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 9. CONTACT TAB */}
+            {activeTab === 'contact' && (
+              <div className="space-y-8 bg-[#0A0A0A] border border-slate-900 rounded-3xl p-8">
+                <div>
+                  <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">
+                    METTITI IN CONTATTO
+                  </span>
+                  <h2 className="text-3xl font-extrabold text-white tracking-tight mt-2">
+                    Scrivi al nostro team
+                  </h2>
+                  <p className="text-xs text-slate-500 font-semibold mt-1">
+                    Siamo a tua disposizione per supporto, partnership commerciali o investimenti.
                   </p>
                 </div>
-              </ScrollReveal>
-              
-              <ScrollReveal animation="fade-left">
-                <span className="text-emerald-600 font-extrabold tracking-widest text-xs uppercase bg-emerald-50 px-3 py-1.5 rounded-md border border-emerald-100">
-                  {t('section.gym.title')}
-                </span>
-                <h2 className="text-4xl md:text-5xl font-black text-slate-900 mt-5 mb-6 tracking-tight leading-tight">
-                  {t('section.gym.heading')}
-                </h2>
-                <p className="text-lg text-slate-600 mb-8 leading-relaxed font-medium">
-                  {t('section.gym.desc')}
-                </p>
-                <div className="mb-10">
-                  <div className="text-5xl font-black text-slate-900 mb-2">{t('section.gym.stat.val')}</div>
-                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('section.gym.stat.label')}</div>
-                </div>
-                <Button
-                  size="lg"
-                  className="bg-emerald-650 hover:bg-emerald-700 text-white rounded-2xl px-8 py-6 font-bold shadow-xl shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all hover:-translate-y-0.5 active:scale-95 flex items-center gap-2"
-                  onClick={() => navigate('/register?role=gym')}
-                >
-                  <span>{t('section.gym.cta')}</span>
-                  <ArrowRight className="w-5 h-5" />
-                </Button>
-              </ScrollReveal>
-            </div>
-          </section>
 
-          {/* 4. SPONSOR SECTION */}
-          <section id="sponsors" className="py-24 bg-slate-950 text-white relative overflow-hidden border-b border-slate-900">
-            <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/10 to-slate-950/50 mix-blend-multiply z-0"></div>
-            <div className="container mx-auto px-4 text-center relative z-10 max-w-4xl">
-              <ScrollReveal animation="scale-in">
-                <span className="inline-block py-1 px-3.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-450 text-xs font-extrabold tracking-widest uppercase mb-6">
-                  {t('section.sponsor.title')}
-                </span>
-                <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight leading-tight">{t('section.sponsor.heading')}</h2>
-                <p className="text-lg md:text-xl text-slate-350 max-w-2xl mx-auto mb-12 leading-relaxed font-medium">
-                  {t('section.sponsor.desc')}
-                </p>
-
-                <div className="max-w-md mx-auto bg-slate-900/90 backdrop-blur-md p-6 rounded-3xl border border-slate-800 mb-12 shadow-2xl">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center font-black text-slate-950 text-sm">Ad</div>
-                    <div className="text-left">
-                      <div className="font-extrabold text-white text-sm">{t('section.sponsor.mock.title')}</div>
-                      <div className="text-[10px] text-slate-450 font-bold uppercase tracking-wider">{t('section.sponsor.mock.label')}</div>
+                <form onSubmit={(e) => { e.preventDefault(); alert('Messaggio inviato con successo!'); }} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold text-slate-450 uppercase tracking-wider">Nome Completo</Label>
+                      <Input 
+                        placeholder="Inserisci il tuo nome" 
+                        required 
+                        className="bg-slate-950 border-slate-900 focus:border-emerald-600 focus:ring-emerald-600 rounded-xl"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold text-slate-450 uppercase tracking-wider">Indirizzo Email</Label>
+                      <Input 
+                        type="email" 
+                        placeholder="Inserisci la tua email" 
+                        required 
+                        className="bg-slate-950 border-slate-900 focus:border-emerald-600 focus:ring-emerald-600 rounded-xl"
+                      />
                     </div>
                   </div>
-                  <div className="h-28 bg-slate-950 rounded-xl mb-4 flex items-center justify-center text-slate-400 border border-slate-800 text-xs font-bold uppercase tracking-wider bg-gradient-to-br from-slate-900/30 to-slate-950">
-                    {t('section.sponsor.mock.ad')}
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold text-slate-450 uppercase tracking-wider">Messaggio o Domanda</Label>
+                    <textarea 
+                      rows={5} 
+                      placeholder="Scrivi qui il tuo messaggio..." 
+                      required 
+                      className="w-full bg-slate-950 border border-slate-900 focus:border-emerald-600 focus:ring-emerald-600 rounded-xl py-3 px-4 text-sm focus:outline-none"
+                    />
                   </div>
-                  <p className="text-xs text-slate-300 text-left italic font-medium">
-                    {t('section.sponsor.mock.desc')}
-                  </p>
-                </div>
-
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-slate-700 text-white hover:bg-slate-900 hover:border-emerald-500/40 rounded-2xl px-8 py-6 font-bold transition-all hover:-translate-y-0.5 active:scale-95"
-                  onClick={() => navigate('/contact')}
-                >
-                  {t('section.sponsor.cta')}
-                </Button>
-              </ScrollReveal>
-            </div>
-          </section>
-
-          {/* UNIFIED FINAL CTA */}
-          <section className="py-32 bg-slate-50 text-center border-t border-slate-200/60">
-            <div className="container mx-auto px-4 max-w-4xl">
-              <ScrollReveal>
-                <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-8 tracking-tight leading-tight">
-                  {t('section.final.title')}
-                </h2>
-                <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-                  <Button
-                    className="h-16 px-10 rounded-2xl bg-slate-950 text-white hover:bg-slate-900 text-lg font-bold shadow-xl hover:shadow-2xl transition-all flex items-center gap-3 group active:scale-95 border border-slate-800"
-                    onClick={startTour}
+                  <Button 
+                    type="submit"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl px-6 py-3.5 shadow active:scale-95 transition-all text-xs"
                   >
-                    <Play className="w-5 h-5 fill-current text-emerald-500 group-hover:scale-110 transition-transform" />
-                    <span>{t('section.final.cta')}</span>
+                    Invia Messaggio
                   </Button>
-                </div>
-                <p className="mt-8 text-xs font-semibold text-slate-500 tracking-wide uppercase">
-                  {t('section.final.welfare_prefix')} <a href="#" className="underline hover:text-slate-800">{t('section.final.welfare')}</a>
-                </p>
-              </ScrollReveal>
-            </div>
-          </section>
+                </form>
+              </div>
+            )}
+
+          </main>
+
         </div>
+
       </div>
     </Layout>
   );
