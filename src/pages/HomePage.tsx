@@ -40,10 +40,10 @@ const HomePage = () => {
     const driverObj = driver({
       showProgress: true,
       steps: [
-        { popover: { title: `Benvenuto in ${brandNameFull}`, description: `Esplora le sezioni interattive per comprendere il valore di ${brandNameFull}.` } },
-        { element: '#tab-btn-home', popover: { title: 'Home', description: 'La nostra proposta di valore in meno di 10 secondi.' } },
-        { element: '#tab-btn-ai-coach', popover: { title: 'AI Matchmaker', description: 'Prova il simulatore di accoppiamento intelligente in tempo reale.' } },
-        { element: '#tab-btn-dashboard', popover: { title: 'Anteprima Dashboard', description: 'Osserva come si presenta il cruscotto di controllo per gli utenti attivi.' } }
+        { popover: { title: `Benvenuto in ${brandNameFull}`, description: isEn ? `Explore the interactive sections to understand the value of ${brandNameFull}.` : `Esplora le sezioni interattive per comprendere il valore di ${brandNameFull}.` } },
+        { element: '#tab-btn-home', popover: { title: 'Home', description: isEn ? 'Our value proposition in less than 10 seconds.' : 'La nostra proposta di valore in meno di 10 secondi.' } },
+        { element: '#tab-btn-ai-coach', popover: { title: 'AI Matchmaker', description: isEn ? 'Try the intelligent matchmaking simulator in real time.' : 'Prova il simulatore di accoppiamento intelligente in tempo reale.' } },
+        { element: '#tab-btn-dashboard', popover: { title: isEn ? 'Dashboard Preview' : 'Anteprima Dashboard', description: isEn ? 'See how the operations dashboard looks for active users.' : 'Osserva come si presenta il cruscotto di controllo per gli utenti attivi.' } }
       ]
     });
     driverObj.drive();
@@ -54,50 +54,50 @@ const HomePage = () => {
     {
       id: 'trainer-1',
       name: 'Marco Bianchi',
-      role: 'Trainer Pro',
+      role: isEn ? 'Pro Trainer' : 'Trainer Pro',
       city: 'Roma',
       goal: 'strength',
       score: 98,
       rate: 35,
       exp: 6,
       avatar: 'MB',
-      spec: ['Powerlifting', 'Massa Muscolare', 'Forza Max']
+      spec: isEn ? ['Powerlifting', 'Muscle Mass', 'Max Strength'] : ['Powerlifting', 'Massa Muscolare', 'Forza Max']
     },
     {
       id: 'trainer-2',
       name: 'Chiara Rossi',
-      role: 'Trainer Pro',
+      role: isEn ? 'Pro Trainer' : 'Trainer Pro',
       city: 'Milano',
       goal: 'weightloss',
       score: 94,
       rate: 40,
       exp: 4,
       avatar: 'CR',
-      spec: ['Perdita Peso', 'Cardio Fitness', 'Tono Muscolare']
+      spec: isEn ? ['Weight Loss', 'Cardio Fitness', 'Muscle Tone'] : ['Perdita Peso', 'Cardio Fitness', 'Tono Muscolare']
     },
     {
       id: 'gym-1',
       name: 'Olympus Gym',
-      role: 'Centro Convenzionato',
+      role: isEn ? 'Partner Gym' : 'Centro Convenzionato',
       city: 'Roma',
       goal: 'strength',
       score: 92,
       rate: 65,
       exp: 10,
       avatar: 'OG',
-      spec: ['Sale Attrezzate', 'Crossfit Area', 'Sauna']
+      spec: isEn ? ['Fully Equipped', 'Crossfit Area', 'Sauna'] : ['Sale Attrezzate', 'Crossfit Area', 'Sauna']
     },
     {
       id: 'gym-2',
       name: 'FitLife Center',
-      role: 'Centro Convenzionato',
+      role: isEn ? 'Partner Gym' : 'Centro Convenzionato',
       city: 'Salerno',
       goal: 'flexibility',
       score: 95,
       rate: 50,
       exp: 8,
       avatar: 'FL',
-      spec: ['Yoga Room', 'Calisthenics', 'Piscina']
+      spec: isEn ? ['Yoga Room', 'Calisthenics', 'Pool'] : ['Yoga Room', 'Calisthenics', 'Piscina']
     }
   ];
 
@@ -106,17 +106,17 @@ const HomePage = () => {
     (item) => item.city === simCity || item.goal === simGoal
   ).sort((a, b) => b.score - a.score);
 
-  // Tab definitions
+  // Tab definitions (localized)
   const tabs = [
     { id: 'home', label: 'Home', icon: Dumbbell },
     { id: 'ai-coach', label: 'AI Coach', icon: Target },
-    { id: 'athletes', label: 'Atleti', icon: Award },
-    { id: 'trainers', label: 'Personal Trainer', icon: Users },
-    { id: 'gyms', label: 'Centri Fitness', icon: Building2 },
+    { id: 'athletes', label: isEn ? 'Athletes' : 'Atleti', icon: Award },
+    { id: 'trainers', label: isEn ? 'Personal Trainers' : 'Personal Trainer', icon: Users },
+    { id: 'gyms', label: isEn ? 'Fitness Centers' : 'Centri Fitness', icon: Building2 },
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'pricing', label: 'Pricing', icon: DollarSign },
     { id: 'faq', label: 'FAQ', icon: HelpCircle },
-    { id: 'contact', label: 'Contatti', icon: Phone }
+    { id: 'contact', label: isEn ? 'Contact' : 'Contatti', icon: Phone }
   ];
 
   return (
@@ -165,7 +165,7 @@ const HomePage = () => {
                   
                   <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-950/60 border border-emerald-900/60 text-emerald-450 text-xs font-black tracking-widest uppercase mb-4 shadow-inner">
                     <Sparkles className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '6s' }} />
-                    <span>L'ecosistema del fitness on-demand</span>
+                    <span>{isEn ? "The On-Demand Fitness Ecosystem" : "L'ecosistema del fitness on-demand"}</span>
                   </div>
 
                   <h1 className="text-4xl md:text-8xl font-black text-white leading-none tracking-tight">
@@ -181,8 +181,10 @@ const HomePage = () => {
                   </h1>
 
                   <p className="text-lg md:text-2xl text-slate-355 max-w-4xl mx-auto font-medium leading-relaxed">
-                    Il punto d'incontro intelligente per <span className="text-white font-bold">Atleti</span>, <span className="text-white font-bold">Personal Trainer</span> e <span className="text-white font-bold">Centri Fitness</span>. 
-                    Prenota allenamenti on-demand, gestisci clienti da un CRM avanzato e monetizza gli spazi vuoti delle palestre.
+                    {isEn 
+                      ? `The intelligent meeting point for Athletes, Personal Trainers, and Fitness Centers. Book workouts on-demand, manage clients with an advanced CRM, and monetize unused gym space.`
+                      : `Il punto d'incontro intelligente per Atleti, Personal Trainer e Centri Fitness. Prenota allenamenti on-demand, gestisci clienti da un CRM avanzato e monetizza gli spazi vuoti delle palestre.`
+                    }
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -191,7 +193,7 @@ const HomePage = () => {
                       onClick={() => setActiveTab('ai-coach')}
                       className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-violet-650 hover:from-emerald-500 hover:to-violet-550 text-white font-extrabold text-base rounded-2xl px-8 py-7 shadow-lg shadow-violet-500/10 active:scale-[0.98] border border-violet-500/35 transition-all flex items-center gap-2 animate-glow-violet"
                     >
-                      <span>Prova l'AI Matchmaker</span>
+                      <span>{isEn ? "Try AI Matchmaker" : "Prova l'AI Matchmaker"}</span>
                       <ArrowRight className="w-5 h-5" />
                     </Button>
                     <Button 
@@ -201,7 +203,7 @@ const HomePage = () => {
                       className="border border-slate-800 text-white bg-slate-900/80 hover:bg-slate-850 rounded-2xl px-8 py-7 text-base font-extrabold transition-all shadow-lg hover:border-violet-500/40"
                     >
                       <Play className="w-4 h-4 fill-white mr-2" />
-                      <span>Guarda come funziona</span>
+                      <span>{isEn ? "See How It Works" : "Guarda come funziona"}</span>
                     </Button>
                   </div>
                 </div>
@@ -216,22 +218,36 @@ const HomePage = () => {
                         <Award className="w-6 h-6" />
                       </div>
                       <div className="space-y-2">
-                        <h3 className="text-xl font-extrabold text-white tracking-tight">Atleti / Utenti</h3>
+                        <h3 className="text-xl font-extrabold text-white tracking-tight">
+                          {isEn ? "Athletes / Users" : "Atleti / Utenti"}
+                        </h3>
                         <p className="text-slate-400 text-xs font-semibold leading-relaxed">
-                          La massima libertà di allenarsi dove e quando vuoi, senza vincoli.
+                          {isEn 
+                            ? "Complete freedom to train where and when you want, subscription-free."
+                            : "La massima libertà di allenarsi dove e quando vuoi, senza vincoli."
+                          }
                         </p>
                       </div>
                       <ul className="space-y-3 font-semibold text-xs text-slate-300">
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Match istantaneo con il coach ideale</li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Prenotazione a consumo</li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Accesso a strutture convenzionate</li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> 
+                          <span>{isEn ? "Instant match with the ideal coach" : "Match istantaneo con il coach ideale"}</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> 
+                          <span>{isEn ? "Pay-as-you-go sessions" : "Prenotazione a consumo"}</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> 
+                          <span>{isEn ? "Access to partner fitness facilities" : "Accesso a strutture convenzionate"}</span>
+                        </li>
                       </ul>
                     </div>
                     <Button 
                       onClick={() => setActiveTab('athletes')}
-                      className="w-full bg-slate-900 hover:bg-slate-850 text-white font-extrabold text-xs rounded-xl py-3 mt-8 active:scale-98 transition-all"
+                      className="w-full bg-slate-900 hover:bg-slate-855 text-white font-extrabold text-xs rounded-xl py-3 mt-8 active:scale-98 transition-all"
                     >
-                      Maggiori Info
+                      {isEn ? "More Details" : "Maggiori Info"}
                     </Button>
                   </Card>
 
@@ -244,20 +260,32 @@ const HomePage = () => {
                       <div className="space-y-2">
                         <h3 className="text-xl font-extrabold text-white tracking-tight">Personal Trainer</h3>
                         <p className="text-slate-400 text-xs font-semibold leading-relaxed">
-                          Acquisisci clienti in target e ottimizza l'agenda oraria.
+                          {isEn 
+                            ? "Acquire target clients and optimize your hourly schedule."
+                            : "Acquisisci clienti in target e ottimizza l'agenda oraria."
+                          }
                         </p>
                       </div>
                       <ul className="space-y-3 font-semibold text-xs text-slate-300">
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Ricevi prenotazioni in zona</li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Riempi le ore vuote</li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> CRM integrato per allenamenti</li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> 
+                          <span>{isEn ? "Receive bookings in your area" : "Ricevi prenotazioni in zona"}</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> 
+                          <span>{isEn ? "Fill empty daily slots" : "Riempi le ore vuote"}</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> 
+                          <span>{isEn ? "Integrated CRM dashboard" : "CRM integrato per allenamenti"}</span>
+                        </li>
                       </ul>
                     </div>
                     <Button 
                       onClick={() => setActiveTab('trainers')}
-                      className="w-full bg-slate-900 hover:bg-slate-850 text-white font-extrabold text-xs rounded-xl py-3 mt-8 active:scale-98 transition-all"
+                      className="w-full bg-slate-900 hover:bg-slate-855 text-white font-extrabold text-xs rounded-xl py-3 mt-8 active:scale-98 transition-all"
                     >
-                      Maggiori Info
+                      {isEn ? "More Details" : "Maggiori Info"}
                     </Button>
                   </Card>
 
@@ -268,22 +296,36 @@ const HomePage = () => {
                         <Building2 className="w-6 h-6" />
                       </div>
                       <div className="space-y-2">
-                        <h3 className="text-xl font-extrabold text-white tracking-tight">Centri Fitness</h3>
+                        <h3 className="text-xl font-extrabold text-white tracking-tight">
+                          {isEn ? "Fitness Centers" : "Centri Fitness"}
+                        </h3>
                         <p className="text-slate-400 text-xs font-semibold leading-relaxed">
-                          Monetizza ingressi e attrezzature inutilizzate nelle ore morte.
+                          {isEn 
+                            ? "Monetize facilities and machinery during off-peak hours."
+                            : "Monetizza ingressi e attrezzature inutilizzate nelle ore morte."
+                          }
                         </p>
                       </div>
                       <ul className="space-y-3 font-semibold text-xs text-slate-300">
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Monetizza ore a bassa affluenza</li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Ingressi extra certificati</li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Zero costi fissi di gestione</li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> 
+                          <span>{isEn ? "Monetize low-occupancy hours" : "Monetizza ore a bassa affluenza"}</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> 
+                          <span>{isEn ? "Earn from certified guests" : "Ingressi extra certificati"}</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> 
+                          <span>{isEn ? "Zero fixed costs or overheads" : "Zero costi fissi di gestione"}</span>
+                        </li>
                       </ul>
                     </div>
                     <Button 
                       onClick={() => setActiveTab('gyms')}
-                      className="w-full bg-slate-900 hover:bg-slate-850 text-white font-extrabold text-xs rounded-xl py-3 mt-8 active:scale-98 transition-all"
+                      className="w-full bg-slate-900 hover:bg-slate-855 text-white font-extrabold text-xs rounded-xl py-3 mt-8 active:scale-98 transition-all"
                     >
-                      Maggiori Info
+                      {isEn ? "More Details" : "Maggiori Info"}
                     </Button>
                   </Card>
 
@@ -297,33 +339,40 @@ const HomePage = () => {
                 <div className="bg-[#0A0A0A] border border-slate-900 rounded-3xl p-8 space-y-6">
                   <div>
                     <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">
-                      PREVIEW LIVE INTERATTIVA
+                      {isEn ? "LIVE INTERACTIVE PREVIEW" : "PREVIEW LIVE INTERATTIVA"}
                     </span>
                     <h2 className="text-3xl font-extrabold text-white tracking-tight mt-2">
                       AI Matchmaking Engine
                     </h2>
                     <p className="text-sm text-slate-500 font-medium">
-                      Simula le preferenze dell'atleta e osserva l'ordinamento dinamico basato sul punteggio di compatibilità.
+                      {isEn 
+                        ? "Simulate athlete preferences and observe real-time compatibility ordering." 
+                        : "Simula le preferenze dell'atleta e osserva l'ordinamento dinamico basato sul punteggio di compatibilità."
+                      }
                     </p>
                   </div>
 
                   {/* Simulator Controls */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-950 p-6 rounded-2xl border border-slate-900">
                     <div className="space-y-2">
-                      <Label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Obiettivo Fitness</Label>
+                      <Label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                        {isEn ? "Fitness Goal" : "Obiettivo Fitness"}
+                      </Label>
                       <select 
                         value={simGoal} 
                         onChange={(e) => setSimGoal(e.target.value)}
                         className="w-full bg-[#0A0A0A] border border-slate-900 rounded-xl py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 font-bold"
                       >
-                        <option value="strength">Aumento Forza / Massa</option>
-                        <option value="weightloss">Perdita Peso / Cardio</option>
-                        <option value="flexibility">Yoga / Flessibilità</option>
+                        <option value="strength">{isEn ? "Strength / Muscle Bulk" : "Aumento Forza / Massa"}</option>
+                        <option value="weightloss">{isEn ? "Weight Loss / Cardio" : "Perdita Peso / Cardio"}</option>
+                        <option value="flexibility">{isEn ? "Yoga / Flexibility" : "Yoga / Flessibilità"}</option>
                       </select>
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Posizione / Città</Label>
+                      <Label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                        {isEn ? "Location / City" : "Posizione / Città"}
+                      </Label>
                       <select 
                         value={simCity} 
                         onChange={(e) => setSimCity(e.target.value)}
@@ -348,7 +397,7 @@ const HomePage = () => {
                           className="bg-slate-950 border border-slate-900 rounded-2xl p-5 hover:border-emerald-500/30 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-4"
                         >
                           <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-emerald-950/60 border border-emerald-900 text-emerald-450 font-black rounded-xl flex items-center justify-center text-sm">
+                            <div className="w-12 h-12 bg-emerald-950/60 border border-emerald-900 text-emerald-455 font-black rounded-xl flex items-center justify-center text-sm">
                               {item.avatar}
                             </div>
                             <div>
@@ -366,8 +415,10 @@ const HomePage = () => {
 
                           <div className="flex items-center gap-6">
                             <div className="text-right">
-                              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tariffa</div>
-                              <div className="text-sm font-extrabold text-white">€{item.rate}/{item.id.includes('gym') ? 'mese' : 'ora'}</div>
+                              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                {isEn ? "Rate" : "Tariffa"}
+                              </div>
+                              <div className="text-sm font-extrabold text-white">€{item.rate}/{item.id.includes('gym') ? (isEn ? 'mo' : 'mese') : (isEn ? 'hr' : 'ora')}</div>
                             </div>
 
                             {/* Circular gauge */}
@@ -399,7 +450,7 @@ const HomePage = () => {
                       onClick={() => navigate('/search')}
                       className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl px-6 py-2 shadow active:scale-95 transition-all text-xs"
                     >
-                      Apri Ricerca Completa
+                      {isEn ? "Open Full Search" : "Apri Ricerca Completa"}
                     </Button>
                   </div>
                 </div>
@@ -411,25 +462,30 @@ const HomePage = () => {
               <div className="space-y-8 bg-[#0A0A0A] border border-slate-900 rounded-3xl p-8">
                 <div>
                   <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">
-                    ATLETI & SPORTIVI
+                    {isEn ? "ATHLETES & SPORTS ENTHUSIASTS" : "ATLETI & SPORTIVI"}
                   </span>
                   <h2 className="text-3xl font-extrabold text-white tracking-tight mt-2">
-                    L'esperienza fitness su misura per te
+                    {isEn ? "Tailored fitness experience" : "L'esperienza fitness su misura per te"}
                   </h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4 font-semibold text-slate-300 text-sm">
                     <p className="leading-relaxed">
-                      Con {brandNameFull} dimentichi abbonamenti bloccanti, contratti lunghi e palestre affollate. Hai a disposizione un intero network di trainer qualificati e strutture in base alle tue esigenze orarie e geografiche.
+                      {isEn 
+                        ? `With ${brandNameFull} you forget locked subscriptions, long contracts, and crowded gyms. You have a whole network of qualified trainers and partner facilities at your disposal according to your hourly and geographic needs.`
+                        : `Con ${brandNameFull} dimentichi abbonamenti bloccanti, contratti lunghi e palestre affollate. Hai a disposizione un intero network di trainer qualificati e strutture in base alle tue esigenze orarie e geografiche.`
+                      }
                     </p>
                     <div className="flex items-start gap-3 pt-2">
                       <div className="p-1 bg-emerald-950/60 rounded-full border border-emerald-900 text-emerald-400 mt-0.5">
                         <Check className="w-4 h-4 stroke-[3]" />
                       </div>
                       <div>
-                        <h4 className="text-white font-bold">Filtri Intelligenti</h4>
-                        <p className="text-xs text-slate-500">Cerca per area, fascia prezzo, disponibilità e recensioni certificate.</p>
+                        <h4 className="text-white font-bold">{isEn ? "Smart Filters" : "Filtri Intelligenti"}</h4>
+                        <p className="text-xs text-slate-500">
+                          {isEn ? "Search by area, budget range, availability and certified reviews." : "Cerca per area, fascia prezzo, disponibilità e recensioni certificate."}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -437,19 +493,23 @@ const HomePage = () => {
                         <Check className="w-4 h-4 stroke-[3]" />
                       </div>
                       <div>
-                        <h4 className="text-white font-bold">Portafoglio Digitale Unico</h4>
-                        <p className="text-xs text-slate-500">Paga a consumo tramite i crediti digitali della piattaforma (Tokens).</p>
+                        <h4 className="text-white font-bold">{isEn ? "Single Digital Wallet" : "Portafoglio Digitale Unico"}</h4>
+                        <p className="text-xs text-slate-500">
+                          {isEn ? "Pay per session via the platform's digital credits (Tokens)." : "Paga a consumo tramite i crediti digitali della piattaforma (Tokens)."}
+                        </p>
                       </div>
                     </div>
                   </div>
 
                   <div className="bg-slate-950 p-6 rounded-2xl border border-slate-900 flex flex-col justify-center space-y-4">
-                    <h3 className="text-lg font-bold text-white text-center">Registrati subito e inizia ad allenarti</h3>
+                    <h3 className="text-lg font-bold text-white text-center">
+                      {isEn ? "Register now and start training" : "Registrati subito e inizia ad allenarti"}
+                    </h3>
                     <Button 
                       onClick={() => navigate('/register?role=user')}
                       className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl py-3.5 shadow active:scale-95 transition-all text-sm"
                     >
-                      Crea Account Atleta
+                      {isEn ? "Create Athlete Account" : "Crea Account Atleta"}
                     </Button>
                   </div>
                 </div>
@@ -465,26 +525,38 @@ const HomePage = () => {
                       PERSONAL TRAINER & COACHES
                     </span>
                     <h2 className="text-3xl font-extrabold text-white tracking-tight mt-2">
-                      Fai decollare la tua attività di coaching
+                      {isEn ? "Grow your coaching business" : "Fai decollare la tua attività di coaching"}
                     </h2>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
                     <div className="md:col-span-7 space-y-4 text-slate-355 text-sm font-semibold">
                       <p className="leading-relaxed">
-                        Trova nuovi atleti in target, gestisci gli appuntamenti e monitora i pagamenti da un cruscotto CRM avanzato e integrato. Non avrai più ore vuote nella tua agenda quotidiana.
+                        {isEn 
+                          ? "Find new target athletes, manage appointments and track payments from an advanced integrated CRM dashboard. No more empty slots in your daily schedule."
+                          : "Trova nuovi atleti in target, gestisci gli appuntamenti e monitora i pagamenti da un cruscotto CRM avanzato e integrato. Non avrai più ore vuote nella tua agenda quotidiana."
+                        }
                       </p>
                       <ul className="space-y-3 text-slate-300">
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Match automatico con clienti vicini a te</li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Gestione schede e cronologia allenamenti</li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Pagamenti istantanei protetti</li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> 
+                          <span>{isEn ? "Automatic matching with clients nearby" : "Match automatico con clienti vicini a te"}</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> 
+                          <span>{isEn ? "Manage workout plans and history" : "Gestione schede e cronologia allenamenti"}</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> 
+                          <span>{isEn ? "Secure and instant payouts" : "Pagamenti istantanei protetti"}</span>
+                        </li>
                       </ul>
                       <div className="pt-4">
                         <Button 
                           onClick={() => navigate('/register?role=instructor')}
                           className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl px-6 py-3 shadow active:scale-95 transition-all text-xs"
                         >
-                          Registrati come Personal Trainer
+                          {isEn ? "Register as Personal Trainer" : "Registrati come Personal Trainer"}
                         </Button>
                       </div>
                     </div>
@@ -501,22 +573,26 @@ const HomePage = () => {
 
                       <div className="grid grid-cols-2 gap-3 text-xs">
                         <div className="bg-[#0A0A0A] p-3 rounded-xl border border-slate-900">
-                          <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Entrate (Mese)</div>
+                          <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                            {isEn ? "Revenue (Mo)" : "Entrate (Mese)"}
+                          </div>
                           <div className="font-extrabold text-white text-base mt-1">€{revenue}</div>
                         </div>
                         <div className="bg-[#0A0A0A] p-3 rounded-xl border border-slate-900">
-                          <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Sessioni</div>
-                          <div className="font-extrabold text-white text-base mt-1">{sessions} fatte</div>
+                          <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                            {isEn ? "Sessions" : "Sessioni"}
+                          </div>
+                          <div className="font-extrabold text-white text-base mt-1">{sessions} {isEn ? "done" : "fatte"}</div>
                         </div>
                       </div>
 
                       <div className="bg-[#0A0A0A] p-3.5 rounded-xl border border-slate-900 flex justify-between items-center text-xs">
                         <div>
                           <div className="font-extrabold text-white">Chiara M.</div>
-                          <div className="text-[10px] text-slate-500 font-semibold">Oggi alle 18:30</div>
+                          <div className="text-[10px] text-slate-500 font-semibold">{isEn ? "Today at 18:30" : "Oggi alle 18:30"}</div>
                         </div>
                         <span className="bg-emerald-950 text-emerald-400 border border-emerald-900/60 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider">
-                          Pronto
+                          {isEn ? "Ready" : "Pronto"}
                         </span>
                       </div>
                     </div>
@@ -530,24 +606,28 @@ const HomePage = () => {
               <div className="space-y-8 bg-[#0A0A0A] border border-slate-900 rounded-3xl p-8">
                 <div>
                   <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">
-                    CENTRI FITNESS & PALESTRE
+                    {isEn ? "FITNESS CENTERS & GYMS" : "CENTRI FITNESS & PALESTRE"}
                   </span>
                   <h2 className="text-3xl font-extrabold text-white tracking-tight mt-2">
-                    Monetizza le tue ore morte
+                    {isEn ? "Monetize your off-peak hours" : "Monetizza le tue ore morte"}
                   </h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                   <div className="bg-slate-950 p-6 rounded-2xl border border-slate-900 space-y-6">
                     <div className="flex justify-between items-center border-b border-slate-900 pb-3 text-xs">
-                      <span className="font-extrabold text-white uppercase tracking-wider">Tasso Occupazione Spazi</span>
-                      <span className="text-emerald-400 bg-emerald-950/60 border border-emerald-900/60 px-2 py-0.5 rounded font-black">+145% Entrate</span>
+                      <span className="font-extrabold text-white uppercase tracking-wider">
+                        {isEn ? "Space Occupancy Rate" : "Tasso Occupazione Spazi"}
+                      </span>
+                      <span className="text-emerald-400 bg-emerald-950/60 border border-emerald-900/60 px-2 py-0.5 rounded font-black">
+                        {isEn ? "+145% Revenue" : "+145% Entrate"}
+                      </span>
                     </div>
 
                     <div className="space-y-3 text-xs font-bold">
                       <div className="space-y-1">
                         <div className="flex justify-between text-slate-400">
-                          <span>Senza {brandNameFull} (Prima)</span>
+                          <span>{isEn ? "Without" : "Senza"} {brandNameFull} ({isEn ? "Before" : "Prima"})</span>
                           <span>35%</span>
                         </div>
                         <div className="h-3 w-full bg-[#0A0A0A] rounded-lg overflow-hidden border border-slate-900">
@@ -557,7 +637,7 @@ const HomePage = () => {
 
                       <div className="space-y-1">
                         <div className="flex justify-between text-white">
-                          <span>Con {brandNameFull}</span>
+                          <span>{isEn ? "With" : "Con"} {brandNameFull}</span>
                           <span className="text-emerald-400">85%</span>
                         </div>
                         <div className="h-3 w-full bg-[#0A0A0A] rounded-lg overflow-hidden border border-slate-900">
@@ -569,19 +649,31 @@ const HomePage = () => {
 
                   <div className="space-y-4 text-slate-300 text-sm font-semibold">
                     <p className="leading-relaxed">
-                      Ospita sessioni esterne di personal trainer accreditati e dei loro atleti nei momenti di bassa affluenza. Sei tu a stabilire tariffe, disponibilità oraria ed accessi tramite il tuo portale dedicato.
+                      {isEn 
+                        ? "Host external sessions of accredited personal trainers and their athletes during low-occupancy times. You set rates, hourly availability, and access parameters through your dedicated partner portal."
+                        : "Ospita sessioni esterne di personal trainer accreditati e dei loro atleti nei momenti di bassa affluenza. Sei tu a stabilire tariffe, disponibilità oraria ed accessi tramite il tuo portale dedicato."
+                      }
                     </p>
                     <ul className="space-y-2 text-xs text-slate-450">
-                      <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Monetizzazione di macchinari fermi</li>
-                      <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Afflusso di potenziali nuovi iscritti</li>
-                      <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> Gestione ingressi automatica via QR Code</li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> 
+                        <span>{isEn ? "Monetization of idle equipment" : "Monetizzazione di macchinari fermi"}</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> 
+                        <span>{isEn ? "Attract new local members" : "Afflusso di potenziali nuovi iscritti"}</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-emerald-500 stroke-[3.5]" /> 
+                        <span>{isEn ? "Automatic entry management via QR Code" : "Gestione ingressi automatica via QR Code"}</span>
+                      </li>
                     </ul>
                     <div className="pt-2">
                       <Button 
                         onClick={() => navigate('/register?role=gym')}
                         className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl px-6 py-3 shadow active:scale-95 transition-all text-xs"
                       >
-                        Registra la tua Palestra
+                        {isEn ? "Register your Gym" : "Registra la tua Palestra"}
                       </Button>
                     </div>
                   </div>
@@ -594,51 +686,61 @@ const HomePage = () => {
               <div className="space-y-8 bg-[#0A0A0A] border border-slate-900 rounded-3xl p-8">
                 <div>
                   <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">
-                    DEMO LIVE DASHBOARD
+                    {isEn ? "LIVE DASHBOARD PREVIEW" : "DEMO LIVE DASHBOARD"}
                   </span>
                   <h2 className="text-3xl font-extrabold text-white tracking-tight mt-2">
-                    Il tuo centro operativo
+                    {isEn ? "Your Operations Hub" : "Il tuo centro operativo"}
                   </h2>
                   <p className="text-xs text-slate-500 font-semibold mt-1">
-                    Visualizza in tempo reale le statistiche degli allenamenti e l'attività economica.
+                    {isEn ? "View workout stats and economic activity in real time." : "Visualizza in tempo reale le statistiche degli allenamenti e l'attività economica."}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-slate-950 p-5 rounded-2xl border border-slate-900 space-y-2">
-                    <div className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">Ore Allenate</div>
+                    <div className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">
+                      {isEn ? "Hours Trained" : "Ore Allenate"}
+                    </div>
                     <div className="text-3xl font-black text-white">124.5 h</div>
-                    <p className="text-[10px] text-emerald-400 font-semibold">+12% questo mese</p>
+                    <p className="text-[10px] text-emerald-400 font-semibold">{isEn ? "+12% this month" : "+12% questo mese"}</p>
                   </div>
                   <div className="bg-slate-950 p-5 rounded-2xl border border-slate-900 space-y-2">
-                    <div className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">Punteggio Feedback</div>
+                    <div className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">
+                      {isEn ? "Feedback Score" : "Punteggio Feedback"}
+                    </div>
                     <div className="text-3xl font-black text-white">4.92 / 5</div>
-                    <p className="text-[10px] text-slate-500 font-semibold">18 recensioni verificate</p>
+                    <p className="text-[10px] text-slate-500 font-semibold">{isEn ? "18 verified reviews" : "18 recensioni verificate"}</p>
                   </div>
                   <div className="bg-slate-950 p-5 rounded-2xl border border-slate-900 space-y-2">
-                    <div className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">Tokens Guadagnati</div>
+                    <div className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">
+                      {isEn ? "Tokens Earned" : "Tokens Guadagnati"}
+                    </div>
                     <div className="text-3xl font-black text-white">480 FC</div>
-                    <p className="text-[10px] text-slate-500 font-semibold">Equivalgono a circa €480</p>
+                    <p className="text-[10px] text-slate-500 font-semibold">{isEn ? "Equivalent to approx. €480" : "Equivalgono a circa €480"}</p>
                   </div>
                 </div>
 
                 {/* Calendar simulation */}
                 <div className="bg-slate-950 p-6 rounded-2xl border border-slate-900 space-y-4">
-                  <h3 className="text-base font-extrabold text-white">Appuntamenti della settimana</h3>
+                  <h3 className="text-base font-extrabold text-white">{isEn ? "Weekly Schedule" : "Appuntamenti della settimana"}</h3>
                   <div className="space-y-3 text-xs">
                     <div className="flex justify-between items-center p-3 bg-[#0A0A0A] rounded-xl border border-slate-900">
                       <div>
-                        <div className="font-bold text-white">Lunedì - 09:00</div>
+                        <div className="font-bold text-white">{isEn ? "Monday - 09:00" : "Lunedì - 09:00"}</div>
                         <div className="text-slate-500">Giuseppe R. • Forza Max</div>
                       </div>
-                      <span className="bg-emerald-950 text-emerald-400 border border-emerald-900/60 px-2 py-1 rounded font-bold uppercase text-[9px]">Completato</span>
+                      <span className="bg-emerald-950 text-emerald-400 border border-emerald-900/60 px-2 py-1 rounded font-bold uppercase text-[9px]">
+                        {isEn ? "Completed" : "Completato"}
+                      </span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-[#0A0A0A] rounded-xl border border-slate-900">
                       <div>
-                        <div className="font-bold text-white">Mercoledì - 18:30</div>
+                        <div className="font-bold text-white">{isEn ? "Wednesday - 18:30" : "Mercoledì - 18:30"}</div>
                         <div className="text-slate-500">Chiara M. • Perdita Peso</div>
                       </div>
-                      <span className="bg-emerald-950 text-emerald-400 border border-emerald-900/60 px-2 py-1 rounded font-bold uppercase text-[9px]">Completato</span>
+                      <span className="bg-emerald-950 text-emerald-400 border border-emerald-900/60 px-2 py-1 rounded font-bold uppercase text-[9px]">
+                        {isEn ? "Completed" : "Completato"}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -650,13 +752,16 @@ const HomePage = () => {
               <div className="space-y-8 bg-[#0A0A0A] border border-slate-900 rounded-3xl p-8">
                 <div className="text-center max-w-xl mx-auto space-y-2">
                   <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">
-                    LISTINO PREZZI
+                    {isEn ? "PRICE LIST" : "LISTINO PREZZI"}
                   </span>
                   <h2 className="text-3xl font-extrabold text-white tracking-tight">
-                    Tariffe trasparenti a consumo
+                    {isEn ? "Transparent pay-as-you-go rates" : "Tariffe trasparenti a consumo"}
                   </h2>
                   <p className="text-xs text-slate-500 font-semibold">
-                    Acquista i pacchetti di crediti (FitFlow Tokens) per allenarti liberamente o ricevere compensi.
+                    {isEn 
+                      ? "Purchase credit packages (FitTokens) to train freely or receive trainer payouts." 
+                      : "Acquista i pacchetti di crediti (FitFlow Tokens) per allenarti liberamente o ricevere compensi."
+                    }
                   </p>
                 </div>
 
@@ -670,17 +775,19 @@ const HomePage = () => {
                         <div className="text-3xl font-black text-white mt-1">€19.99</div>
                       </div>
                       <div className="text-emerald-400 font-extrabold text-sm">20 FitTokens</div>
-                      <p className="text-xs text-slate-500 font-medium">Ottimo per iniziare ed effettuare i primi due allenamenti.</p>
+                      <p className="text-xs text-slate-500 font-medium">
+                        {isEn ? "Great to start and perform your first two sessions." : "Ottimo per iniziare ed effettuare i primi due allenamenti."}
+                      </p>
                     </div>
                     <Button className="w-full bg-[#0A0A0A] hover:bg-slate-900 text-white font-bold text-xs rounded-xl py-3 border border-slate-900">
-                      Acquista
+                      {isEn ? "Buy" : "Acquista"}
                     </Button>
                   </Card>
 
                   {/* Pro Plan */}
                   <Card className="bg-slate-950 border border-violet-500/40 rounded-2xl p-6 space-y-6 flex flex-col justify-between relative animate-glow-violet">
                     <div className="absolute top-0 right-6 transform -translate-y-1/2 bg-gradient-to-r from-emerald-600 to-violet-650 text-white text-[9px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full shadow-md">
-                      POPOLARE
+                      {isEn ? "POPULAR" : "POPOLARE"}
                     </div>
                     <div className="space-y-4">
                       <div>
@@ -688,10 +795,12 @@ const HomePage = () => {
                         <div className="text-3xl font-black text-white mt-1">€49.99</div>
                       </div>
                       <div className="text-emerald-400 font-extrabold text-sm">55 FitTokens</div>
-                      <p className="text-xs text-slate-500 font-medium">Ideale per atleti costanti. Include 5 crediti bonus in regalo.</p>
+                      <p className="text-xs text-slate-500 font-medium">
+                        {isEn ? "Ideal for regular athletes. Includes 5 free bonus credits." : "Ideale per atleti costanti. Include 5 crediti bonus in regalo."}
+                      </p>
                     </div>
-                    <Button className="w-full bg-gradient-to-r from-emerald-600 to-violet-650 hover:from-emerald-500 hover:to-violet-550 text-white font-bold text-xs rounded-xl py-3 shadow shadow-violet-500/10 border-0">
-                      Acquista
+                    <Button className="w-full bg-gradient-to-r from-emerald-600 to-violet-655 hover:from-emerald-500 hover:to-violet-550 text-white font-bold text-xs rounded-xl py-3 shadow shadow-violet-500/10 border-0">
+                      {isEn ? "Buy" : "Acquista"}
                     </Button>
                   </Card>
 
@@ -703,10 +812,12 @@ const HomePage = () => {
                         <div className="text-3xl font-black text-white mt-1">€99.99</div>
                       </div>
                       <div className="text-emerald-400 font-extrabold text-sm">115 FitTokens</div>
-                      <p className="text-xs text-slate-500 font-medium">Per chi si allena intensamente. Risparmio massimo con 15 crediti bonus.</p>
+                      <p className="text-xs text-slate-500 font-medium">
+                        {isEn ? "For intensive training. Maximum savings with 15 free bonus credits." : "Per chi si allena intensamente. Risparmio massimo con 15 crediti bonus."}
+                      </p>
                     </div>
                     <Button className="w-full bg-[#0A0A0A] hover:bg-slate-900 text-white font-bold text-xs rounded-xl py-3 border border-slate-900">
-                      Acquista
+                      {isEn ? "Buy" : "Acquista"}
                     </Button>
                   </Card>
 
@@ -719,26 +830,36 @@ const HomePage = () => {
               <div className="space-y-8 bg-[#0A0A0A] border border-slate-900 rounded-3xl p-8">
                 <div>
                   <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">
-                    DOMANDE FREQUENTI
+                    {isEn ? "FREQUENTLY ASKED QUESTIONS" : "DOMANDE FREQUENTI"}
                   </span>
                   <h2 className="text-3xl font-extrabold text-white tracking-tight mt-2">
-                    Chiarisci ogni dubbio
+                    {isEn ? "Clarify all your doubts" : "Chiarisci ogni dubbio"}
                   </h2>
                 </div>
 
                 <div className="space-y-4">
                   {[
                     {
-                      q: `Come funziona il sistema di Matchmaking AI di ${brandNameFull}?`,
-                      a: "Il nostro algoritmo incrocia la tua posizione geografica con le tue preferenze orarie, gli obiettivi fisici e la tariffa oraria desiderata, fornendoti una percentuale di compatibilità dettagliata."
+                      q: isEn 
+                        ? `How does the AI Matchmaking system of ${brandNameFull} work?`
+                        : `Come funziona il sistema di Matchmaking AI di ${brandNameFull}?`,
+                      a: isEn
+                        ? "Our algorithm crosses your geographic location with your time preferences, physical goals, and desired hourly rate, providing you with a detailed compatibility percentage."
+                        : "Il nostro algoritmo incrocia la tua posizione geografica con le tue preferenze orarie, gli obiettivi fisici e la tariffa oraria desiderata, fornendoti una percentuale di compatibilità dettagliata."
                     },
                     {
-                      q: "Cosa sono i FitTokens?",
-                      a: "I FitTokens sono la moneta virtuale della piattaforma. Consentono di pagare gli allenamenti a consumo senza dover sottoscrivere abbonamenti o contratti fisici con le singole palestre."
+                      q: isEn ? "What are FitTokens?" : "Cosa sono i FitTokens?",
+                      a: isEn
+                        ? "FitTokens are the virtual currency of the platform. They allow you to pay for workouts on-demand without having to subscribe or sign physical contracts with individual gyms."
+                        : "I FitTokens sono la moneta virtuale della piattaforma. Consentono di pagare gli allenamenti a consumo senza dover sottoscrivere abbonamenti o contratti fisici con le singole palestre."
                     },
                     {
-                      q: `Sono un gestore di una palestra, quanto mi costa aderire a ${brandNameFull}?`,
-                      a: `L'adesione a ${brandNameFull} è totalmente gratuita. Guadagni una percentuale su ogni ora di utilizzo delle sale o attrezzature da parte di atleti esterni convenzionati.`
+                      q: isEn
+                        ? `I am a gym owner, how much does it cost to join ${brandNameFull}?`
+                        : `Sono un gestore di una palestra, quanto mi costa aderire a ${brandNameFull}?`,
+                      a: isEn
+                        ? `Joining ${brandNameFull} is completely free. You earn a percentage on every hour of usage of rooms or equipment by external partner athletes.`
+                        : `L'adesione a ${brandNameFull} è totalmente gratuita. Guadagni una percentuale su ogni ora di utilizzo delle sale o attrezzature da parte di atleti esterni convenzionati.`
                     }
                   ].map((faq, index) => (
                     <div 
@@ -768,41 +889,50 @@ const HomePage = () => {
               <div className="space-y-8 bg-[#0A0A0A] border border-slate-900 rounded-3xl p-8">
                 <div>
                   <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest">
-                    METTITI IN CONTATTO
+                    {isEn ? "GET IN TOUCH" : "METTITI IN CONTATTO"}
                   </span>
                   <h2 className="text-3xl font-extrabold text-white tracking-tight mt-2">
-                    Scrivi al nostro team
+                    {isEn ? "Write to our team" : "Scrivi al nostro team"}
                   </h2>
                   <p className="text-xs text-slate-500 font-semibold mt-1">
-                    Siamo a tua disposizione per supporto, partnership commerciali o investimenti.
+                    {isEn 
+                      ? "We are at your disposal for support, commercial partnerships, or investments."
+                      : "Siamo a tua disposizione per supporto, partnership commerciali o investimenti."
+                    }
                   </p>
                 </div>
 
-                <form onSubmit={(e) => { e.preventDefault(); alert('Messaggio inviato con successo!'); }} className="space-y-4">
+                <form onSubmit={(e) => { e.preventDefault(); alert(isEn ? 'Message sent successfully!' : 'Messaggio inviato con successo!'); }} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-xs font-bold text-slate-450 uppercase tracking-wider">Nome Completo</Label>
+                      <Label className="text-xs font-bold text-slate-450 uppercase tracking-wider">
+                        {isEn ? "Full Name" : "Nome Completo"}
+                      </Label>
                       <Input 
-                        placeholder="Inserisci il tuo nome" 
+                        placeholder={isEn ? "Enter your name" : "Inserisci il tuo nome"}
                         required 
                         className="bg-slate-950 border-slate-900 focus:border-emerald-600 focus:ring-emerald-600 rounded-xl"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs font-bold text-slate-450 uppercase tracking-wider">Indirizzo Email</Label>
+                      <Label className="text-xs font-bold text-slate-450 uppercase tracking-wider">
+                        {isEn ? "Email Address" : "Indirizzo Email"}
+                      </Label>
                       <Input 
                         type="email" 
-                        placeholder="Inserisci la tua email" 
+                        placeholder={isEn ? "Enter your email" : "Inserisci la tua email"}
                         required 
                         className="bg-slate-950 border-slate-900 focus:border-emerald-600 focus:ring-emerald-600 rounded-xl"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold text-slate-450 uppercase tracking-wider">Messaggio o Domanda</Label>
+                    <Label className="text-xs font-bold text-slate-455 uppercase tracking-wider">
+                      {isEn ? "Message or Question" : "Messaggio o Domanda"}
+                    </Label>
                     <textarea 
                       rows={5} 
-                      placeholder="Scrivi qui il tuo messaggio..." 
+                      placeholder={isEn ? "Write your message here..." : "Scrivi qui il tuo messaggio..."}
                       required 
                       className="w-full bg-slate-950 border border-slate-900 focus:border-emerald-600 focus:ring-emerald-600 rounded-xl py-3 px-4 text-sm focus:outline-none"
                     />
@@ -811,7 +941,7 @@ const HomePage = () => {
                     type="submit"
                     className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl px-6 py-3.5 shadow active:scale-95 transition-all text-xs"
                   >
-                    Invia Messaggio
+                    {isEn ? "Send Message" : "Invia Messaggio"}
                   </Button>
                 </form>
               </div>
