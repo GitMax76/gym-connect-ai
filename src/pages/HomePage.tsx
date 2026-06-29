@@ -212,7 +212,7 @@ const HomePage = () => {
                   {/* Athletes Card */}
                   <Card className="bg-[#0A0A0A] border-slate-900 rounded-3xl hover:border-emerald-500/30 transition-all duration-300 p-8 flex flex-col justify-between group shadow-xl">
                     <div className="space-y-6">
-                      <div className="w-12 h-12 bg-emerald-950/60 border border-emerald-900/60 rounded-2xl flex items-center justify-center text-emerald-450 group-hover:scale-105 transition-transform">
+                      <div className="w-12 h-12 bg-emerald-950/60 border border-emerald-900/60 rounded-2xl flex items-center justify-center text-white group-hover:scale-105 transition-transform">
                         <Award className="w-6 h-6" />
                       </div>
                       <div className="space-y-2">
@@ -238,7 +238,7 @@ const HomePage = () => {
                   {/* Trainer Card */}
                   <Card className="bg-[#0A0A0A] border-slate-900 rounded-3xl hover:border-emerald-500/30 transition-all duration-300 p-8 flex flex-col justify-between group shadow-xl">
                     <div className="space-y-6">
-                      <div className="w-12 h-12 bg-emerald-950/60 border border-emerald-900/60 rounded-2xl flex items-center justify-center text-emerald-450 group-hover:scale-105 transition-transform">
+                      <div className="w-12 h-12 bg-emerald-950/60 border border-emerald-900/60 rounded-2xl flex items-center justify-center text-white group-hover:scale-105 transition-transform">
                         <Users className="w-6 h-6" />
                       </div>
                       <div className="space-y-2">
@@ -264,7 +264,7 @@ const HomePage = () => {
                   {/* Gyms Card */}
                   <Card className="bg-[#0A0A0A] border-slate-900 rounded-3xl hover:border-emerald-500/30 transition-all duration-300 p-8 flex flex-col justify-between group shadow-xl">
                     <div className="space-y-6">
-                      <div className="w-12 h-12 bg-emerald-950/60 border border-emerald-900/60 rounded-2xl flex items-center justify-center text-emerald-450 group-hover:scale-105 transition-transform">
+                      <div className="w-12 h-12 bg-emerald-950/60 border border-emerald-900/60 rounded-2xl flex items-center justify-center text-white group-hover:scale-105 transition-transform">
                         <Building2 className="w-6 h-6" />
                       </div>
                       <div className="space-y-2">
