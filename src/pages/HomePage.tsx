@@ -183,28 +183,30 @@ const HomePage = () => {
             </div>
           </aside>
 
-          {/* Mobile Top Tabs Scroller Navigation (Visible only on mobile/tablet) */}
-          <div className="lg:hidden col-span-1 border-b border-slate-900 pb-2 select-none overflow-x-auto scrollbar-none flex gap-3.5">
-            {tabs.map((tab) => {
-              const TabIcon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => {
-                    setActiveTab(tab.id);
-                  }}
-                  className={`flex items-center gap-2.5 px-4 py-3 rounded-full text-xs font-extrabold whitespace-nowrap tracking-wider uppercase transition-all duration-200 border ${
-                    activeTab === tab.id
-                      ? 'bg-emerald-600 text-white border-emerald-500 shadow-md shadow-emerald-600/10'
-                      : 'bg-[#0A0A0A] border-slate-900 text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <TabIcon className="w-4 h-4 flex-shrink-0" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
+          {/* Mobile Top Tabs Scroller Navigation (Visible only on mobile/tablet when NOT on home tab) */}
+          {activeTab !== 'home' && (
+            <div className="lg:hidden col-span-1 border-b border-slate-900 pb-2 select-none overflow-x-auto scrollbar-none flex gap-3.5">
+              {tabs.map((tab) => {
+                const TabIcon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveTab(tab.id);
+                    }}
+                    className={`flex items-center gap-2.5 px-4 py-3 rounded-full text-xs font-extrabold whitespace-nowrap tracking-wider uppercase transition-all duration-200 border ${
+                      activeTab === tab.id
+                        ? 'bg-emerald-600 text-white border-emerald-500 shadow-md shadow-emerald-600/10'
+                        : 'bg-[#0A0A0A] border-slate-900 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <TabIcon className="w-4 h-4 flex-shrink-0" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {/* Right Workspace Main Content Area */}
           <main className="lg:col-span-9 space-y-8 animate-fade-in">
@@ -242,14 +244,37 @@ const HomePage = () => {
                     </Button>
                     <Button 
                       size="lg" 
-                      variant="outline"
+                      variant="ghost"
                       onClick={startTour}
-                      className="border-slate-800 text-white hover:bg-slate-900 rounded-2xl px-8 py-7 text-base font-extrabold transition-all"
+                      className="border border-slate-800 text-white bg-slate-950/45 hover:bg-slate-900 rounded-2xl px-8 py-7 text-base font-extrabold transition-all"
                     >
                       <Play className="w-4 h-4 fill-white mr-2" />
                       <span>Guarda come funziona</span>
                     </Button>
                   </div>
+                </div>
+
+                {/* Mobile Tabs Scroller (rendered right below the Hero on the home tab on mobile) */}
+                <div className="lg:hidden border-b border-slate-900 pb-2 select-none overflow-x-auto scrollbar-none flex gap-3.5">
+                  {tabs.map((tab) => {
+                    const TabIcon = tab.icon;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => {
+                          setActiveTab(tab.id);
+                        }}
+                        className={`flex items-center gap-2.5 px-4 py-3 rounded-full text-xs font-extrabold whitespace-nowrap tracking-wider uppercase transition-all duration-200 border ${
+                          activeTab === tab.id
+                            ? 'bg-emerald-600 text-white border-emerald-500 shadow-md shadow-emerald-600/10'
+                            : 'bg-[#0A0A0A] border-slate-900 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <TabIcon className="w-4 h-4 flex-shrink-0" />
+                        <span>{tab.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
 
                 {/* 3-Pillar Value Matrix Grid */}
