@@ -171,16 +171,16 @@ const HomePage = () => {
                   <h1 className="text-4xl md:text-8xl font-black text-white leading-none tracking-tight">
                     {brandNameFull.includes(' ') ? (
                       <>
-                        {brandNameFull.split(' ')[0]}<span className="text-emerald-500"> {brandNameFull.split(' ')[1]}</span>
+                        {brandNameFull.split(' ')[0]}<span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-emerald-400 to-violet-500"> {brandNameFull.split(' ')[1]}</span>
                       </>
                     ) : (
                       <>
-                        {brandNameFull}<span className="text-emerald-500">.ai</span>
+                        {brandNameFull}<span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-emerald-400 to-violet-500">.ai</span>
                       </>
                     )}
                   </h1>
 
-                  <p className="text-lg md:text-2xl text-slate-350 max-w-4xl mx-auto font-medium leading-relaxed">
+                  <p className="text-lg md:text-2xl text-slate-355 max-w-4xl mx-auto font-medium leading-relaxed">
                     Il punto d'incontro intelligente per <span className="text-white font-bold">Atleti</span>, <span className="text-white font-bold">Personal Trainer</span> e <span className="text-white font-bold">Centri Fitness</span>. 
                     Prenota allenamenti on-demand, gestisci clienti da un CRM avanzato e monetizza gli spazi vuoti delle palestre.
                   </p>
@@ -189,7 +189,7 @@ const HomePage = () => {
                     <Button 
                       size="lg" 
                       onClick={() => setActiveTab('ai-coach')}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base rounded-2xl px-8 py-7 shadow-lg shadow-emerald-600/10 hover:shadow-emerald-600/20 active:scale-[0.98] transition-all flex items-center gap-2"
+                      className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-violet-650 hover:from-emerald-500 hover:to-violet-550 text-white font-extrabold text-base rounded-2xl px-8 py-7 shadow-lg shadow-violet-500/10 active:scale-[0.98] border border-violet-500/35 transition-all flex items-center gap-2 animate-glow-violet"
                     >
                       <span>Prova l'AI Matchmaker</span>
                       <ArrowRight className="w-5 h-5" />
@@ -198,7 +198,7 @@ const HomePage = () => {
                       size="lg" 
                       variant="ghost"
                       onClick={startTour}
-                      className="border border-slate-800 text-white bg-slate-900/80 hover:bg-slate-850 rounded-2xl px-8 py-7 text-base font-extrabold transition-all shadow-lg"
+                      className="border border-slate-800 text-white bg-slate-900/80 hover:bg-slate-850 rounded-2xl px-8 py-7 text-base font-extrabold transition-all shadow-lg hover:border-violet-500/40"
                     >
                       <Play className="w-4 h-4 fill-white mr-2" />
                       <span>Guarda come funziona</span>
@@ -678,8 +678,8 @@ const HomePage = () => {
                   </Card>
 
                   {/* Pro Plan */}
-                  <Card className="bg-slate-950 border-emerald-600/30 rounded-2xl p-6 space-y-6 flex flex-col justify-between relative">
-                    <div className="absolute top-0 right-6 transform -translate-y-1/2 bg-emerald-600 text-white text-[9px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full">
+                  <Card className="bg-slate-950 border border-violet-500/40 rounded-2xl p-6 space-y-6 flex flex-col justify-between relative animate-glow-violet">
+                    <div className="absolute top-0 right-6 transform -translate-y-1/2 bg-gradient-to-r from-emerald-600 to-violet-650 text-white text-[9px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full shadow-md">
                       POPOLARE
                     </div>
                     <div className="space-y-4">
@@ -690,7 +690,7 @@ const HomePage = () => {
                       <div className="text-emerald-400 font-extrabold text-sm">55 FitTokens</div>
                       <p className="text-xs text-slate-500 font-medium">Ideale per atleti costanti. Include 5 crediti bonus in regalo.</p>
                     </div>
-                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl py-3 shadow shadow-emerald-500/10">
+                    <Button className="w-full bg-gradient-to-r from-emerald-600 to-violet-650 hover:from-emerald-500 hover:to-violet-550 text-white font-bold text-xs rounded-xl py-3 shadow shadow-violet-500/10 border-0">
                       Acquista
                     </Button>
                   </Card>

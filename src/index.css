@@ -281,3 +281,19 @@
 .card-hover-effect {
   @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-blue-300/50;
 }
+
+/* 5. Violet Neon Glow Animation */
+@keyframes glowViolet {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(168, 85, 247, 0.25), 0 0 12px rgba(168, 85, 247, 0.15);
+    border-color: rgba(168, 85, 247, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(168, 85, 247, 0.65), 0 0 25px rgba(168, 85, 247, 0.35);
+    border-color: rgba(168, 85, 247, 0.9);
+  }
+}
+
+.animate-glow-violet {
+  animation: glowViolet 3.5s infinite ease-in-out;
+}
